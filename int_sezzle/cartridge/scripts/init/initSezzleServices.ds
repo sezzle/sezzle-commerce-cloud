@@ -1,0 +1,45 @@
+/**
+ * This script used for defining and configuring Sezzle services
+ *
+ */
+var service = require('dw/svc'),
+	sezzleUtils = require('int_sezzle/cartridge/scripts/utils/sezzleUtils.ds'),
+	StringUtils = require('dw/util/StringUtils'),
+	getAuthHeader = function(currentSite){
+		var authString = currentSite.getCustomPreferenceValue('SezzlePublicKey')
+			+ ':' + currentSite.getCustomPreferenceValue('SezzlePrivateKey');
+		return 'Basic ' + StringUtils.encodeBase64(authString);
+	},
+	commonCreateRequest = function(svc, args){
+		svc.setRequestMethod('POST');
+		svc.addHeader('Content-Type', 'application/json');
+		svc.addHeader('Authorization', getAuthHeader(require('dw/system/Site').current));
+		if (!empty(args)) {
+			return JSON.stringify(args);
+		}
+	};
+
+service.ServiceRegistry.configure('sezzle.auth', {
+	createRequest: commonCreateRequest,
+	parseResponse: sezzleUtils.responseParser
+});
+
+service.ServiceRegistry.configure('sezzle.void', {
+	createRequest: commonCreateRequest,
+	parseResponse: sezzleUtils.responseParser
+});
+
+service.ServiceRegistry.configure('sezzle.refund', {
+	createRequest: commonCreateRequest,
+	parseResponse: sezzleUtils.responseParser
+});
+
+service.ServiceRegistry.configure('sezzle.capture', {
+	createRequest: commonCreateRequest,
+	parseResponse: sezzleUtils.responseParser
+});
+
+service.ServiceRegistry.configure('sezzle.update', {
+	createRequest: commonCreateRequest,
+	parseResponse: sezzleUtils.responseParser
+});

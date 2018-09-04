@@ -1,0 +1,8 @@
+<!--- TEMPLATENAME: sezzleerrors.isml --->
+<isif condition="${!empty(pdict.SezzleStatus) && pdict.SezzleStatus.error}">
+	<div class="error-form">
+		<isloop items="${pdict.SezzleStatus.items}" var="Status">
+			<isprint value="${Status.getMessage()}" encoding="on" /></br>
+		</isloop>
+	</div>
+</isif>
