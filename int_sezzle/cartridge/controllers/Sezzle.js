@@ -35,24 +35,10 @@ function checkCart(cart) {
 			authResponse: null
 		};
 	}
-	if (sezzle.data.getSezzleVCNStatus() == 'on'){
-		if (basket.totalGrossPrice.value != session.custom.sezzleTotal || basket.giftCertificateTotalPrice.value > 0){
-			return {
-				status:{
-					error: true,
-					PlaceOrderError: new Status(Status.ERROR, 'basket.changed.error')
-				}
-			};
-		} else {
-			return {
-				status:{
-					error: false
-				}
-			};
-		}
-	} else {
-		var token = parametersMap.checkout_token.stringValue;
-		if (empty(token)) {
+
+		var order_reference_id = parametersMap.order_reference_id.stringValue;
+		if (empty(order_reference_id)) {
+			dw.system.Logger.info('Checkout token empty')
 			return {
 				status:{
 					error: true,
@@ -60,29 +46,39 @@ function checkCart(cart) {
 				}
 			};
 		}
-		var sezzleResponse = sezzle.order.authOrder(token);
-		session.custom.sezzleResponseID = sezzleResponse.response.id;
-		session.custom.sezzleFirstEventID = sezzleResponse.response.events[0].id;
-		session.custom.sezzleAmount = sezzleResponse.response.amount;
-		if (empty(sezzleResponse) || sezzleResponse.error){
-			return {
-				status:{
-					error: true,
-					PlaceOrderError: new Status(Status.ERROR, 'confirm.error.technical')
-				}
-			};
-		}
-		var sezzleStatus = sezzle.basket.syncBasket(basket, sezzleResponse.response);
-		if (sezzleStatus.error){
-			sezzle.order.voidOrder(sezzleResponse.response.id);
-		}
+//		var sezzleResponse = sezzle.order.authOrder(token);
+//		session.custom.sezzleResponseID = sezzleResponse.response.id;
+//		session.custom.sezzleFirstEventID = sezzleResponse.response.events[0].id;
+//		session.custom.sezzleAmount = sezzleResponse.response.amount;
+		session.custom.sezzleed = true;
+		session.custom.referenceId = order_reference_id;
+//		if (empty(sezzleResponse) || sezzleResponse.error){
+//			dw.system.Logger.info('Empty Sezzle Response')
+//			return {
+//				status:{
+//					error: true,
+//					PlaceOrderError: new Status(Status.ERROR, 'confirm.error.technical')
+//				}
+//			};
+//		}
+//		var sezzleStatus = sezzle.basket.syncBasket(basket, sezzleResponse.response);
+//		if (sezzleStatus.error){
+//			sezzle.order.voidOrder(sezzleResponse.response.id);
+//		}
+//		dw.system.Logger.info('Something else is wrong')
+//		return {
+//			status:{
+//				error: sezzleStatus.error,
+//				PlaceOrderError: new Status(Status.ERROR, 'basket.changed.error')
+//			}
+//		};
+		
 		return {
 			status:{
-				error: sezzleStatus.error,
+				error: false,
 				PlaceOrderError: new Status(Status.ERROR, 'basket.changed.error')
 			}
 		};
-	}
 }
 
 function postProcess(order){
@@ -105,11 +101,11 @@ function postProcess(order){
 }
 
 function redirect() {
-//	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 	if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD) && sezzle.data.getSezzleVCNStatus() != 'on') {
 		
 		var basket = BasketMgr.getCurrentBasket();
-//		logger.debug('Sezzle Basket Details - {0}', basket);
+		logger.debug('Sezzle Basket Details - {0}', basket);
 		ISML.renderTemplate('sezzle/sezzlecheckout', {
 			Basket : basket
 		});

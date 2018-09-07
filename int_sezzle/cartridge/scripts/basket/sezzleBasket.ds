@@ -110,14 +110,14 @@
 			 		checkForParentCategory(category.category);
 			 		categoryNames.push(arr.reverse());
 			 	}
-				
-				items.push({
-					'display_name' : productLineItem.getProductName(),
-					'sku' : productLineItem.getProductID(),
-					'unit_price' : productLineItem.optionProductLineItem ?
+				var item_price = productLineItem.optionProductLineItem ?
 									productLineItem.getBasePrice().multiply(100).getValue() :
-									productLineItem.product.getPriceModel().getPrice().multiply(100).getValue(),
-					'qty' : productLineItem.getQuantityValue(),
+									productLineItem.product.getPriceModel().getPrice().multiply(100).getValue();
+				items.push({
+					'name' : productLineItem.getProductName(),
+					'sku' : productLineItem.getProductID(),
+					'price' : {'amount_in_cents' : item_price, 'currency' :'USD'},
+					'quantity' : productLineItem.getQuantityValue(),
 					'item_image_url' : !empty(productLineItem.product) ?
 										productLineItem.product.getImage('medium').getHttpURL().toString() :
 										'',
@@ -176,9 +176,11 @@
 		};
 
 		self.getDiscounts = function (basket) {
-			var discount = {};
+			var discount = {
+				
+			};
 
-			return discount;
+			return [];
 		};
 
 		/**
@@ -267,6 +269,16 @@
 				basket.removePaymentInstrument(paymentInstrument);
 			}
 		};
+		
+		self.generateRandomId = function makeid() {
+			  var text = "";
+			  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			
+			  for (var i = 0; i < 5; i++)
+			    text += possible.charAt(Math.floor(Math.random() * possible.length));
+			
+			  return text;
+			}
 
 		/**
 		 * Build object with checkout data
@@ -275,6 +287,8 @@
 		 * @returns {string} checkout data object in JSON format
 		 */
 		self.getCheckout = function (basket) {
+			var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+			logger.debug('basket' + basket);
 			var checkoutObject = {
 				'merchant' : self.getMerchant(),
 				'config' : self.getConfig(),
@@ -283,10 +297,18 @@
 				'shipping': self.getShippingAddress(basket),
 				'discounts' : self.getDiscounts(basket),
 				'metadata' : self.getMetadata(basket),
-				'shipping_amount' : self.getShippingAmmout(basket),
-				'tax_amount' : self.getTaxAmount(basket),
-				'total' : self.getTotal(basket)
+				'shipping_amount' : {'amount_in_cents' : self.getShippingAmmout(basket), 'currency': 'USD'},
+				'tax_amount' : {'amount_in_cents' : self.getTaxAmount(basket), 'currency': 'USD'},
+				'amount_in_cents' : self.getTotal(basket),
+				'currency_code' : "USD",
+				'order_description' : "Commerce cloud order",
+				'order_reference_id' : self.generateRandomId(),
+				'checkout_complete_url' : self.getMerchant().user_confirmation_url ,
+				'checkout_cancel_url' : self.getMerchant().user_cancel_url,
+				'requires_shipping_info' : false,
+				'merchant_completes' : false	
 			};
+			
 			var fpName = self.utils.getFPNameByBasket(basket);
 			if (fpName) {
 				if (fpName == "default"){
@@ -297,7 +319,6 @@
 				}
 			}
 			checkoutObject = JSON.stringify(checkoutObject);
-			var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 			logger.debug('Generating checkout object 2:\n' + checkoutObject);
 			return checkoutObject;
 		};

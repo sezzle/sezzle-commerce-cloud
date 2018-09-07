@@ -24,15 +24,17 @@ function authorize(args){
 	var paymentProcessor = PaymentMgr.getPaymentMethod(paymentInstrument.getPaymentMethod()).getPaymentProcessor();
 	var order = OrderMgr.getOrder(orderNo);
 
-	if (!paymentInstrument.custom.sezzleed && empty(session.custom.sezzleResponseID)){
+	if (!session.custom.sezzleed && empty(session.custom.sezzleResponseID)){
 		return {error: true};
 	}
 
 	Transaction.wrap(function () {
 		paymentInstrument.paymentTransaction.transactionID = orderNo;
 		paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
+		dw.system.Logger.info('Payment Reference Id');
+		dw.system.Logger.info(session.custom.referenceId);
 		var sezzleResponseObject = {
-				'id' : session.custom.sezzleResponseID,
+				'id' : session.custom.referenceId,
 				'events' : [{'id': session.custom.sezzleFirstEventID}],
 				'amount': session.custom.sezzleAmount
 		};

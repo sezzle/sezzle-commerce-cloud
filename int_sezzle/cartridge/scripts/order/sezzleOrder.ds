@@ -56,15 +56,15 @@
 		 * @param {dw.order.PaymentProcessor} PaymentProcessor payment processor instance
 		 * @param {dw.order.PaymentInstrument} PaymentInstrument payment isntrument instance
 		 */
-		this.updateAttributes = function (order, reponse, paymentProcessor, paymentInstrument) {
+		this.updateAttributes = function (order, response, paymentProcessor, paymentInstrument) {
 			
 			try {
-				paymentInstrument.paymentTransaction.transactionID = reponse.events[0].id;
-				paymentInstrument.paymentTransaction.amount = new Money(reponse.amount, order.currencyCode).divide(100);
+				paymentInstrument.paymentTransaction.transactionID = response.events[0].id;
+				paymentInstrument.paymentTransaction.amount = new Money(response.amount, order.currencyCode).divide(100);
 				paymentInstrument.paymentTransaction.setPaymentProcessor(paymentProcessor);
 				
-				order.custom.SezzleToken = reponse.events[0].id;
-				order.custom.SezzleExternalId = reponse.id;
+				order.custom.SezzleToken = response.events[0].id;
+				order.custom.SezzleExternalId = response.id;
 				order.custom.SezzleStatus = 'AUTH';
 				order.custom.SezzlePaymentAction = data.getSezzlePaymentAction();
 			} catch (e) {

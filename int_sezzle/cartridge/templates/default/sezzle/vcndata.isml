@@ -13,4 +13,6 @@
 	data-errorurl='<isprint value="${dw.web.URLUtils.https("COBilling-Start")}" encoding="on" />'
 	data-csrfname='<isprint value="${dw.web.CSRFProtection.getTokenName()}" encoding="on" />'
 	data-csrftoken='<isprint value="${dw.web.CSRFProtection.generateToken()}" encoding="on" />'
+	data-publickey='<isprint value="${sezzle.data.getPublicKey()}" encoding="on" />'
+	data-privatekey='<isprint value="${sezzle.data.getPrivateKey()}" encoding="on" />'
 	id="vcn-data"></div>
