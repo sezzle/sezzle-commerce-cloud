@@ -4,7 +4,10 @@ $(function(){
 			return true;
 		}
 		var checkoutObject = $('#vcn-data').data('vcndata');
+		var public_key = $('#vcn-data').data('publickey');
+		var private_key = $('#vcn-data').data('privatekey');
 
+		
 		if ($('#vcn-data').data('enabled')){
 			var $thisBtn = $(this);
 			e.preventDefault();

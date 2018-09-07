@@ -46,6 +46,8 @@ function checkCart(cart) {
 				}
 			};
 		}
+		dw.system.Logger.info('Sezzle Checkout');
+		dw.system.Logger.info(JSON.stringify(sezzle.checkout));
 //		var sezzleResponse = sezzle.order.authOrder(token);
 //		session.custom.sezzleResponseID = sezzleResponse.response.id;
 //		session.custom.sezzleFirstEventID = sezzleResponse.response.events[0].id;
