@@ -46,13 +46,11 @@ function checkCart(cart) {
 				}
 			};
 		}
-		dw.system.Logger.info('Sezzle Checkout');
-		dw.system.Logger.info(JSON.stringify(sezzle.checkout));
 //		var sezzleResponse = sezzle.order.authOrder(token);
 //		session.custom.sezzleResponseID = sezzleResponse.response.id;
 //		session.custom.sezzleFirstEventID = sezzleResponse.response.events[0].id;
-//		session.custom.sezzleAmount = sezzleResponse.response.amount;
-		session.custom.sezzleed = true;
+		session.custom.sezzleAmount = 50;
+		session.custom.sezzled = true;
 		session.custom.referenceId = order_reference_id;
 //		if (empty(sezzleResponse) || sezzleResponse.error){
 //			dw.system.Logger.info('Empty Sezzle Response')
@@ -85,6 +83,9 @@ function checkCart(cart) {
 
 function postProcess(order){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+	logger.info('sezzle.data.getSezzlePaymentAction()')
+	var payment_action = sezzle.data.getSezzlePaymentAction()
+	logger.info(payment_action)
 	if (sezzle.data.getSezzlePaymentAction() == 'CAPTURE'){
 		try {
 			Transaction.wrap(function(){
@@ -154,7 +155,7 @@ function updateBasket(){
 			return;
 		} else {
 			Transaction.wrap(function(){
-				paymentInstrument.custom.sezzleed = true;
+				paymentInstrument.custom.sezzled = true;
 			});
 		}
 	} else {

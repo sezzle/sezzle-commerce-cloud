@@ -13,11 +13,47 @@ var service = require('dw/svc'),
 	commonCreateRequest = function(svc, args){
 		svc.setRequestMethod('POST');
 		svc.addHeader('Content-Type', 'application/json');
-		svc.addHeader('Authorization', getAuthHeader(require('dw/system/Site').current));
+		if (args.authToken){
+			svc.addHeader('Authorization', 'Bearer ' + args.authToken);
+		}
 		if (!empty(args)) {
 			return JSON.stringify(args);
 		}
-	};
+		
+	},
+	responseParserN = function (svc, client) {
+			var response;
+			
+			switch (client.statusCode) {
+				case 200:
+					response = {
+						error : false,
+						response : JSON.parse(client.text)
+					};
+					break;
+				case 201:
+					response = {
+						error : false,
+						response : JSON.parse(client.text)
+					};
+					break;
+				case 400:
+				case 401:
+				case 404:
+					response = {
+						error : true,
+						response : JSON.parse(client.text)
+					};
+					break;
+			}
+			
+			return response;
+		};
+	
+service.ServiceRegistry.configure('sezzle.authenticate', {
+	createRequest: commonCreateRequest,
+	parseResponse: responseParserN
+});
 
 service.ServiceRegistry.configure('sezzle.auth', {
 	createRequest: commonCreateRequest,

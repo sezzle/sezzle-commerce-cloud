@@ -306,7 +306,7 @@
 				'checkout_complete_url' : self.getMerchant().user_confirmation_url ,
 				'checkout_cancel_url' : self.getMerchant().user_cancel_url,
 				'requires_shipping_info' : false,
-				'merchant_completes' : false	
+				'merchant_completes' : true	
 			};
 			
 			var fpName = self.utils.getFPNameByBasket(basket);

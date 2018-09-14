@@ -24,7 +24,7 @@ function authorize(args){
 	var paymentProcessor = PaymentMgr.getPaymentMethod(paymentInstrument.getPaymentMethod()).getPaymentProcessor();
 	var order = OrderMgr.getOrder(orderNo);
 
-	if (!session.custom.sezzleed && empty(session.custom.sezzleResponseID)){
+	if (!session.custom.sezzled && empty(session.custom.sezzleResponseID)){
 		return {error: true};
 	}
 
@@ -47,6 +47,8 @@ function authorize(args){
 function handle(){
 	var basket = BasketMgr.getCurrentBasket();
 	Transaction.wrap(function(){
+		dw.system.Logger.info('Sezzle Basket handle');
+		dw.system.Logger.info(JSON.stringify(basket));
 		sezzleUtils.basket.createPaymentInstrument(basket);
 		session.custom.sezzleResponseID = '';
 		session.custom.sezzleFirstEventID = '';

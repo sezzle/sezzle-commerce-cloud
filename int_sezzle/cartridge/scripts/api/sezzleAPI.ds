@@ -13,6 +13,36 @@
 			service = require('dw/svc');
 		
 		/**
+		 * Update order by charge ID
+		 *
+		 * @param {string} chargeId
+		 * @returns {Object} charge update event object
+		 */
+		self.authenticate = function () {
+			try {
+				var sezzleService = service.ServiceRegistry.get('sezzle.authenticate');
+				var public_key = sezzleData.getPublicKey();
+				var private_key = sezzleData.getPrivateKey();
+					
+				sezzleService.URL = sezzleData.getURLPath() + 'authentication/';
+				logger.info('authenticating');
+				logger.info(sezzleService.URL)
+				var resp = sezzleService.call({
+					'public_key' : public_key,
+					'private_key' : private_key
+				});
+				logger.info('resp')
+				logger.info(resp)
+				return resp.object;
+			} catch (e) {
+				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					error : false
+				};
+			}
+		};
+		
+		/**
 		 * Get charge object by token
 		 *
 		 * @param {string} token that was POSTed to the pipeline COPlaceOrder-Start
@@ -41,13 +71,17 @@
 		 * @param {string} chargeId
 		 * @returns {Object} charge capture event object
 		 */
-		self.capture = function (chargeId) {
+		self.capture = function (order_reference_id) {
 			try {
-				var sezzleService = service.ServiceRegistry.get('sezzle.capture');
-					
-				sezzleService.URL = sezzleData.getURLPath() + 'charges/' + chargeId + '/capture';
+				var authentication = self.authenticate();
+				var obj = {
+					authToken : authentication.response.token
+				}
 				
-				return sezzleService.call().object;
+				var sezzleService = service.ServiceRegistry.get('sezzle.capture');
+				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete';
+				
+				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
@@ -83,13 +117,18 @@
 		 * @param {string} chargeId
 		 * @returns {Object} charge refund event object
 		 */
-		self.refund = function (chargeId) {
+		self.refund = function (order_reference_id) {
 			try {
+				var authentication = self.authenticate();
+				var obj = {
+					authToken : authentication.response.token
+				}
 				var sezzleService = service.ServiceRegistry.get('sezzle.refund');
 					
-				sezzleService.URL = sezzleData.getURLPath() + 'charges/' + chargeId + '/refund';
+				sezzleService.URL = sezzleData.getURLPath() + 'orders/' + order_reference_id + '/refund';
 				
-				return sezzleService.call().object;
+				return sezzleService.call(obj).object;
+				
 			} catch (e) {
 				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {

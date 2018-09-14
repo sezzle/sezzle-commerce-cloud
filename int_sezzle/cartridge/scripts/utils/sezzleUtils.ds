@@ -165,8 +165,17 @@
 
 		self.responseParser = function (svc, client) {
 			var response;
+			logger = system.Logger.getLogger('Sezzle', '');
+			logger.debug('response');
+			response=client.text
 			switch (client.statusCode) {
 				case 200:
+					response = {
+						error : false,
+						response : JSON.parse(client.text)
+					};
+					break;
+				case 201:
 					response = {
 						error : false,
 						response : JSON.parse(client.text)
@@ -181,7 +190,10 @@
 					};
 					break;
 			}
-			return response;
+			
+			logger.debug(JSON.stringify(client));
+			logger.debug(JSON.stringify(response));
+			return client;
 		};
 
 		/**

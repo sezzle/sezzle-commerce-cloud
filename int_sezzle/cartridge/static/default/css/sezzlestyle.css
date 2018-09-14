@@ -11,11 +11,11 @@
 	vertical-align: middle;
 }
 
-.sezzle-payment-method.form-row .field-wrapper .field-label img{
+/* .sezzle-payment-method.form-row .field-wrapper .field-label img{
 	vertical-align: 53%;
 	width: 75px;
 }
-
+ */
 .sezzle-payment-method.form-row .field-wrapper .field-label span{
 	vertical-align: 70%;
 }
