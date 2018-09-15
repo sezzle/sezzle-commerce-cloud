@@ -8,7 +8,8 @@
 		basket : require('int_sezzle/cartridge/scripts/basket/sezzleBasket.ds'),
 		data : require('int_sezzle/cartridge/scripts/data/sezzleData.ds'),
 		order : require('int_sezzle/cartridge/scripts/order/sezzleOrder.ds'),
-		utils : require('int_sezzle/cartridge/scripts/utils/sezzleUtils.ds')
+		utils : require('int_sezzle/cartridge/scripts/utils/sezzleUtils.ds'),
+		api : require('int_sezzle/cartridge/scripts/api/sezzleAPI.ds')
 	};
 	
 }());

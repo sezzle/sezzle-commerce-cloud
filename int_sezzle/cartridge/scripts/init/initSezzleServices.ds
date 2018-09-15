@@ -79,3 +79,8 @@ service.ServiceRegistry.configure('sezzle.update', {
 	createRequest: commonCreateRequest,
 	parseResponse: sezzleUtils.responseParser
 });
+
+service.ServiceRegistry.configure('sezzle.initiatecheckout', {
+	createRequest: commonCreateRequest,
+	parseResponse: responseParserN
+});

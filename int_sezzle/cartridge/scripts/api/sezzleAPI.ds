@@ -157,6 +157,30 @@
 				};
 			}
 		};
+		
+		/**
+		 * Refund charge by charge ID
+		 *
+		 * @param {string} chargeId
+		 * @returns {Object} charge refund event object
+		 */
+		self.initiateCheckout = function (checkoutObject) {
+			try {
+				var authentication = self.authenticate();
+				checkoutObject.authToken = authentication.response.token
+				var sezzleService = service.ServiceRegistry.get('sezzle.initiatecheckout');
+					
+				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/'
+				logger.info("initiating checkout")
+				return sezzleService.call(checkoutObject).object;
+				
+			} catch (e) {
+				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					error : false
+				};
+			}
+		};
 	};
 	
 	module.exports = new Api();

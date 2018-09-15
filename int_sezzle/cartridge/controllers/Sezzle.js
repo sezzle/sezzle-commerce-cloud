@@ -36,22 +36,22 @@ function checkCart(cart) {
 		};
 	}
 
-		var order_reference_id = parametersMap.order_reference_id.stringValue;
-		if (empty(order_reference_id)) {
-			dw.system.Logger.info('Checkout token empty')
-			return {
-				status:{
-					error: true,
-					PlaceOrderError: new Status(Status.ERROR, 'confirm.error.technical')
-				}
-			};
-		}
+//		var order_reference_id = parametersMap.order_reference_id.stringValue;
+//		if (empty(order_reference_id)) {
+//			dw.system.Logger.info('Checkout token empty')
+//			return {
+//				status:{
+//					error: true,
+//					PlaceOrderError: new Status(Status.ERROR, 'confirm.error.technical')
+//				}
+//			};
+//		}
 //		var sezzleResponse = sezzle.order.authOrder(token);
 //		session.custom.sezzleResponseID = sezzleResponse.response.id;
 //		session.custom.sezzleFirstEventID = sezzleResponse.response.events[0].id;
-		session.custom.sezzleAmount = 50;
+//		session.custom.sezzleAmount = 50;
 		session.custom.sezzled = true;
-		session.custom.referenceId = order_reference_id;
+//		session.custom.referenceId = order_reference_id;
 //		if (empty(sezzleResponse) || sezzleResponse.error){
 //			dw.system.Logger.info('Empty Sezzle Response')
 //			return {
@@ -105,13 +105,20 @@ function postProcess(order){
 
 function redirect() {
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD) && sezzle.data.getSezzleVCNStatus() != 'on') {
-		
+	logger.debug('Selected Payment Method Id - {0}', CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value);
+	logger.debug('Sezzle VCN Status - {0}', sezzle.data.getSezzleVCNStatus());
+	if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
 		var basket = BasketMgr.getCurrentBasket();
-		logger.debug('Sezzle Basket Details - {0}', basket);
-		ISML.renderTemplate('sezzle/sezzlecheckout', {
-			Basket : basket
+		checkoutObject = sezzle.basket.initiateCheckout(basket)
+		logger.debug('checkoutObject - {0}', checkoutObject)
+		
+		ISML.renderTemplate('sezzle/sezzleredirect', {
+			SezzleRedirectUrl : checkoutObject['redirect_url']
 		});
+		session.custom.sezzleAmount = checkoutObject['amount_in_cents']
+		session.custom.referenceId = checkoutObject['order_reference_id']
+		
+		logger.debug('Sezzle redirect return - {0}', 'true');
 		return true;
 	} else {
 		return false;

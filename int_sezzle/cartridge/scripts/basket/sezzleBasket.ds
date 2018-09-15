@@ -14,6 +14,7 @@
 			ProductMgr = require('dw/catalog/ProductMgr'),
 			sezzleUtils = require('int_sezzle/cartridge/scripts/utils/sezzleUtils.ds'),
 			sezzleData = require('int_sezzle/cartridge/scripts/data/sezzleData.ds');
+			sezzleAPI = require('int_sezzle/cartridge/scripts/api/sezzleAPI.ds');
 
 		self.utils = sezzleUtils;
 
@@ -286,6 +287,34 @@
 		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {string} checkout data object in JSON format
 		 */
+		self.initiateCheckout = function (basket) {
+			var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+			logger.debug('basket' + basket);
+			var order_ref_id = self.generateRandomId();
+			var checkoutObject = {
+				'merchant' : self.getMerchant(),
+				'config' : self.getConfig(),
+				'items' : self.getItems(basket),
+				'billing' : self.getBillingAddress(basket),
+				'shipping': self.getShippingAddress(basket),
+				'discounts' : self.getDiscounts(basket),
+				'metadata' : self.getMetadata(basket),
+				'shipping_amount' : {'amount_in_cents' : self.getShippingAmmout(basket), 'currency': 'USD'},
+				'tax_amount' : {'amount_in_cents' : self.getTaxAmount(basket), 'currency': 'USD'},
+				'amount_in_cents' : self.getTotal(basket),
+				'currency_code' : "USD",
+				'order_description' : "Commerce cloud order",
+				'order_reference_id' : order_ref_id,
+				'checkout_complete_url' : self.getMerchant().user_confirmation_url,
+				'checkout_cancel_url' : self.getMerchant().user_cancel_url,
+				'requires_shipping_info' : false,
+				'merchant_completes' : true	
+			};
+			checkoutResponse = sezzleAPI.initiateCheckout(checkoutObject) 
+			checkoutObject['redirect_url'] = checkoutResponse.response.checkout_url;
+			return checkoutObject;
+		};
+
 		self.getCheckout = function (basket) {
 			var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 			logger.debug('basket' + basket);
@@ -308,21 +337,12 @@
 				'requires_shipping_info' : false,
 				'merchant_completes' : true	
 			};
-			
-			var fpName = self.utils.getFPNameByBasket(basket);
-			if (fpName) {
-				if (fpName == "default"){
-					checkoutObject["financing_program"] = "";
-				}
-				else{
-					checkoutObject["financing_program"] = fpName;
-				}
-			}
 			checkoutObject = JSON.stringify(checkoutObject);
-			logger.debug('Generating checkout object 2:\n' + checkoutObject);
+			
 			return checkoutObject;
 		};
-
+		
+		
 		/**
 		 * Compare basket and Sezzle response object to avoid differences
 		 *
