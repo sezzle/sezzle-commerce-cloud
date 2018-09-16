@@ -71,7 +71,7 @@
 		 * @param {string} chargeId
 		 * @returns {Object} charge capture event object
 		 */
-		self.capture = function (order_reference_id) {
+		self.capture = function (order_reference_id, order_number) {
 			try {
 				var authentication = self.authenticate();
 				var obj = {
@@ -79,7 +79,8 @@
 				}
 				
 				var sezzleService = service.ServiceRegistry.get('sezzle.capture');
-				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete';
+				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
+				logger.info(sezzleService.URL)
 				
 				return sezzleService.call(obj).object;
 			} catch (e) {
@@ -121,7 +122,9 @@
 			try {
 				var authentication = self.authenticate();
 				var obj = {
-					authToken : authentication.response.token
+					authToken : authentication.response.token,
+					is_full_refund :true,
+					
 				}
 				var sezzleService = service.ServiceRegistry.get('sezzle.refund');
 					

@@ -72,7 +72,7 @@ service.ServiceRegistry.configure('sezzle.refund', {
 
 service.ServiceRegistry.configure('sezzle.capture', {
 	createRequest: commonCreateRequest,
-	parseResponse: sezzleUtils.responseParser
+	parseResponse: responseParserN
 });
 
 service.ServiceRegistry.configure('sezzle.update', {

@@ -271,15 +271,7 @@
 			}
 		};
 		
-		self.generateRandomId = function makeid() {
-			  var text = "";
-			  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-			
-			  for (var i = 0; i < 5; i++)
-			    text += possible.charAt(Math.floor(Math.random() * possible.length));
-			
-			  return text;
-			}
+		
 
 		/**
 		 * Build object with checkout data
@@ -290,7 +282,7 @@
 		self.initiateCheckout = function (basket) {
 			var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 			logger.debug('basket' + basket);
-			var order_ref_id = self.generateRandomId();
+			var order_ref_id = sezzleUtils.generateUUID();
 			var checkoutObject = {
 				'merchant' : self.getMerchant(),
 				'config' : self.getConfig(),

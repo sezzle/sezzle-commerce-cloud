@@ -86,10 +86,13 @@
 		this.captureOrders = function () {
 			OrderMgr.processOrders(function (order) {
 				try {
-					api.capture(order.custom.SezzleExternalId);
-					order.custom.SezzleStatus = 'CAPTURE';
-					order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-					order.setStatus(Order.ORDER_STATUS_COMPLETED);
+					var response = api.capture(order.custom.SezzleExternalId, order.orderNo);
+					if (!response.error){
+						order.custom.SezzleStatus = 'CAPTURE';
+						order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
+						//order.setStatus(Order.ORDER_STATUS_COMPLETED);
+						
+					}
 				} catch (e) {
 					logger.error('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 				}
@@ -120,8 +123,10 @@
 		this.refundOrders = function () {
 			OrderMgr.processOrders(function (order) {
 				try {
-					api.refund(order.custom.SezzleExternalId);
-					order.custom.SezzleStatus = 'REFUNDED';
+					response = api.refund(order.custom.SezzleExternalId);
+					if (!response.error){
+						order.custom.SezzleStatus = 'REFUNDED';
+					}
 				} catch (e) {
 					logger.error('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 				}
