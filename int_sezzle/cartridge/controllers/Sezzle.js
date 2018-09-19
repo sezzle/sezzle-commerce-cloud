@@ -12,11 +12,9 @@ var guard = require(Resource.msg('sezzle.controllers.cartridge','sezzle','app_st
 var BasketMgr = require('dw/order/BasketMgr');
 var ISML = require('dw/template/ISML');
 var sezzle = require('int_sezzle/cartridge/scripts/sezzle.ds');
-var parametersMap = request.httpParameterMap;
 var CurrentForms = session.getForms();
 var Status = require('dw/system/Status');
 var Transaction = require('dw/system/Transaction');
-var PaymentMgr = require('dw/order/PaymentMgr');
 var Order = require('dw/order/Order');
 
 
@@ -37,35 +35,14 @@ function checkCart(cart) {
 	}
 
 
-		session.custom.sezzled = true;
-//		session.custom.referenceId = order_reference_id;
-//		if (empty(sezzleResponse) || sezzleResponse.error){
-//			dw.system.Logger.info('Empty Sezzle Response')
-//			return {
-//				status:{
-//					error: true,
-//					PlaceOrderError: new Status(Status.ERROR, 'confirm.error.technical')
-//				}
-//			};
-//		}
-//		var sezzleStatus = sezzle.basket.syncBasket(basket, sezzleResponse.response);
-//		if (sezzleStatus.error){
-//			sezzle.order.voidOrder(sezzleResponse.response.id);
-//		}
-//		dw.system.Logger.info('Something else is wrong')
-//		return {
-//			status:{
-//				error: sezzleStatus.error,
-//				PlaceOrderError: new Status(Status.ERROR, 'basket.changed.error')
-//			}
-//		};
-		
-		return {
-			status:{
-				error: false,
-				PlaceOrderError: new Status(Status.ERROR, 'basket.changed.error')
-			}
-		};
+	session.custom.sezzled = true;
+	
+	return {
+		status:{
+			error: false,
+			PlaceOrderError: new Status(Status.ERROR, 'basket.changed.error')
+		}
+	};
 }
 
 function postProcess(order){
@@ -97,7 +74,6 @@ function postProcess(order){
 function redirect() {
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 	logger.debug('Selected Payment Method Id - {0}', CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value);
-	logger.debug('Sezzle VCN Status - {0}', sezzle.data.getSezzleVCNStatus());
 	if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
 		var basket = BasketMgr.getCurrentBasket();
 		checkoutObject = sezzle.basket.initiateCheckout(basket)
@@ -140,7 +116,7 @@ function updateBasket(){
 		response.writer.print(JSON.stringify({error: true}));
 		return;
 	}
-	var hookName = "dw.int_sezzle.payment_instrument." + sezzle.data.VCNPaymentInstrument();
+	var hookName = "dw.int_sezzle.payment_instrument"
 	var basket = BasketMgr.getCurrentBasket();
 	var cart = app.getModel('Cart').get(basket);
 	response.setContentType('application/json');

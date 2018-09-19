@@ -6,7 +6,6 @@
 <isset name="sezzleTotal" value="${pdict.Basket.totalGrossPrice.value}" scope="session" />
 <div class="hide" 
 	data-vcndata='<isprint value="${sezzle.basket.getCheckout(pdict.Basket)}" encoding="on" />'
-	data-enabled='<isprint value="${sezzle.data.getSezzleVCNStatus() == 'on'}" encoding="on" />'
 	data-sezzleselected='<isprint value="${session.forms.billing.paymentMethods.selectedPaymentMethodID.value == 'Sezzle'}" encoding="on" />'
 	data-errormessages='<isprint value="${sezzle.data.getErrorMessages()}" encoding="on" />'
 	data-updateurl='<isprint value="${dw.web.URLUtils.https("Sezzle-Update")}" encoding="on" />'

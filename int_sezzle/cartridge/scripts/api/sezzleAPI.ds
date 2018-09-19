@@ -25,14 +25,10 @@
 				var private_key = sezzleData.getPrivateKey();
 					
 				sezzleService.URL = sezzleData.getURLPath() + 'authentication/';
-				logger.info('authenticating');
-				logger.info(sezzleService.URL)
 				var resp = sezzleService.call({
 					'public_key' : public_key,
 					'private_key' : private_key
 				});
-				logger.info('resp')
-				logger.info(resp)
 				return resp.object;
 			} catch (e) {
 				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
@@ -80,8 +76,6 @@
 				
 				var sezzleService = service.ServiceRegistry.get('sezzle.capture');
 				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
-				logger.info(sezzleService.URL)
-				
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
@@ -174,7 +168,6 @@
 				var sezzleService = service.ServiceRegistry.get('sezzle.initiatecheckout');
 					
 				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/'
-				logger.info("initiating checkout")
 				return sezzleService.call(checkoutObject).object;
 				
 			} catch (e) {

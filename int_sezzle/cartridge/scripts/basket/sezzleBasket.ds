@@ -203,7 +203,6 @@
 				'platform_version': compatibilityMode,
 				'platform_type': web.Resource.msg('metadata.platform_type', 'sezzle', null),
 				'platform_sezzle': web.Resource.msg('metadata.platform_sezzle', 'sezzle', null),
-				'mode': sezzleData.getSezzleModalEnable()
 			};
 
 			return metadata;
@@ -281,7 +280,6 @@
 		 */
 		self.initiateCheckout = function (basket) {
 			var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-			logger.debug('basket' + basket);
 			var order_ref_id = sezzleUtils.generateUUID();
 			var checkoutObject = {
 				'merchant' : self.getMerchant(),
@@ -309,7 +307,6 @@
 
 		self.getCheckout = function (basket) {
 			var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-			logger.debug('basket' + basket);
 			var checkoutObject = {
 				'merchant' : self.getMerchant(),
 				'config' : self.getConfig(),
