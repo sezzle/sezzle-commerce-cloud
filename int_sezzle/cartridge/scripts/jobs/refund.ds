@@ -5,11 +5,11 @@ var sezzleService =  require('dw/svc').ServiceRegistry;
 
 function execute(args) {
 	try {
- 		var result = sezzleService.get('sezzle.refund').call();
+ 		//var result = sezzleService.get('sezzle.refund').call();
  		
-		if (result.status == 'SERVICE_UNAVAILABLE') {
-			return new Status(Status.ERROR);
-		}
+		//if (result.status == 'SERVICE_UNAVAILABLE') {
+		//	return new Status(Status.ERROR);
+		//}
 		require('int_sezzle/cartridge/scripts/sezzle.ds').order.refundOrders();
 		return new Status(Status.OK);
 	} catch (e) {

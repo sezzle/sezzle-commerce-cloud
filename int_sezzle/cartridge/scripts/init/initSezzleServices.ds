@@ -13,22 +13,26 @@ var service = require('dw/svc'),
 	commonCreateRequest = function(svc, args){
 		svc.setRequestMethod('POST');
 		svc.addHeader('Content-Type', 'application/json');
-		if (args.authToken){
-			svc.addHeader('Authorization', 'Bearer ' + args.authToken);
-		}
 		if (!empty(args)) {
+			if (args.authToken){
+				svc.addHeader('Authorization', 'Bearer ' + args.authToken);
+			}
 			return JSON.stringify(args);
 		}
 		
 	},
 	responseParserN = function (svc, client) {
 			var response;
+			response = {
+				error : true,
+				response : JSON.parse(client.text)
+			}
 			
 			switch (client.statusCode) {
 				case 200:
 					response = {
 						error : false,
-						response : JSON.parse(client.text)
+						response : JSON.parse(client.text) 	
 					};
 					break;
 				case 201:

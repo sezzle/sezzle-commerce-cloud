@@ -1,4 +1,4 @@
-<isset name="sezzleData" value="${require('int_sezzle/cartridge/scripts/data/sezzleData.ds')}" scope="page" />
+<!-- <isset name="sezzleData" value="${require('int_sezzle/cartridge/scripts/data/sezzleData.ds')}" scope="page" />
 <isset name="sezzleUtils" value="${require('int_sezzle/cartridge/scripts/utils/sezzleUtils')}" scope="page" />
 
 <isset name="promoModal" value="${''}" scope="page"/>
@@ -55,4 +55,4 @@
 	<iselse/>
 		<p style="padding-bottom: 49px"></p>
 	</isif>
-</isif>
+</isif> -->
