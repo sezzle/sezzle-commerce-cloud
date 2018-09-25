@@ -47,9 +47,7 @@ function checkCart(cart) {
 
 function postProcess(order){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	logger.info('sezzle.data.getSezzlePaymentAction()')
 	var payment_action = sezzle.data.getSezzlePaymentAction()
-	logger.info(payment_action)
 	if (sezzle.data.getSezzlePaymentAction() == 'CAPTURE'){
 		try {
 			Transaction.wrap(function(){
@@ -64,7 +62,7 @@ function postProcess(order){
 			});
 		} catch (e) {
 			sezzle.order.voidOrder(order.custom.SezzleExternalId);
-			logger.error('Sezzle Capturing error. Details - {0}', e);
+			logger.debug('Sezzle Capturing error. Details - {0}', e);
 			return new Status(Status.ERROR);
 		}
 	}
@@ -77,16 +75,14 @@ function redirect() {
 	if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
 		var basket = BasketMgr.getCurrentBasket();
 		checkoutObject = sezzle.basket.initiateCheckout(basket)
-		logger.debug('checkoutObject - {0}', checkoutObject)
 		
 		ISML.renderTemplate('sezzle/sezzleredirect', {
 			SezzleRedirectUrl : checkoutObject['redirect_url']
 		});
+		session.custom.sezzleToken=sezzle.utils.getQueryString("id", checkoutObject['redirect_url'])
 		session.custom.sezzled = true;
 		session.custom.sezzleAmount = checkoutObject['amount_in_cents']
 		session.custom.referenceId = checkoutObject['order_reference_id']
-		
-		logger.debug('Sezzle redirect return - {0}', 'true');
 		return true;
 	} else {
 		return false;

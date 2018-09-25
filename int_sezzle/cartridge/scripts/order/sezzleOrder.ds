@@ -59,16 +59,16 @@
 		this.updateAttributes = function (order, response, paymentProcessor, paymentInstrument) {
 			
 			try {
-				paymentInstrument.paymentTransaction.transactionID = response.events[0].id;
+				paymentInstrument.paymentTransaction.transactionID = response.token;
 				paymentInstrument.paymentTransaction.amount = new Money(response.amount, order.currencyCode).divide(100);
 				paymentInstrument.paymentTransaction.setPaymentProcessor(paymentProcessor);
 				
-				order.custom.SezzleToken = response.events[0].id;
+				order.custom.SezzleToken = response.token;
 				order.custom.SezzleExternalId = response.id;
 				order.custom.SezzleStatus = 'AUTH';
 				order.custom.SezzlePaymentAction = data.getSezzlePaymentAction();
 			} catch (e) {
-				logger.error('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 			}
 		};
 		
@@ -96,7 +96,7 @@
 						
 					}
 				} catch (e) {
-					logger.error('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+					logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 				}
 			}, '(status = {0} OR status = {1}) AND custom.SezzlePaymentAction = {2} AND custom.SezzleStatus = {3}', Order.ORDER_STATUS_NEW, Order.ORDER_STATUS_OPEN, 'AUTH', 'AUTH');
 		};
@@ -112,7 +112,7 @@
 					api.void(order.custom.SezzleExternalId);
 					order.custom.SezzleStatus = 'VOIDED';
 				} catch (e) {
-					logger.error('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+					logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 				}
 			}, 'status = {0} AND custom.SezzleStatus = {1}', Order.ORDER_STATUS_CANCELLED, 'AUTH');
 		};
@@ -130,7 +130,7 @@
 						order.custom.SezzleStatus = 'REFUNDED';
 					}
 				} catch (e) {
-					logger.error('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+					logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 				}
 			}, 'status = {0} AND custom.SezzleStatus = {1}', Order.ORDER_STATUS_CANCELLED, 'CAPTURE');
 		};
@@ -159,7 +159,7 @@
 					}
 					api.update(order.custom.SezzleExternalId, updateObject);
 				} catch (e) {
-					logger.error('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+					logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 				}
 			}, 'custom.SezzleStatus != NULL AND lastModified > {0}', lastUpdateDateTime.toISOString());
 			saveDateToFile(startDate);

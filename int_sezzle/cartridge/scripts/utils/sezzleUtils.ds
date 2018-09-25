@@ -165,8 +165,6 @@
 
 		self.responseParser = function (svc, client) {
 			var response;
-			logger = system.Logger.getLogger('Sezzle', '');
-			logger.debug('response');
 			switch (client.statusCode) {
 				case 200:
 					response = {
@@ -223,8 +221,14 @@
 			    return v.toString(16);
 			  });
 			}
-
-    /**
+		
+		self.getQueryString = function ( field, url ) {
+			var href = url;
+			var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
+			var string = reg.exec(href);
+			return string ? string[1] : null;
+		};
+		    /**
 		 * Get financing program details by product object
 		 *
 		 * @param {dw.catalog.Product} demandware product

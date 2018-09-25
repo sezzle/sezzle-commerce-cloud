@@ -31,7 +31,7 @@
 				});
 				return resp.object;
 			} catch (e) {
-				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
 					error : false
 				};
@@ -54,7 +54,7 @@
 						'checkout_token' : token
 					}).object;
 			} catch (e) {
-				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
 					error : false
 				};
@@ -78,7 +78,7 @@
 				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
 				return sezzleService.call(obj).object;
 			} catch (e) {
-				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
 					error : false
 				};
@@ -99,7 +99,7 @@
 				
 				return sezzleService.call().object;
 			} catch (e) {
-				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
 					error : false
 				};
@@ -127,7 +127,7 @@
 				return sezzleService.call(obj).object;
 				
 			} catch (e) {
-				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
 					error : false
 				};
@@ -148,7 +148,7 @@
 				
 				return sezzleService.call(updateData).object;
 			} catch (e) {
-				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
 					error : false
 				};
@@ -171,7 +171,7 @@
 				return sezzleService.call(checkoutObject).object;
 				
 			} catch (e) {
-				logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
 					error : false
 				};

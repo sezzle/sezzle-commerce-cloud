@@ -279,7 +279,6 @@
 		 * @returns {string} checkout data object in JSON format
 		 */
 		self.initiateCheckout = function (basket) {
-			var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 			var order_ref_id = sezzleUtils.generateUUID();
 			var checkoutObject = {
 				'merchant' : self.getMerchant(),
@@ -306,7 +305,6 @@
 		};
 
 		self.getCheckout = function (basket) {
-			var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 			var checkoutObject = {
 				'merchant' : self.getMerchant(),
 				'config' : self.getConfig(),

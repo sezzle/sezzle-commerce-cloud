@@ -35,18 +35,18 @@ function authorize(args){
 	Transaction.wrap(function () {
 		paymentInstrument.paymentTransaction.transactionID = orderNo;
 		paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
-		dw.system.Logger.info('Payment Reference Id');
-		dw.system.Logger.info(session.custom.referenceId);
+		dw.system.Logger.debug('Sezzle Payment Reference Id - {0}', session.custom.referenceId );
 		var sezzleResponseObject = {
 				'id' : session.custom.referenceId,
 				'events' : [{'id': session.custom.sezzleFirstEventID}],
-				'amount': session.custom.sezzleAmount
+				'amount': session.custom.sezzleAmount,
+				'token': session.custom.sezzleToken
 		};
 		sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
 		
 	});
 	var resp = postProcess(order);
-	dw.system.Logger.info(JSON.stringify(resp));
+	dw.system.Logger.debug(JSON.stringify(resp));
 	if (resp.error){
 		return {error: true};
 	}
@@ -56,9 +56,7 @@ function authorize(args){
 
 function postProcess(order){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	logger.info('sezzle.data.getSezzlePaymentAction()')
 	var payment_action = sezzleUtils.data.getSezzlePaymentAction()
-	logger.info(payment_action)
 	if (sezzleUtils.data.getSezzlePaymentAction() == 'CAPTURE'){
 		try {
 			Transaction.wrap(function(){
@@ -70,18 +68,18 @@ function postProcess(order){
 //						order.setStatus(Order.ORDER_STATUS_COMPLETED);
 					}
 					else{
-						logger.error('Sezzle Capturing error');
+						logger.debug('Sezzle Capturing error');
 						return {error: true};
 					}
 				}
 				else{
-					logger.error('Sezzle Capturing error. Details');
+					logger.debug('Sezzle Capturing error. Details');
 					return {error: true};
 				}
 			});
 		} catch (e) {
 			sezzleUtils.order.voidOrder(order.custom.SezzleExternalId);
-			logger.error('Sezzle Capturing error. Details - {0}', e);
+			logger.debug('Sezzle Capturing error. Details - {0}', e);
 			return {error: true};
 		}
 	}
@@ -91,8 +89,6 @@ function postProcess(order){
 function handle(){
 	var basket = BasketMgr.getCurrentBasket();
 	Transaction.wrap(function(){
-		dw.system.Logger.info('Sezzle Basket handle');
-		dw.system.Logger.info(JSON.stringify(basket));
 		sezzleUtils.basket.createPaymentInstrument(basket);
 		session.custom.sezzleResponseID = '';
 		session.custom.sezzleFirstEventID = '';
