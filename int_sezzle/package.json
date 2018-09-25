@@ -1,4 +1,0 @@
-{
-    "init": ["./cartridge/scripts/init/initSezzleServices.ds"],
-    "hooks": "./cartridge/scripts/hooks.json"
-}
