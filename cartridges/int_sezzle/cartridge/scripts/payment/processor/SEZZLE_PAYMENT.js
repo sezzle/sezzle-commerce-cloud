@@ -29,6 +29,12 @@ function authorize(args){
 		return {error: true};
 	}
 	
+	var reference_id = request.httpParameterMap["order_reference_id"]
+	dw.system.Logger.debug('Sezzle Payment Reference Id - {0}', reference_id );
+	if (session.custom.referenceId != reference_id){
+		return {error: true};
+	}
+	
 //	var sezzleController = require('int_sezzle/cartridge/controllers/Sezzle');
 //    sezzleController.PostProcess(order);
 

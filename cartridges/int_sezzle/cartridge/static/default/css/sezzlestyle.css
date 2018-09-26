@@ -25,6 +25,9 @@
 	vertical-align: 50%;
 }
 
+.sezzle-payment-method.form-row .field-wrapper img{
+	width:250px;
+}
 .js-countries_selectbox {
 	width: 100px; 
 	position: absolute; 

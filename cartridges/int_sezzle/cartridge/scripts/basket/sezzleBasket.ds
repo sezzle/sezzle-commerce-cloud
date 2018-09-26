@@ -294,7 +294,7 @@
 				'currency_code' : "USD",
 				'order_description' : "Commerce cloud order",
 				'order_reference_id' : order_ref_id,
-				'checkout_complete_url' : self.getMerchant().user_confirmation_url,
+				'checkout_complete_url' : self.getMerchant().user_confirmation_url + "?order_reference_id="+order_ref_id,
 				'checkout_cancel_url' : self.getMerchant().user_cancel_url,
 				'requires_shipping_info' : false,
 				'merchant_completes' : true	
