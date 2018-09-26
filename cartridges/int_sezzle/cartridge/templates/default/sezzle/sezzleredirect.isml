@@ -1,0 +1,3 @@
+<!--- TEMPLATENAME: sezzleredirect.isml --->
+<isredirect location="${pdict.SezzleRedirectUrl}"/>
+
