@@ -10,23 +10,6 @@
                 <externally-managed-flag>true</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
-            <attribute-definition attribute-id="SezzlePaymentAction">
-                <display-name xml:lang="x-default">Sezzle Payment Action</display-name>
-                <description xml:lang="x-default">Defines by what action order was placed</description>
-                <type>enum-of-string</type>
-                <mandatory-flag>false</mandatory-flag>
-                <externally-managed-flag>true</externally-managed-flag>
-                <value-definitions>
-                    <value-definition>
-                        <display xml:lang="x-default">AUTHORIZATION</display>
-                        <value>AUTH</value>
-                    </value-definition>
-                    <value-definition>
-                        <display xml:lang="x-default">AUTHORIZATION + CAPTURE</display>
-                        <value>CAPTURE</value>
-                    </value-definition>
-                </value-definitions>
-            </attribute-definition>
             <attribute-definition attribute-id="SezzleStatus">
                 <display-name xml:lang="x-default">Sezzle Status</display-name>
                 <description xml:lang="x-default">Sezzle status of a order</description>
@@ -75,13 +58,6 @@
 
     <type-extension type-id="SitePreferences">
         <custom-attribute-definitions>
-            <attribute-definition attribute-id="SezzlePaymentOnlineStatus">
-                <display-name xml:lang="x-default">Disable Sezzle Payment Method</display-name>
-                <type>boolean</type>
-                <mandatory-flag>false</mandatory-flag>
-                <externally-managed-flag>false</externally-managed-flag>
-                <default-value>false</default-value>
-            </attribute-definition>
             <attribute-definition attribute-id="SezzleMode">
                 <display-name xml:lang="x-default">Sezzle Mode</display-name>
                 <type>enum-of-string</type>
@@ -99,11 +75,12 @@
                 </value-definitions>
             </attribute-definition>
             <attribute-definition attribute-id="SezzleOnline">
-                <display-name xml:lang="x-default">Sezzle Online Status</display-name>
+                <display-name xml:lang="x-default">Sezzle Enabled</display-name>
                 <description xml:lang="x-default">Turn on/off Sezzle integration</description>
                 <type>boolean</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
+                <default-value>true</default-value>
             </attribute-definition>
             <attribute-definition attribute-id="SezzlePaymentAction">
                 <display-name xml:lang="x-default">Sezzle Payment Action</display-name>
@@ -135,19 +112,6 @@
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
-            <attribute-definition attribute-id="SezzlePaymentMaxTotal">
-                <display-name xml:lang="x-default">Payment Max Total</display-name>
-                <type>double</type>
-                <mandatory-flag>false</mandatory-flag>
-                <externally-managed-flag>false</externally-managed-flag>
-            </attribute-definition>
-            <attribute-definition attribute-id="SezzlePaymentMinTotal">
-                <display-name xml:lang="x-default">Payment Min Total</display-name>
-                <type>double</type>
-                <mandatory-flag>false</mandatory-flag>
-                <externally-managed-flag>false</externally-managed-flag>
-                <default-value>50.0</default-value>
-            </attribute-definition>
         </custom-attribute-definitions>
         <group-definitions>
             <attribute-group group-id="SEZZLE_PAYMENT">
@@ -156,11 +120,6 @@
                 <attribute attribute-id="SezzleMode"/>
                 <attribute attribute-id="SezzlePublicKey"/>
                 <attribute attribute-id="SezzlePrivateKey"/>
-                <attribute attribute-id="SezzlePaymentAction"/>
-                <attribute attribute-id="SezzlePaymentOnlineStatus"/>
-                <attribute attribute-id="SezzlePaymentMinTotal"/>
-                <attribute attribute-id="SezzlePaymentMaxTotal"/>
-				<!-- <attribute attribute-id="SezzleModalEnable"/> -->
             </attribute-group>
         </group-definitions>
     </type-extension>

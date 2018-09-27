@@ -303,51 +303,6 @@
 			checkoutObject['redirect_url'] = checkoutResponse.response.checkout_url;
 			return checkoutObject;
 		};
-
-		self.getCheckout = function (basket) {
-			var checkoutObject = {
-				'merchant' : self.getMerchant(),
-				'config' : self.getConfig(),
-				'items' : self.getItems(basket),
-				'billing' : self.getBillingAddress(basket),
-				'shipping': self.getShippingAddress(basket),
-				'discounts' : self.getDiscounts(basket),
-				'metadata' : self.getMetadata(basket),
-				'shipping_amount' : {'amount_in_cents' : self.getShippingAmmout(basket), 'currency': 'USD'},
-				'tax_amount' : {'amount_in_cents' : self.getTaxAmount(basket), 'currency': 'USD'},
-				'amount_in_cents' : self.getTotal(basket),
-				'currency_code' : "USD",
-				'order_description' : "Commerce cloud order",
-				'order_reference_id' : self.generateRandomId(),
-				'checkout_complete_url' : self.getMerchant().user_confirmation_url ,
-				'checkout_cancel_url' : self.getMerchant().user_cancel_url,
-				'requires_shipping_info' : false,
-				'merchant_completes' : true	
-			};
-			checkoutObject = JSON.stringify(checkoutObject);
-			
-			return checkoutObject;
-		};
-		
-		
-		/**
-		 * Compare basket and Sezzle response object to avoid differences
-		 *
-		 * @param {dw.order.Basket} Basket demandware basket
-		 * @param {Object} charge object
-		 * @returns {dw.system.Status} status object
-		 */
-		self.syncBasket = function (basket, SezzleResponse) {
-			var SezzleStatus = new system.Status();
-
-			sezzleUtils.checkLineItems(basket, SezzleResponse, SezzleStatus);
-			sezzleUtils.checkTaxation(basket, SezzleResponse, SezzleStatus);
-			sezzleUtils.checkTotalPrice(basket, SezzleResponse, SezzleStatus);
-			sezzleUtils.checkAddresses(basket, SezzleResponse, SezzleStatus);
-			sezzleUtils.checkGiftCertificates(basket, SezzleStatus);
-
-			return SezzleStatus;
-		};
 	};
 
 	module.exports = new Basket();

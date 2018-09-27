@@ -29,14 +29,14 @@ function authorize(args){
 		return {error: true};
 	}
 	
+	//Check the reference token passed during redirection
 	var reference_id = request.httpParameterMap["order_reference_id"]
 	dw.system.Logger.debug('Sezzle Payment Reference Id - {0}', reference_id );
+	
 	if (session.custom.referenceId != reference_id){
+		dw.system.Logger.debug('Sezzle Error - Reference ID has changed' );
 		return {error: true};
 	}
-	
-//	var sezzleController = require('int_sezzle/cartridge/controllers/Sezzle');
-//    sezzleController.PostProcess(order);
 
 	Transaction.wrap(function () {
 		paymentInstrument.paymentTransaction.transactionID = orderNo;
@@ -71,7 +71,6 @@ function postProcess(order){
 					if (!resp.error){
 						order.custom.SezzleStatus = 'CAPTURE';
 						order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-//						order.setStatus(Order.ORDER_STATUS_COMPLETED);
 					}
 					else{
 						logger.debug('Sezzle Capturing error');

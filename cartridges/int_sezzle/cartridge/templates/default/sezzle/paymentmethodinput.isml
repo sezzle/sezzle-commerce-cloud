@@ -1,11 +1,11 @@
-<isif condition="${!require('int_sezzle/cartridge/scripts/data/sezzleData').getSezzlePaymentOnlineStatus()}">
+<isif condition="${require('int_sezzle/cartridge/scripts/data/sezzleData').getSezzleOnlineStatus()}">
 <div class="form-row label-inline sezzle-payment-method">
 	<isset name="radioID" value="${paymentMethodType.value}" scope="page"/>
 	<div class="field-wrapper">
 		<input id="is-${radioID}" type="radio" class="input-radio" name="${pdict.CurrentForms.billing.paymentMethods.selectedPaymentMethodID.htmlName}" value="${paymentMethodType.htmlValue}" <isif condition="${paymentMethodType.value == pdict.CurrentForms.billing.paymentMethods.selectedPaymentMethodID.htmlValue}">checked="checked"</isif> />
 		<label for="is-${radioID}" class="field-label">
 			<img alt="${Resource.msg(paymentMethodType.label,'forms',null)}" 
-				src="https://d34uoa9py2cgca.cloudfront.net/branding/sezzle-logos/sezzle-pay-over-time-no-interest@2x.png"
+				src="${Resource.msg('payment.urllogo', 'sezzle', null)}"
 				title="${Resource.msg(paymentMethodType.label,'forms',null)}"/>
 <!-- 			<a class="sezzle-product-modal" style=""
 			data-amount="${pdict.Basket.totalGrossPrice.multiply(100).getValue().toFixed()}"

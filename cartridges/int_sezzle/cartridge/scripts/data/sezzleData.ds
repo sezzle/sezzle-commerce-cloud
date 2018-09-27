@@ -49,9 +49,7 @@
 		 * @returns {string} Promo text
 		 */
 		this.getSezzlePaymentAction = function () {
-			return !empty(currentSite.getCustomPreferenceValue('SezzlePaymentAction')) ?
-					currentSite.getCustomPreferenceValue('SezzlePaymentAction').getValue() :
-					'';
+			return web.Resource.msg('payment.action', 'sezzle', null);;
 		};
 		
 		/**
@@ -76,10 +74,11 @@
 		/**
 		 * @description Due to CyberSource changes payment can be disabled from the BM (Requirement 09.12.2017)
 		 * @returns {Boolean}
-		 */
+		 
 		this.getSezzlePaymentOnlineStatus = function() {
 			return currentSite.getCustomPreferenceValue('SezzlePaymentOnlineStatus');
 		};
+		*/
 
 		/**
 		 * Return sezzle minimal applying total
@@ -96,7 +95,8 @@
 		 * @returns {Number} minimal applying total
 		 */
 		this.getSezzlePaymentMinTotal = function () {
-			return currentSite.getCustomPreferenceValue('SezzlePaymentMinTotal');
+			//return currentSite.getCustomPreferenceValue('SezzlePaymentMinTotal');
+			return web.Resource.msg('payment.minTotal', 'sezzle', '')
 		};
 		
 		/**
@@ -105,7 +105,8 @@
 		 * @returns {Number} maximal applying total
 		 */
 		this.getSezzlePaymentMaxTotal = function () {
-			return currentSite.getCustomPreferenceValue('SezzlePaymentMaxTotal');
+			//return currentSite.getCustomPreferenceValue('SezzlePaymentMaxTotal');
+			return web.Resource.msg('payment.maxTotal', 'sezzle', '')
 		};
 
 		this.getErrorMessages = function(){
