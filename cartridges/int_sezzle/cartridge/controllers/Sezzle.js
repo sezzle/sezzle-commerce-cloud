@@ -17,57 +17,9 @@ var Status = require('dw/system/Status');
 var Transaction = require('dw/system/Transaction');
 var Order = require('dw/order/Order');
 
-
-
-
-/*
- * Export the publicly available controller methods
+/**
+ * Redirects the user to Sezzle's checkout
  */
-
-function checkCart(cart) {
-	var basket = 'object' in cart ? cart.object : cart;
-	var selectedPaymentMethod = CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value;
-	if (!sezzle.data.getSezzleOnlineStatus() || selectedPaymentMethod != SEZZLE_PAYMENT_METHOD){
-		return {
-			status: new Status(Status.OK),
-			authResponse: null
-		};
-	}
-
-
-	session.custom.sezzled = true;
-	
-	return {
-		status:{
-			error: false,
-			PlaceOrderError: new Status(Status.ERROR, 'basket.changed.error')
-		}
-	};
-}
-
-function postProcess(order){
-	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	var payment_action = sezzle.data.getSezzlePaymentAction()
-	if (sezzle.data.getSezzlePaymentAction() == 'CAPTURE'){
-		try {
-			Transaction.wrap(function(){
-				var resp = sezzle.order.captureOrder(order.custom.SezzleExternalId, order.orderNo);
-				if (resp){
-					if (!resp.error){
-						order.custom.SezzleStatus = 'CAPTURE';
-						order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-						order.setStatus(Order.ORDER_STATUS_COMPLETED);
-					}
-				}
-			});
-		} catch (e) {
-			sezzle.order.voidOrder(order.custom.SezzleExternalId);
-			logger.debug('Sezzle Capturing error. Details - {0}', e);
-			return new Status(Status.ERROR);
-		}
-	}
-	return new Status(Status.OK);
-}
 
 function redirect() {
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
@@ -107,41 +59,6 @@ function success() {
 	}
 }
 
-function updateBasket(){
-	if (!dw.web.CSRFProtection.validateRequest()){
-		response.writer.print(JSON.stringify({error: true}));
-		return;
-	}
-	var hookName = "dw.int_sezzle.payment_instrument"
-	var basket = BasketMgr.getCurrentBasket();
-	var cart = app.getModel('Cart').get(basket);
-	response.setContentType('application/json');
-	Transaction.wrap(function(){
-		cart.removeExistingPaymentInstruments(SEZZLE_PAYMENT_METHOD);
-	});
-	if (dw.system.HookMgr.hasHook(hookName)){
-		var paymentInstrument = dw.system.HookMgr.callHook(hookName, "add", basket);
-		if (!paymentInstrument){
-			response.writer.print(JSON.stringify({error: true}));
-			return;
-		} else {
-			Transaction.wrap(function(){
-				paymentInstrument.custom.sezzled = true;
-			});
-		}
-	} else {
-		response.writer.print(JSON.stringify({error: true}));
-		return;
-	}
-	
-	response.writer.print(JSON.stringify({error: false}));
-}
-
-/**
- * Checks authentication and synchronization DW Basket and Sezzle Basket
- */
-exports.CheckCart = checkCart;
-
 /**
  * Redirects customer to sezzle's checkout if sezzle is enabled and there is no
  * gift certificates in basket
@@ -149,5 +66,3 @@ exports.CheckCart = checkCart;
 exports.Redirect = redirect;
 exports.Success = guard.ensure([ 'get' ], success);
 exports.Init = init;
-exports.Update = guard.ensure([ 'post' ], updateBasket);
-exports.PostProcess = postProcess;
