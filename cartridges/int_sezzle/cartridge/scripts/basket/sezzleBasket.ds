@@ -273,7 +273,7 @@
 		
 
 		/**
-		 * Build object with checkout data
+		 * Build object with checkout data and fetch the checkout url
 		 *
 		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {string} checkout data object in JSON format

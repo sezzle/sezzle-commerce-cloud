@@ -11,11 +11,6 @@
 	vertical-align: middle;
 }
 
-/* .sezzle-payment-method.form-row .field-wrapper .field-label img{
-	vertical-align: 53%;
-	width: 75px;
-}
- */
 .sezzle-payment-method.form-row .field-wrapper .field-label span{
 	vertical-align: 70%;
 }
@@ -27,10 +22,4 @@
 
 .sezzle-payment-method.form-row .field-wrapper img{
 	width:250px;
-}
-.js-countries_selectbox {
-	width: 100px; 
-	position: absolute; 
-	top: 0px; 
-	left: 210px;
 }

@@ -83,7 +83,6 @@ function postProcess(order){
 				}
 			});
 		} catch (e) {
-			sezzleUtils.order.voidOrder(order.custom.SezzleExternalId);
 			logger.debug('Sezzle Capturing error. Details - {0}', e);
 			return {error: true};
 		}

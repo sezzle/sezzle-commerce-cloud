@@ -13,10 +13,9 @@
 			service = require('dw/svc');
 		
 		/**
-		 * Update order by charge ID
+		 * Authenticate the merchant by public and private key
 		 *
-		 * @param {string} chargeId
-		 * @returns {Object} charge update event object
+		 * @returns {Object} auth token object
 		 */
 		self.authenticate = function () {
 			try {
@@ -39,33 +38,10 @@
 		};
 		
 		/**
-		 * Get charge object by token
+		 * Capture charge by order reference ID
 		 *
-		 * @param {string} token that was POSTed to the pipeline COPlaceOrder-Start
-		 * @returns {Object} charge object
-		 */
-		self.auth = function (token) {
-			try {
-				var sezzleService = service.ServiceRegistry.get('sezzle.auth');
-					
-				sezzleService.URL = sezzleData.getURLPath() + 'charges';
-				
-				return sezzleService.call({
-						'checkout_token' : token
-					}).object;
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
-				return {
-					error : false
-				};
-			}
-		};
-		
-		/**
-		 * Capture charge by charge ID
-		 *
-		 * @param {string} chargeId
-		 * @returns {Object} charge capture event object
+		 * @param {string} order_reference_id ref
+		 * @returns status
 		 */
 		self.capture = function (order_reference_id, order_number) {
 			try {
@@ -86,32 +62,10 @@
 		};
 		
 		/**
-		 * Void charge by charge ID
+		 * Refund payment by order reference ID
 		 *
-		 * @param {string} chargeId
-		 * @returns {Object} charge void event object
-		 */
-		self.void = function (chargeId) {
-			try {
-				var sezzleService = service.ServiceRegistry.get('sezzle.void');
-					
-				sezzleService.URL = sezzleData.getURLPath() + 'charges/' + chargeId + '/void';
-				
-				return sezzleService.call().object;
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
-				return {
-					error : false
-				};
-			}
-		};
-		
-		/**
-		 * Refund charge by charge ID
-		 *
-		 * @param {string} chargeId
-		 * @returns {Object} charge refund event object
-		 */
+		 * @param {string} order_reference_id
+		 * @returns status		 */
 		self.refund = function (order_reference_id) {
 			try {
 				var authentication = self.authenticate();
@@ -135,31 +89,10 @@
 		};
 		
 		/**
-		 * Update order by charge ID
+		 * Initiate a checkout - fetch the checkout url
 		 *
-		 * @param {string} chargeId
-		 * @returns {Object} charge update event object
-		 */
-		self.update = function (chargeId, updateData) {
-			try {
-				var sezzleService = service.ServiceRegistry.get('sezzle.update');
-					
-				sezzleService.URL = sezzleData.getURLPath() + 'charges/' + chargeId + '/update';
-				
-				return sezzleService.call(updateData).object;
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
-				return {
-					error : false
-				};
-			}
-		};
-		
-		/**
-		 * Refund charge by charge ID
-		 *
-		 * @param {string} chargeId
-		 * @returns {Object} charge refund event object
+		 * @param {Object} - Checkout Object
+		 * @returns {Object} object with checkout url
 		 */
 		self.initiateCheckout = function (checkoutObject) {
 			try {
