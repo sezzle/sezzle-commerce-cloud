@@ -59,16 +59,6 @@ service.ServiceRegistry.configure('sezzle.authenticate', {
 	parseResponse: responseParserN
 });
 
-service.ServiceRegistry.configure('sezzle.auth', {
-	createRequest: commonCreateRequest,
-	parseResponse: sezzleUtils.responseParser
-});
-
-service.ServiceRegistry.configure('sezzle.void', {
-	createRequest: commonCreateRequest,
-	parseResponse: sezzleUtils.responseParser
-});
-
 service.ServiceRegistry.configure('sezzle.refund', {
 	createRequest: commonCreateRequest,
 	parseResponse: sezzleUtils.responseParser
@@ -77,11 +67,6 @@ service.ServiceRegistry.configure('sezzle.refund', {
 service.ServiceRegistry.configure('sezzle.capture', {
 	createRequest: commonCreateRequest,
 	parseResponse: responseParserN
-});
-
-service.ServiceRegistry.configure('sezzle.update', {
-	createRequest: commonCreateRequest,
-	parseResponse: sezzleUtils.responseParser
 });
 
 service.ServiceRegistry.configure('sezzle.initiatecheckout', {
