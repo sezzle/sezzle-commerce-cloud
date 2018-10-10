@@ -10,6 +10,23 @@
                 <externally-managed-flag>true</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
+            <attribute-definition attribute-id="SezzlePaymentAction">
+                <display-name xml:lang="x-default">Sezzle Payment Action</display-name>
+                <description xml:lang="x-default">Defines by what action order was placed</description>
+                <type>enum-of-string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>true</externally-managed-flag>
+                <value-definitions>
+                    <value-definition>
+                        <display xml:lang="x-default">AUTHORIZATION</display>
+                        <value>AUTH</value>
+                    </value-definition>
+                    <value-definition>
+                        <display xml:lang="x-default">AUTHORIZATION + CAPTURE</display>
+                        <value>CAPTURE</value>
+                    </value-definition>
+                </value-definitions>
+            </attribute-definition>
             <attribute-definition attribute-id="SezzleStatus">
                 <display-name xml:lang="x-default">Sezzle Status</display-name>
                 <description xml:lang="x-default">Sezzle status of a order</description>
