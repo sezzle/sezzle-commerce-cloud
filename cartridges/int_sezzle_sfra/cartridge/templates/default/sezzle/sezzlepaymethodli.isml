@@ -1,0 +1,10 @@
+<li class="nav-item" data-method-id="${paymentOption.ID}">
+    <a class="nav-link sezzle-payment-tab" data-toggle="tab" href="#sezzle-payment-content" role="tab">
+        <img class="sezzle-payment-option"
+                src="https://cdn-assets.sezzle.com/images/blue_logo-transparent_bg.png"
+                height="32"
+                alt="${paymentOption.name}"
+                title="${paymentOption.name}"
+        >
+    </a>
+</li>

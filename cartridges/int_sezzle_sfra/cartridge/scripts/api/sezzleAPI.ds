@@ -1,0 +1,110 @@
+(function () {
+    /**
+     * Creates library-wrapper for Sezzle API
+     *
+     * @constructor
+     * @this {Api}
+     * @returns Api instance
+     */
+    var Api = function () {
+        var self = this;
+        var sezzleData = require('int_sezzle_sfra/cartridge/scripts/data/sezzleData.ds');
+        var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+        var service = require('dw/svc');
+        /**
+         * Get charge object by token
+         *
+         * @param {string} token that was POSTed to the pipeline CheckoutServices-PlaceOrder
+         * @returns {Object} charge object
+         */
+        self.auth = function (token) {
+            try {
+                var sezzleService = service.ServiceRegistry.get('sezzle.auth');
+                sezzleService.URL = sezzleData.getURLPath() + 'charges';
+                return sezzleService.call({
+                    'checkout_token': token
+                }).object;
+            } catch (e) {
+                logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+                return {
+                    error : false
+                };
+            }
+        };
+        /**
+         * Capture charge by charge ID
+         *
+         * @param {string} chargeId
+         * @returns {Object} charge capture event object
+         */
+        self.capture = function (chargeId, captureData) {
+            try {
+                var sezzleService = service.ServiceRegistry.get('sezzle.capture');
+                    
+                sezzleService.URL = sezzleData.getURLPath() + 'charges/' + chargeId + '/capture';
+                
+                return sezzleService.call({
+						'order_id' : captureData
+					}).object;
+            } catch (e) {
+                logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+                return { error : false }
+            }
+        };
+        /**
+         * Void charge by charge ID
+         *
+         * @param {string} chargeId
+         * @returns {Object} charge void event object
+         */
+        self.void = function (chargeId) {
+            try {
+                var sezzleService = service.ServiceRegistry.get('sezzle.void');
+                sezzleService.URL = sezzleData.getURLPath() + 'charges/' + chargeId + '/void';
+                return sezzleService.call().object;
+            } catch (e) {
+                logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+                return {
+                    error : false
+                };
+            }
+        };
+        /**
+         * Refund charge by charge ID
+         *
+         * @param {string} chargeId
+         * @returns {Object} charge refund event object
+         */
+        self.refund = function (chargeId) {
+            try {
+                var sezzleService = service.ServiceRegistry.get('sezzle.refund');
+                    
+                sezzleService.URL = sezzleData.getURLPath() + 'charges/' + chargeId + '/refund';
+                
+                return sezzleService.call().object;
+            } catch (e) {
+                logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+                return { error : false }
+            }
+        };
+        /**
+         * Update order by charge ID
+         *
+         * @param {string} chargeId
+         * @returns {Object} charge update event object
+         */
+        self.update = function (chargeId, updateData) {
+            try {
+                var sezzleService = service.ServiceRegistry.get('sezzle.update');
+                sezzleService.URL = sezzleData.getURLPath() + 'charges/' + chargeId + '/update';
+                return sezzleService.call(updateData).object;
+            } catch (e) {
+                logger.error('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+                return {
+                    error : false
+                };
+            }
+        };
+    };
+    module.exports = new Api();
+}());

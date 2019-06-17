@@ -1,0 +1,14 @@
+<isprint value="${sezzle.data.getSezzleVCNStatus() == 'on'}" encoding="on" />
+<isset name="sezzle" value="${require('int_sezzle_sfra/cartridge/scripts/sezzle.ds')}" scope="page" />
+<isset name="sezzleTotal" value="${pdict.Basket.totalGrossPrice.value}" scope="session" />
+<!--TODO:FIX: sezzleselected and  session.forms.billing.paymentMethods.selectedPaymentMethodID.value == 'Sezzle'  -->
+<div class="hide" 
+	data-vcndata='<isprint value="${sezzle.basket.getCheckout(pdict.basket)}" encoding="on" />'
+	data-enabled='<isprint value="${sezzle.data.getSezzleVCNStatus() == 'on'}" encoding="on" />'
+	data-sezzleselected='<isprint value="${true}" encoding="on" />'
+	data-errormessages='<isprint value="${sezzle.data.getErrorMessages()}" encoding="on" />'
+	data-updateurl='<isprint value="${dw.web.URLUtils.https("Sezzle-Update")}" encoding="on" />'
+	data-errorurl='<isprint value="${dw.web.URLUtils.https("Checkout-Begin")}" encoding="on" />'
+	data-csrfname='<isprint value="${dw.web.CSRFProtection.getTokenName()}" encoding="on" />'
+	data-csrftoken='<isprint value="${dw.web.CSRFProtection.generateToken()}" encoding="on" />'
+	id="vcn-data"></div>
