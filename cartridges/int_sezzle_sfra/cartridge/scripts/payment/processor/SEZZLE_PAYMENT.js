@@ -9,7 +9,7 @@
 var BasketMgr = require('dw/order/BasketMgr');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var Transaction = require('dw/system/Transaction');
-var sezzleUtils = require('int_sezzle_sfra/cartridge/scripts/sezzle');
+var sezzleUtils = require('int_sezzle/cartridge/scripts/sezzle');
 var OrderMgr = require('dw/order/OrderMgr');
 var Resource = require('dw/web/Resource');
 

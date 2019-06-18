@@ -1,5 +1,5 @@
-<isset name="sezzleData" value="${require('int_sezzle_sfra/cartridge/scripts/data/sezzleData.ds')}" scope="page" />
-<isset name="sezzleUtils" value="${require('int_sezzle_sfra/cartridge/scripts/utils/sezzleUtils')}" scope="page" />
+<isset name="sezzleData" value="${require('int_sezzle/cartridge/scripts/data/sezzleData.ds')}" scope="page" />
+<isset name="sezzleUtils" value="${require('int_sezzle/cartridge/scripts/utils/sezzleUtils')}" scope="page" />
 <isset name="promoModal" value="${''}" scope="page"/>
 
 <isif condition="${pdict.fpname}">
@@ -11,11 +11,15 @@
 	<iselse>
 		<isset name="basketTotal" value="${Basket.getAdjustedMerchandizeTotalPrice(true).add(Basket.giftCertificateTotalPrice)}" scope="page" />
 	</isif>
-	<p class="sezzle-as-low-as" data-sezzle-show="${sezzleData.getSezzleMinTotal() <= basketTotal.getValue() ? 'true' : ''}"
-		<isif condition="${!empty(promoModal) && !empty(promoModal.promoID)}">data-promo-id="${promoModal.promoID}"</isif>
-		<isif condition="${!empty(promoModal) && !empty(promoModal.modalID)}">data-modal-id="${promoModal.modalID}"</isif>
-		data-amount="${basketTotal.multiply(100).getValue().toFixed()}" data-sezzle-color="blue"></p>
+	
+	<isif condition="${sezzleData.getSezzleMinTotal() <= basketTotal.getValue()}">
+		<p class="sezzle-as-low-as" data-sezzle-show="${sezzleData.getSezzleMinTotal() <= basketTotal.getValue() ? 'true' : ''}"
+			<isif condition="${!empty(promoModal) && !empty(promoModal.promoID)}">data-promo-id="${promoModal.promoID}"</isif>
+			<isif condition="${!empty(promoModal) && !empty(promoModal.modalID)}">data-modal-id="${promoModal.modalID}"</isif>
+			data-amount="${basketTotal.multiply(100).getValue().toFixed()}" data-sezzle-color="blue" data-page-type="cart"></p>
+	</isif>
 <iselseif condition="${pdict.context == 'pdp' && sezzleData.getProductPromoMessageStatus()}">
+	
 	<isset name="Product" value="${require('dw/catalog/ProductMgr').getProduct(product.id)}" scope="page"/>
 	<isset name="psTop" value="${!empty(Product) && (Product.productSet || Product.bundle || Product.product)}" scope="page"/>
 	<isif condition="${psTop}">
@@ -36,7 +40,13 @@
 			<p class="sezzle-as-low-as"
 				<isif condition="${!empty(promoModal) && !empty(promoModal.promoID)}">data-promo-id="${promoModal.promoID}"</isif>
 				<isif condition="${!empty(promoModal) && !empty(promoModal.modalID)}">data-modal-id="${promoModal.modalID}"</isif>
-				data-amount="${price.multiply(100).getValue().toFixed()}" data-sezzle-color="blue"></p>
+				<isif condition="${Product.primaryCategory}">
+				data-category="${Product.primaryCategory.ID}"
+				<iselse>
+					<isif condition="${Product.classificationCategory}"> data-category="${Product.classificationCategory.ID}" </isif>
+				</isif>
+				<isif condition="${Product.brand}">data-brand="${Product.brand}"</isif>
+				data-amount="${price.multiply(100).getValue().toFixed()}" data-sezzle-color="blue" data-page-type="product" data-sku="${Product.ID}"></p>
 		</isif>
 	</isif>
 <iselseif condition="${pdict.context == 'plp' && sezzleData.getPLPPromoMessageStatus()}">
@@ -52,8 +62,26 @@
 		<p class="sezzle-as-low-as" height="52px" style="padding-bottom: 20px"
 			<isif condition="${!empty(promoModal) && !empty(promoModal.promoID)}">data-promo-id="${promoModal.promoID}"</isif>
 			<isif condition="${!empty(promoModal) && !empty(promoModal.modalID)}">data-modal-id="${promoModal.modalID}"</isif>
-			data-amount="${(price * 100).toFixed()}" data-sezzle-color="blue"></p>
+			<isif condition="${Product.brand}">data-brand="${Product.brand}"</isif>
+			<isif condition="${request.httpParameterMap.cgid.value}"> data-category="<isprint value=${request.httpParameterMap.cgid.value} encoding="htmlsinglequote"/>"
+			<iselse>
+				<isif condition="${Product.primaryCategory}">
+					data-category="${Product.primaryCategory.ID}"
+				<iselse>
+					<isif condition="${Product.classificationCategory}"> data-category="${Product.classificationCategory.ID}" </isif>
+				</isif>
+			</isif>
+			
+			data-amount="${(price * 100).toFixed()}" data-sezzle-color="blue"  data-sku="${Product.ID}"></p>
 	<iselse/>
 		<p style="padding-bottom: 49px"></p>
 	</isif>
+	
+	<script>
+		$(".sezzle-as-low-as").ready(function(){
+			$(".sezzle-as-low-as").each(function(){
+				this.dataset.pageType = $('.homepage').length ? 'homepage' : 'category';
+			}) 
+		})
+	</script>
 </isif>
