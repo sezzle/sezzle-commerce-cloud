@@ -11,7 +11,7 @@ var URLUtils = require('dw/web/URLUtils');
 var server = require('server');
 var BasketMgr = require('dw/order/BasketMgr');
 var ISML = require('dw/template/ISML');
-var sezzle = require('*/cartridge/scripts/sezzle.ds');
+var sezzle = require('int_sezzle_sfra/cartridge/scripts/sezzle.ds');
 var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
  
  
@@ -20,26 +20,16 @@ var Transaction = require('dw/system/Transaction');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var Order = require('dw/order/Order');
 var PaymentMgr = require('dw/order/PaymentMgr');
-var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
+var sezzleHelper = require('int_sezzle_sfra/cartridge/scripts/utils/sezzleHelper');
 var OrderModel = require('*/cartridge/models/order');
-var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
-var hooksHelper = require('*/cartridge/scripts/helpers/hooks');
+
 
 /**
  * Handle successful response from Sezzle
  */
-server.get(
-		'Success',
-		server.middleware.https,
-	    csrfProtection.generateToken,
-	    function(req, res, next) {
+server.get('Success', function(req, res, next) {
 	// Creates a new order.
 	var currentBasket = BasketMgr.getCurrentBasket();
-	if(!currentBasket){
-		res.redirect(URLUtils.url('Cart-Show').toString());
-	   return next();
-	}
-	
 	
 	var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
 	
@@ -49,8 +39,6 @@ server.get(
         });
         return next();
     }
-	
-
 	
     var order = COHelpers.createOrder(currentBasket);
     if (!order) {
@@ -69,16 +57,15 @@ server.get(
         });
         return next();
     }
-    var fraudDetectionStatus = hooksHelper('app.fraud.detection', 'fraudDetection', currentBasket, require('*/cartridge/scripts/hooks/fraudDetection').fraudDetection);
     
-    var orderPlacementStatus = COHelpers.placeOrder(order, fraudDetectionStatus);
+    var orderPlacementStatus = COHelpers.placeOrder(order);
 
     if (orderPlacementStatus.error) {
         return next(new Error('Could not place order'));
     }
     
     sezzleHelper.PostProcess(order);
-
+    
     COHelpers.sendConfirmationEmail(order, req.locale.id);
     
     var config = {
@@ -146,8 +133,8 @@ server.get('CheckoutObject', function(req, res, next){
 		return next();
 	}
 	var sezzleTotal = basket.totalGrossPrice.value;
-	var vcndata = sezzle.basket.getCheckout(basket, 1);
-	var enabled = sezzle.data.getSezzleVCNStatus() == 'on' ? true : false;
+	var vcndata = sezzle.basket.getCheckout(basket);
+	var enabled = sezzle.data.getSezzleVCNStatus() == 'on'?true:false;
 	var sezzleselected = true;
 	var errormessages = sezzle.data.getErrorMessages();
 
@@ -170,27 +157,6 @@ server.get('CheckoutObject', function(req, res, next){
  * gift certificates in basket
  */
 
-
-
-/**
- * 
- * Places sezzle tracking script to orderconfirmation page
- */
-server.get('Tracking', function(req, res, next) {
-	 
-		var orderId = request.httpParameterMap.orderId ? request.httpParameterMap.orderId.stringValue : false;
-		if (orderId){
-			var obj = sezzle.order.trackOrderConfirmed(orderId);
-			res.setContentType('text/html')
-			res.render('order/trackingscript', {
-				sezzleOnlineAndAnalytics: sezzle.data.getAnalyticsStatus(),
-				orderInfo : JSON.stringify(obj.orderInfo),
-				productInfo: JSON.stringify(obj.productInfo)
-	        });
-		}
-	
-	 next(); 
-})
 
 module.exports = server.exports();
 

@@ -1,16 +1,12 @@
 $(function () {
     $(document).on('click', '.place-order', function (e) {
-    	if ( $('.payment-information').data( "payment-method-id" ) !== "Sezzle" ){
-    		return true;
-    	}
-    	if (!$('#vcn-data').data('sezzleselected') || window.vcn_approved) {
+        if (!$('#vcn-data').data('sezzleselected') || window.vcn_approved) {
              return true;
         }
         var checkoutObject = $('#vcn-data').data('vcndata');
         if ($('#vcn-data').data('enabled')) {
-        	var $thisBtn = $(this);
-        	$('#vcn-data').data('vcncomplete', 'true');
-        	e.preventDefault();
+            var $thisBtn = $(this);
+            e.preventDefault();
             delete checkoutObject.metadata.mode;
             sezzle.checkout.open_vcn({
                 success: function (card_details) {
@@ -22,6 +18,7 @@ $(function () {
                         success: function (response) {
                             if (!response.error) {
                                 window.vcn_approved = true;
+                                console.log($thisBtn);
                                 $thisBtn.click();
                             } else if ($('div.error-form').length) {
                                 $('div.error-form').text($('#vcn-data').data('errormessages')['default']);

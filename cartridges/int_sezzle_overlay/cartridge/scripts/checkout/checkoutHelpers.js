@@ -5,7 +5,9 @@ var server = require('server');
 var collections = require('*/cartridge/scripts/util/collections');
 
 var BasketMgr = require('dw/order/BasketMgr');
+var HashMap = require('dw/util/HashMap');
 var HookMgr = require('dw/system/HookMgr');
+var Mail = require('dw/net/Mail');
 var OrderMgr = require('dw/order/OrderMgr');
 var PaymentInstrument = require('dw/order/PaymentInstrument');
 var PaymentMgr = require('dw/order/PaymentMgr');
@@ -13,6 +15,7 @@ var Order = require('dw/order/Order');
 var Status = require('dw/system/Status');
 var Resource = require('dw/web/Resource');
 var Site = require('dw/system/Site');
+var Template = require('dw/util/Template');
 var Transaction = require('dw/system/Transaction');
 var Money = require('dw/value/Money');
 
@@ -22,7 +25,7 @@ var formErrors = require('*/cartridge/scripts/formErrors');
 var renderTemplateHelper = require('*/cartridge/scripts/renderTemplateHelper');
 var ShippingHelper = require('*/cartridge/scripts/checkout/shippingHelpers');
 
-var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
+//var sezzle = require('int_sezzle_sfra/cartridge/controllers/Sezzle')
 
 // static functions needed for Checkout Controller logic
 
@@ -167,8 +170,7 @@ function copyShippingAddressToShipment(shippingData, shipmentOrNull) {
         shippingAddress.setCity(shippingData.address.city);
         shippingAddress.setPostalCode(shippingData.address.postalCode);
         shippingAddress.setStateCode(shippingData.address.stateCode);
-        var countryCode = shippingData.address.countryCode.value ? shippingData.address.countryCode.value : shippingData.address.countryCode;
-        shippingAddress.setCountryCode(countryCode);
+        shippingAddress.setCountryCode(shippingData.address.countryCode);
         shippingAddress.setPhone(shippingData.address.phone);
 
         ShippingHelper.selectShippingMethod(shipment, shippingData.shippingMethod);
@@ -178,9 +180,9 @@ function copyShippingAddressToShipment(shippingData, shipmentOrNull) {
 /**
  * Copies a raw address object to the baasket billing address
  * @param {Object} address - an address-similar Object (firstName, ...)
- * @param {Object} currentBasket - the current shopping basket
  */
-function copyBillingAddressToBasket(address, currentBasket) {
+function copyBillingAddressToBasket(address) {
+    var currentBasket = BasketMgr.getCurrentBasket();
     var billingAddress = currentBasket.billingAddress;
 
     Transaction.wrap(function () {
@@ -223,24 +225,6 @@ function getFirstNonDefaultShipmentWithProductLineItems(currentBasket) {
 }
 
 /**
- * Loop through all shipments and make sure all not null
- * @param {dw.order.LineItemCtnr} lineItemContainer - Current users's basket
- * @returns {boolean} - allValid
- */
-function ensureValidShipments(lineItemContainer) {
-    var shipments = lineItemContainer.shipments;
-    var allValid = collections.every(shipments, function (shipment) {
-        if (shipment) {
-            var address = shipment.shippingAddress;
-            return address && address.address1;
-        }
-        return false;
-    });
-    return allValid;
-}
-
-
-/**
  * Ensures that no shipment exists with 0 product line items
  * @param {Object} req - the request object needed to access session.privacyCache
  */
@@ -279,11 +263,6 @@ function ensureNoEmptyShipments(req) {
                         currentBasket.defaultShipment.createShippingAddress();
                     }
 
-                    if (altShipment.custom && altShipment.custom.fromStoreId && altShipment.custom.shipmentType) {
-                        currentBasket.defaultShipment.custom.fromStoreId = altShipment.custom.fromStoreId;
-                        currentBasket.defaultShipment.custom.shipmentType = altShipment.custom.shipmentType;
-                    }
-
                     currentBasket.defaultShipment.setShippingMethod(altShipment.shippingMethod);
                     // then delete 2nd one
                     shipmentsToDelete.push(altShipment);
@@ -306,7 +285,7 @@ function ensureNoEmptyShipments(req) {
 function recalculateBasket(currentBasket) {
     // Calculate the basket
     Transaction.wrap(function () {
-        basketCalculationHelpers.calculateTotals(currentBasket);
+        HookMgr.callHook('dw.order.calculate', 'calculate', currentBasket);
     });
 }
 
@@ -405,12 +384,15 @@ function validatePayment(req, currentBasket) {
         countryCode,
         paymentAmount
     );
+    
+   // applicablePaymentMethods = require('int_sezzle_sfra/cartridge/scripts/sezzle.ds').Init(currentBasket, applicablePaymentMethods);
+    
     applicablePaymentCards = creditCardPaymentMethod.getApplicablePaymentCards(
         currentCustomer,
         countryCode,
         paymentAmount
     );
-
+   
     var invalid = true;
 
     for (var i = 0; i < paymentInstruments.length; i++) {
@@ -528,32 +510,37 @@ function handlePayments(order, orderNumber) {
  */
 function sendConfirmationEmail(order, locale) {
     var OrderModel = require('*/cartridge/models/order');
-    var emailHelpers = require('*/cartridge/scripts/helpers/emailHelpers');
     var Locale = require('dw/util/Locale');
 
+    var confirmationEmail = new Mail();
+    var context = new HashMap();
     var currentLocale = Locale.getLocale(locale);
 
     var orderModel = new OrderModel(order, { countryCode: currentLocale.country });
 
     var orderObject = { order: orderModel };
 
-    var emailObj = {
-        to: order.customerEmail,
-        subject: Resource.msg('subject.order.confirmation.email', 'order', null),
-        from: Site.current.getCustomPreferenceValue('customerServiceEmail') || 'no-reply@salesforce.com',
-        type: emailHelpers.emailTypes.orderConfirmation
-    };
+    confirmationEmail.addTo(order.customerEmail);
+    confirmationEmail.setSubject(Resource.msg('subject.order.confirmation.email', 'order', null));
+    confirmationEmail.setFrom(Site.current.getCustomPreferenceValue('customerServiceEmail')
+        || 'no-reply@salesforce.com');
 
-    emailHelpers.sendEmail(emailObj, 'checkout/confirmation/confirmationEmail', orderObject);
+    Object.keys(orderObject).forEach(function (key) {
+        context.put(key, orderObject[key]);
+    });
+
+    var template = new Template('checkout/confirmation/confirmationEmail');
+    var content = template.render(context).text;
+    confirmationEmail.setContent(content, 'text/html', 'UTF-8');
+    confirmationEmail.send();
 }
 
 /**
  * Attempts to place the order
  * @param {dw.order.Order} order - The order object to be placed
- * @param {Object} fraudDetectionStatus - an Object returned by the fraud detection hook
  * @returns {Object} an error object
  */
-function placeOrder(order, fraudDetectionStatus) {
+function placeOrder(order) {
     var result = { error: false };
 
     try {
@@ -562,13 +549,7 @@ function placeOrder(order, fraudDetectionStatus) {
         if (placeOrderStatus === Status.ERROR) {
             throw new Error();
         }
-
-        if (fraudDetectionStatus.status === 'flag') {
-            order.setConfirmationStatus(Order.CONFIRMATION_STATUS_NOTCONFIRMED);
-        } else {
-            order.setConfirmationStatus(Order.CONFIRMATION_STATUS_CONFIRMED);
-        }
-
+        order.setConfirmationStatus(Order.CONFIRMATION_STATUS_CONFIRMED);
         order.setExportStatus(Order.EXPORT_STATUS_READY);
         Transaction.commit();
     } catch (e) {
@@ -590,7 +571,7 @@ function savePaymentInstrumentToWallet(billingData, currentBasket, customer) {
     var wallet = customer.getProfile().getWallet();
 
     return Transaction.wrap(function () {
-        var storedPaymentInstrument = wallet.createPaymentInstrument(PaymentInstrument.METHOD_CREDIT_CARD);
+        var storedPaymentInstrument = wallet.createPaymentInstrument('CREDIT_CARD');
 
         storedPaymentInstrument.setCreditCardHolder(
             currentBasket.billingAddress.fullName
@@ -608,9 +589,8 @@ function savePaymentInstrumentToWallet(billingData, currentBasket, customer) {
             billingData.paymentInformation.expirationYear.value
         );
 
-        var processor = PaymentMgr.getPaymentMethod(PaymentInstrument.METHOD_CREDIT_CARD).getPaymentProcessor();
         var token = HookMgr.callHook(
-            'app.payment.processor.' + processor.ID.toLowerCase(),
+            'app.payment.processor.basic_credit',
             'createMockToken'
         );
 
@@ -646,34 +626,6 @@ function getRenderedPaymentInstruments(req, accountModel) {
     return result || null;
 }
 
-/**
- * sets the gift message on a shipment
- * @param {dw.order.Shipment} shipment - Any shipment for the current basket
- * @param {boolean} isGift - is the shipment a gift
- * @param {string} giftMessage - The gift message the user wants to attach to the shipment
- * @returns {Object} object containing error information
- */
-function setGift(shipment, isGift, giftMessage) {
-    var result = { error: false, errorMessage: null };
-
-    try {
-        Transaction.wrap(function () {
-            shipment.setGift(isGift);
-
-            if (isGift && giftMessage) {
-                shipment.setGiftMessage(giftMessage);
-            } else {
-                shipment.setGiftMessage(null);
-            }
-        });
-    } catch (e) {
-        result.error = true;
-        result.errorMessage = Resource.msg('error.message.could.not.be.attached', 'checkout', null);
-    }
-
-    return result;
-}
-
 function getNonGiftCertificateAmount(basket) {
     // The total redemption amount of all gift certificate payment instruments in the basket.
     var giftCertTotal = new Money(0.0, basket.getCurrencyCode());
@@ -700,8 +652,6 @@ function getNonGiftCertificateAmount(basket) {
     return amountOpen;
 }
 
-
-
 module.exports = {
     getFirstNonDefaultShipmentWithProductLineItems: getFirstNonDefaultShipmentWithProductLineItems,
     ensureNoEmptyShipments: ensureNoEmptyShipments,
@@ -726,8 +676,5 @@ module.exports = {
     savePaymentInstrumentToWallet: savePaymentInstrumentToWallet,
     getRenderedPaymentInstruments: getRenderedPaymentInstruments,
     sendConfirmationEmail: sendConfirmationEmail,
-    ensureValidShipments: ensureValidShipments,
-    setGift: setGift,
     getNonGiftCertificateAmount: getNonGiftCertificateAmount
-    
 };

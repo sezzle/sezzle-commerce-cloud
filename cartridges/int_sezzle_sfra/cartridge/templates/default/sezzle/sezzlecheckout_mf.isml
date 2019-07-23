@@ -9,16 +9,12 @@
  // Use your live public API Key and https://cdn1.sezzle.com/js/v2/sezzle.js script to point to Sezzle production environment.
 </script>
 <script>
-
-	sezzle.checkout(<isprint value="${sezzle.basket.getCheckout(pdict.Basket, 1)}" encoding="on" />);
-
+	sezzle.checkout(<isprint value="${sezzle.basket.getCheckout(pdict.Basket)}" encoding="on" />);
 	sezzle.checkout.post();
 	sezzle.ui.ready(
 	    function() {
 	        sezzle.ui.error.on("close", function(){
-
 	            window.location.replace("<isprint value="${dw.web.URLUtils.https('Checkout-Begin')}" encoding="on" />");
-
 	        });
 	    }
 	);
