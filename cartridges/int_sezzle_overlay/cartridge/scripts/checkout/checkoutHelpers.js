@@ -225,6 +225,51 @@ function getFirstNonDefaultShipmentWithProductLineItems(currentBasket) {
 }
 
 /**
+ * Loop through all shipments and make sure all not null
+ * @param {dw.order.LineItemCtnr} lineItemContainer - Current users's basket
+ * @returns {boolean} - allValid
+ */
+function ensureValidShipments(lineItemContainer) {
+    var shipments = lineItemContainer.shipments;
+    var allValid = collections.every(shipments, function (shipment) {
+        if (shipment) {
+            var address = shipment.shippingAddress;
+            return address && address.address1;
+        }
+        return false;
+    });
+    return allValid;
+}
+
+/**
+ * sets the gift message on a shipment
+ * @param {dw.order.Shipment} shipment - Any shipment for the current basket
+ * @param {boolean} isGift - is the shipment a gift
+ * @param {string} giftMessage - The gift message the user wants to attach to the shipment
+ * @returns {Object} object containing error information
+ */
+function setGift(shipment, isGift, giftMessage) {
+    var result = { error: false, errorMessage: null };
+
+    try {
+        Transaction.wrap(function () {
+            shipment.setGift(isGift);
+
+            if (isGift && giftMessage) {
+                shipment.setGiftMessage(giftMessage);
+            } else {
+                shipment.setGiftMessage(null);
+            }
+        });
+    } catch (e) {
+        result.error = true;
+        result.errorMessage = Resource.msg('error.message.could.not.be.attached', 'checkout', null);
+    }
+
+    return result;
+}
+
+/**
  * Ensures that no shipment exists with 0 product line items
  * @param {Object} req - the request object needed to access session.privacyCache
  */
@@ -676,5 +721,7 @@ module.exports = {
     savePaymentInstrumentToWallet: savePaymentInstrumentToWallet,
     getRenderedPaymentInstruments: getRenderedPaymentInstruments,
     sendConfirmationEmail: sendConfirmationEmail,
+    ensureValidShipments: ensureValidShipments,
+    setGift: setGift,
     getNonGiftCertificateAmount: getNonGiftCertificateAmount
 };
