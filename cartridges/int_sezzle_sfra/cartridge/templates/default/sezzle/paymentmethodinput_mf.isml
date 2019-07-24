@@ -25,6 +25,5 @@
          data-vcnenabled='<isprint value="${sezzle.data.getSezzleVCNStatus() == 'on'}" encoding="on" />'
          data-sezzleenabled='<isprint value="${sezzle.data.getSezzleOnlineStatus()}" encoding="on" />'
          data-affirupdateurl='<isprint value="${URLUtils.url('Sezzle-CheckoutObject')}" encoding="on" />'
-         data-mode='<isprint value="${dw.system.Site.getCurrent().getCustomPreferenceValue('SezzleModalEnable').value}" encoding="on" />'
-         ></div>
+         </div>
 </div>
