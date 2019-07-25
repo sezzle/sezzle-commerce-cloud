@@ -28,7 +28,10 @@ var parametersMap = request.httpParameterMap;
 
 function checkCart(cart) {
 	var basket = 'object' in cart ? cart.object : cart;
+	var logger = require('dw/system').Logger.getLogger('Snow', '');
+	
 	if (!cart.paymentInstrument){
+		logger.debug('34');
 		return {
 			status:{
 					error: true
@@ -37,6 +40,7 @@ function checkCart(cart) {
 	}
 	var selectedPaymentMethod = cart.paymentInstrument.paymentMethod;
 	if (!sezzle.data.getSezzleOnlineStatus() || selectedPaymentMethod != 'Sezzle'){
+		logger.debug('43');
 		return {
 			status: new Status(Status.OK),
 			authResponse: null
@@ -44,6 +48,7 @@ function checkCart(cart) {
 	}
 	if (sezzle.data.getSezzleVCNStatus() == 'on'){
 		if (basket.totalGrossPrice.value != session.custom.sezzleTotal || basket.giftCertificateTotalPrice.value > 0){
+			logger.debug('51');
 			return {
 				status:{
 					error: true,
@@ -61,6 +66,7 @@ function checkCart(cart) {
 		var test = parametersMap;
 		var token = parametersMap.checkout_token.stringValue;
 		if (empty(token)) {
+			logger.debug('69');
 			return {
 				status:{
 					error: true,
@@ -73,6 +79,7 @@ function checkCart(cart) {
 		session.custom.sezzleFirstEventID = sezzleResponse.response.events[0].id;
 		session.custom.sezzleAmount = sezzleResponse.response.amount;
 		if (empty(sezzleResponse) || sezzleResponse.error){
+			logger.debug('82');
 			return {
 				status:{
 					error: true,
@@ -83,6 +90,7 @@ function checkCart(cart) {
 		var sezzleStatus = sezzle.basket.syncBasket(basket, sezzleResponse.response);
 		if (sezzleStatus.error){
 			sezzle.order.voidOrder(sezzleResponse.response.id);
+			logger.debug('93');
             return {
     			status:{
     				error: sezzleStatus.error,
@@ -120,7 +128,8 @@ function postProcess(order){
 }
 
 function redirect() {
-	
+	var logger = require('dw/system').Logger.getLogger('Snow', '');
+	logger.debug('redirection');
 	if(server.forms.getForm('billing').paymentMethod == SEZZLE_PAYMENT_METHOD  && sezzle.data.getSezzleVCNStatus() != 'on'){
 	var basket = BasketMgr.getCurrentBasket();	
 		

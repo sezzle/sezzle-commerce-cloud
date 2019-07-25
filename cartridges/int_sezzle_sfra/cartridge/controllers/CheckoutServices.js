@@ -349,6 +349,10 @@ server.replace(
 
 
 server.replace('PlaceOrder', server.middleware.https, function (req, res, next) {
+	
+	var logger = require('dw/system').Logger.getLogger('Snow', '');
+	logger.debug('order place');
+	
     var BasketMgr = require('dw/order/BasketMgr');
     var HookMgr = require('dw/system/HookMgr');
     var Resource = require('dw/web/Resource');
@@ -357,7 +361,16 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
 
     var currentBasket = BasketMgr.getCurrentBasket();
     
-
+    var viewData = {};
+    viewData.phone = { value: '1235' };
+    res.setViewData(viewData);
+    res.json({
+        error: false,
+        continueUrl: URLUtils.url('Sezzle-Redirect').toString()
+    });
+    logger.debug('368');
+    return next();
+    logger.debug('370');
     if (!currentBasket) {
         res.json({
             error: true,
@@ -366,22 +379,10 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
             serverErrors: [],
             redirectUrl: URLUtils.url('Cart-Show').toString()
         });
+        logger.debug('373');
         return next();
     }
-
-    var validationBasketStatus = HookMgr.callHook(
-        'app.validate.basket',
-        'validateBasket',
-        currentBasket,
-        false
-    );
-    if (validationBasketStatus.error) {
-        res.json({
-            error: true,
-            errorMessage: validationBasketStatus.message
-        });
-        return next();
-    }
+    logger.debug('376');
 
     // Check to make sure there is a shipping address
     if (currentBasket.defaultShipment.shippingAddress === null) {
@@ -393,9 +394,10 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
             },
             errorMessage: Resource.msg('error.no.shipping.address', 'checkout', null)
         });
+        logger.debug('388');
         return next();
     }
-
+    logger.debug('391');
     // Check to make sure billing address exists
     if (!currentBasket.billingAddress) {
         res.json({
@@ -406,14 +408,15 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
             },
             errorMessage: Resource.msg('error.no.billing.address', 'checkout', null)
         });
+        logger.debug('402');
         return next();
     }
-
+    logger.debug('405');
     // Calculate the basket
     Transaction.wrap(function () {
         HookMgr.callHook('dw.order.calculate', 'calculate', currentBasket);
     });
-
+    logger.debug('410');
     // Re-validates existing payment instruments
     var validPayment = COHelpers.validatePayment(req, currentBasket);
     if (validPayment.error) {
@@ -425,9 +428,10 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
             },
             errorMessage: Resource.msg('error.payment.not.valid', 'checkout', null)
         });
+        logger.debug('422');
         return next();
     }
-
+    logger.debug('425');
     // Re-calculate the payments.
     var calculatedPaymentTransactionTotal = COHelpers.calculatePaymentTransaction(currentBasket);
     if (calculatedPaymentTransactionTotal.error) {
@@ -435,21 +439,24 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
             error: true,
             errorMessage: Resource.msg('error.technical', 'checkout', null)
         });
+        logger.debug('433');
         return next();
     }
     
     //var sezzleHelper = require('int_sezzle_sfra/cartridge/controllers/Sezzle');
-    var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
-    if (sezzleCheck.status.error){
-    	res.render('/error', {
-    		error: true,
-            errorMessage: Resource.msg('error.technical', 'checkout', null)
-        });
-        return next();
-    }
+//    var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
+//    if (sezzleCheck.status.error){
+//    	res.render('/error', {
+//    		error: true,
+//            errorMessage: Resource.msg('error.technical', 'checkout', null)
+//        });
+//    	logger.debug(sezzleCheck.status.error);
+//    	logger.debug('444');
+//        return next();
+//    }
     
     
-
+    logger.debug('450');
     // Creates a new order.
     var order = COHelpers.createOrder(currentBasket);
     if (!order) {
@@ -457,9 +464,10 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
             error: true,
             errorMessage: Resource.msg('error.technical', 'checkout', null)
         });
+        logger.debug('457');
         return next();
     }
-
+    logger.debug('461');
     // Handles payment authorization
     var handlePaymentResult = COHelpers.handlePayments(order, order.orderNo);
     if (handlePaymentResult.error) {
@@ -467,9 +475,10 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
             error: true,
             errorMessage: Resource.msg('error.technical', 'checkout', null)
         });
+        logger.debug('468');
         return next();
     }
-
+    logger.debug('472');
     // Places the order
     var placeOrderResult = COHelpers.placeOrder(order);
     if (placeOrderResult.error) {
@@ -477,26 +486,28 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
             error: true,
             errorMessage: Resource.msg('error.technical', 'checkout', null)
         });
+        logger.debug('479');
         return next();
     }
     
     
-
-    COHelpers.sendConfirmationEmail(order, req.locale.id);
-
+    logger.debug('485');
+    //COHelpers.sendConfirmationEmail(order, req.locale.id);
+    logger.debug('487');
     // Reset usingMultiShip after successful Order placement
     req.session.privacyCache.set('usingMultiShipping', false);
 
     // TODO: Exposing a direct route to an Order, without at least encoding the orderID
     //  is a serious PII violation.  It enables looking up every customers orders, one at a
     //  time.
+    
     res.json({
         error: false,
         orderID: order.orderNo,
         orderToken: order.orderToken,
         continueUrl: URLUtils.url('Order-Confirm').toString()
     });
-
+    logger.debug('501');
     return next();
 });
 

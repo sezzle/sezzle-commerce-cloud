@@ -2,39 +2,74 @@
  * This script used for defining and configuring Sezzle services
  *
  */
-var service = require('dw/svc');
-var sezzleUtils = require('int_sezzle_sfra/cartridge/scripts/utils/jobUtils.ds');
-var StringUtils = require('dw/util/StringUtils');
-var getAuthHeader = function (currentSite) {
-        var authString = currentSite.getCustomPreferenceValue('SezzlePublicKey')
-            + ':' + currentSite.getCustomPreferenceValue('SezzlePrivateKey');
-        return 'Basic ' + StringUtils.encodeBase64(authString);
-    },
-    commonCreateRequest = function (svc, args) {
-        svc.setRequestMethod('POST');
-        svc.addHeader('Content-Type', 'application/json');
-        svc.addHeader('Authorization', getAuthHeader(require('dw/system/Site').current));
-        if (!empty(args)) {
-            return JSON.stringify(args);
-        }
-    };
-service.ServiceRegistry.configure('sezzle.auth', {
-    createRequest: commonCreateRequest,
-    parseResponse: sezzleUtils.responseParser
+var service = require('dw/svc'),
+	sezzleUtils = require('int_sezzle_sfra/cartridge/scripts/utils/sezzleUtils.ds'),
+	StringUtils = require('dw/util/StringUtils'),
+	getAuthHeader = function(currentSite){
+		var authString = currentSite.getCustomPreferenceValue('SezzlePublicKey')
+			+ ':' + currentSite.getCustomPreferenceValue('SezzlePrivateKey');
+		return 'Basic ' + StringUtils.encodeBase64(authString);
+	},
+	commonCreateRequest = function(svc, args){
+		svc.setRequestMethod('POST');
+		svc.addHeader('Content-Type', 'application/json');
+		if (!empty(args)) {
+			if (args.authToken){
+				svc.addHeader('Authorization', 'Bearer ' + args.authToken);
+			}
+			return JSON.stringify(args);
+		}
+		
+	},
+	responseParserN = function (svc, client) {
+			var response;
+			response = {
+				error : true,
+				response : JSON.parse(client.text)
+			}
+			
+			switch (client.statusCode) {
+				case 200:
+					response = {
+						error : false,
+						response : JSON.parse(client.text) 	
+					};
+					break;
+				case 201:
+					response = {
+						error : false,
+						response : JSON.parse(client.text)
+					};
+					break;
+				case 400:
+				case 401:
+				case 404:
+					response = {
+						error : true,
+						response : JSON.parse(client.text)
+					};
+					break;
+			}
+			
+			return response;
+		};
+	
+service.ServiceRegistry.configure('sezzle.authenticate', {
+	createRequest: commonCreateRequest,
+	parseResponse: responseParserN
 });
-service.ServiceRegistry.configure('sezzle.void', {
-    createRequest: commonCreateRequest,
-    parseResponse: sezzleUtils.responseParser
-});
+
 service.ServiceRegistry.configure('sezzle.refund', {
-    createRequest: commonCreateRequest,
-    parseResponse: sezzleUtils.responseParser
+	createRequest: commonCreateRequest,
+	parseResponse: sezzleUtils.responseParser
 });
+
 service.ServiceRegistry.configure('sezzle.capture', {
-    createRequest: commonCreateRequest,
-    parseResponse: sezzleUtils.responseParser
+	createRequest: commonCreateRequest,
+	parseResponse: responseParserN
 });
-service.ServiceRegistry.configure('sezzle.update', {
-    createRequest: commonCreateRequest,
-    parseResponse: sezzleUtils.responseParser
+
+service.ServiceRegistry.configure('sezzle.initiatecheckout', {
+	createRequest: commonCreateRequest,
+	parseResponse: responseParserN
 });

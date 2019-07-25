@@ -1,29 +1,14 @@
 <div class="tab-pane sezzle-payment-content" id="sezzle-payment-content" role="tabpanel">
-	<fieldset class="sezzle-form">
-	<div class="form-row label-inline sezzle-payment-method">
-		<div class="field-wrapper">
-			<input type="hidden" class="form-control"
-            name="${pdict.forms.billingForm.paymentMethod.htmlName}"
-            value="Sezzle">
+	<fieldset class="payment-form-fields">
 
-			<label for="sezzlePayment" class="field-label">
-				<img alt="${Resource.msg('paymentMethodType.label','forms',null)}"
-					src="https://cdn-assets.sezzle.com/images/blue_logo-transparent_bg.png"
-					title="${Resource.msg('paymentMethodType.label','forms',null)}"/>
-				<span>${Resource.msg('payment.monthlypayments', 'sezzle', null)}</span>
-				<a class="sezzle-product-modal" style="" data-amount="${require('dw/order/BasketMgr').currentBasket.totalGrossPrice.multiply(100).getValue().toFixed()}"
-				>${Resource.msg('payment.learnmore', 'sezzle', null)}</a>
-			</label>
-		</div>
-		${Resource.msg('payment.info', 'sezzle', null)}
-	</div>
-	   </fieldset>
-		 <isset name="sezzle" value="${require('int_sezzle_sfra/cartridge/scripts/sezzle.ds')}" scope="page" />
-		 <isset name="sezzleTotal" value="${pdict.order.totals.grandTotal}" scope="session" />
-		 <!--TODO:FIX: sezzleselected and  session.forms.billing.paymentMethod.value == 'Sezzle'  -->
-         <div id="sezzle-config"
-         data-vcnenabled='<isprint value="${sezzle.data.getSezzleVCNStatus() == 'on'}" encoding="on" />'
-         data-sezzleenabled='<isprint value="${sezzle.data.getSezzleOnlineStatus()}" encoding="on" />'
-         data-affirupdateurl='<isprint value="${URLUtils.url('Sezzle-CheckoutObject')}" encoding="on" />'
-         </div>
+        <!--- payment method is sezzle pay --->
+        <input type="hidden" class="form-control"
+               name="${pdict.forms.billingForm.paymentMethod.htmlName}"
+               value="Sezzle"
+        >
+        
+        
+
+
+    </fieldset>
 </div>

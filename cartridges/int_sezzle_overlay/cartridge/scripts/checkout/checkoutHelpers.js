@@ -29,6 +29,39 @@ var ShippingHelper = require('*/cartridge/scripts/checkout/shippingHelpers');
 
 // static functions needed for Checkout Controller logic
 
+function ensureValidShipments(lineItemContainer) {
+    var shipments = lineItemContainer.shipments;
+    var allValid = collections.every(shipments, function (shipment) {
+        if (shipment) {
+            var address = shipment.shippingAddress;
+            return address && address.address1;
+        }
+        return false;
+    });
+    return allValid;
+}
+
+function setGift(shipment, isGift, giftMessage) {
+    var result = { error: false, errorMessage: null };
+
+    try {
+        Transaction.wrap(function () {
+            shipment.setGift(isGift);
+
+            if (isGift && giftMessage) {
+                shipment.setGiftMessage(giftMessage);
+            } else {
+                shipment.setGiftMessage(null);
+            }
+        });
+    } catch (e) {
+        result.error = true;
+        result.errorMessage = Resource.msg('error.message.could.not.be.attached', 'checkout', null);
+    }
+
+    return result;
+}
+
 /**
  * Prepares the Shipping form
  * @returns {Object} processed Shipping form object
@@ -222,51 +255,6 @@ function getFirstNonDefaultShipmentWithProductLineItems(currentBasket) {
     }
 
     return match;
-}
-
-/**
- * Loop through all shipments and make sure all not null
- * @param {dw.order.LineItemCtnr} lineItemContainer - Current users's basket
- * @returns {boolean} - allValid
- */
-function ensureValidShipments(lineItemContainer) {
-    var shipments = lineItemContainer.shipments;
-    var allValid = collections.every(shipments, function (shipment) {
-        if (shipment) {
-            var address = shipment.shippingAddress;
-            return address && address.address1;
-        }
-        return false;
-    });
-    return allValid;
-}
-
-/**
- * sets the gift message on a shipment
- * @param {dw.order.Shipment} shipment - Any shipment for the current basket
- * @param {boolean} isGift - is the shipment a gift
- * @param {string} giftMessage - The gift message the user wants to attach to the shipment
- * @returns {Object} object containing error information
- */
-function setGift(shipment, isGift, giftMessage) {
-    var result = { error: false, errorMessage: null };
-
-    try {
-        Transaction.wrap(function () {
-            shipment.setGift(isGift);
-
-            if (isGift && giftMessage) {
-                shipment.setGiftMessage(giftMessage);
-            } else {
-                shipment.setGiftMessage(null);
-            }
-        });
-    } catch (e) {
-        result.error = true;
-        result.errorMessage = Resource.msg('error.message.could.not.be.attached', 'checkout', null);
-    }
-
-    return result;
 }
 
 /**
@@ -518,6 +506,11 @@ function handlePayments(order, orderNumber) {
                     paymentInstrument.paymentTransaction.setTransactionID(orderNumber);
                     Transaction.commit();
                 } else {
+                	var logger = require('dw/system').Logger.getLogger('Snow', '');
+                	logger.debug(orderNumber);
+                	logger.debug(paymentProcessor);
+                	logger.debug(paymentInstrument);
+                	logger.debug(paymentProcessor.ID);
                     if (HookMgr.hasHook('app.payment.processor.' +
                             paymentProcessor.ID.toLowerCase())) {
                         authorizationResult = HookMgr.callHook(

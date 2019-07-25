@@ -2,7 +2,7 @@
     <isif condition="${paymentOption.ID === 'Sezzle' && require('int_sezzle_sfra/cartridge/scripts/utils/sezzleHelper').IsSezzleApplicable()}">
    		<isinclude template="sezzle/paymentmethodinput_mf" />
     </isif>
-    <isif condition="${paymentOption.ID === 'CREDIT_CARD' && !require('int_sezzle_sfra/cartridge/scripts/utils/sezzleHelper').IsSezzleApplicable()}">
+    <isif condition="${paymentOption.ID === 'CREDIT_CARD'}">
         <isinclude template="checkout/billing/paymentOptions/creditCardContent" />
     </isif>
 </isloop>

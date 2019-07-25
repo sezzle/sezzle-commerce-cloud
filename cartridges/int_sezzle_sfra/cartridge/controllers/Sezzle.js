@@ -21,24 +21,38 @@ var PaymentMgr = require('dw/order/PaymentMgr');
 var Order = require('dw/order/Order');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var sezzleHelper = require('int_sezzle_sfra/cartridge/scripts/utils/sezzleHelper');
+var sezzle = require('int_sezzle_sfra/cartridge/scripts/sezzle.ds');
 var OrderModel = require('*/cartridge/models/order');
 
+server.get('Redirect', function(req, res, next) {
+	var logger = require('dw/system').Logger.getLogger('Snow', '');
+	logger.debug('redirect now');
+	var basket = BasketMgr.getCurrentBasket();
+	var checkoutObject = sezzle.basket.initiateCheckout(basket);
+	logger.debug(checkoutObject['redirect_url']);
+	res.render('sezzle/sezzleredirect', {
+		SezzleRedirectUrl: checkoutObject['redirect_url']
+    });
+	
+	session.custom.sezzleToken=sezzle.utils.getQueryString("id", checkoutObject['redirect_url'])
+	session.custom.sezzled = true;
+	session.custom.sezzleAmount = checkoutObject['amount_in_cents']
+	session.custom.referenceId = checkoutObject['order_reference_id']
+	return next();
+});
 
 /**
  * Handle successful response from Sezzle
  */
 server.get('Success', function(req, res, next) {
+	var logger = require('dw/system').Logger.getLogger('Snow', '');
+	logger.debug('success-page');
 	// Creates a new order.
 	var currentBasket = BasketMgr.getCurrentBasket();
 	
 	var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
 	
-	if (sezzleCheck.status.error){
-    	res.render('/error', {
-            message: Resource.msg('error.confirmation.error', 'confirmation', null)
-        });
-        return next();
-    }
+	
 	
     var order = COHelpers.createOrder(currentBasket);
     if (!order) {
@@ -66,7 +80,7 @@ server.get('Success', function(req, res, next) {
     
     sezzleHelper.PostProcess(order);
     
-    COHelpers.sendConfirmationEmail(order, req.locale.id);
+    //COHelpers.sendConfirmationEmail(order, req.locale.id);
     
     var config = {
             numberOfLineItems: '*'

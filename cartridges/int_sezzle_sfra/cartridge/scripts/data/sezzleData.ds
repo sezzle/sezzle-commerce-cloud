@@ -47,9 +47,7 @@
          * @returns {string} Promo text
          */
         this.getSezzlePaymentAction = function () {
-            return !empty(currentSite.getCustomPreferenceValue('SezzlePaymentAction')) ?
-                    currentSite.getCustomPreferenceValue('SezzlePaymentAction').getValue() :
-                    '';
+            return web.Resource.msg('payment.action', 'sezzle', null);
         };
         /**
          * Return Sezzle URL path from resource file
