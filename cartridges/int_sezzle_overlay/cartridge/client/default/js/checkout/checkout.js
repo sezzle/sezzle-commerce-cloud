@@ -21,7 +21,9 @@ var formHelpers = require('../base/checkout/formErrors');
 (function ($) {
     $.fn.checkout = function () { // eslint-disable-line
         var plugin = this;
-
+        var logger = require('dw/system').Logger.getLogger('Snow', '');
+    	logger.debug('checkout js');
+console.log('24');
         //
         // Collect form data from user input
         //
@@ -121,6 +123,7 @@ var formHelpers = require('../base/checkout/formErrors');
                             url: url,
                             method: 'GET',
                             success: function (data) {
+                            	console.log('124');
                                 $('body').trigger('checkout:updateCheckoutView',
                                     { order: data.order, customer: data.customer });
                                 defer.resolve();
@@ -234,6 +237,7 @@ var formHelpers = require('../base/checkout/formErrors');
                                 //
                                 // Populate the Address Summary
                                 //
+                            	console.log(238)
                                 $('body').trigger('checkout:updateCheckoutView',
                                     { order: data.order, customer: data.customer });
 
@@ -467,6 +471,8 @@ var exports = {
 
     updateCheckoutView: function () {
         $('body').on('checkout:updateCheckoutView', function (e, data) {
+        	var logger = require('dw/system').Logger.getLogger('Snow', '');
+        	logger.debug('checkout');
             shippingHelpers.methods.updateMultiShipInformation(data.order);
             summaryHelpers.updateTotals(data.order.totals);
             data.order.shipping.forEach(function (shipping) {

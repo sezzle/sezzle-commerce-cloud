@@ -34,17 +34,12 @@ server.replace(
         // verify billing form data
         billingFormErrors = COHelpers.validateBillingForm(paymentForm.addressFields);
 
-        if (!req.form.storedPaymentUUID) {
-            // verify credit card form data
-            creditCardErrors = COHelpers.validateCreditCard(paymentForm);
-        }
 
-
-        if (Object.keys(creditCardErrors).length || Object.keys(billingFormErrors).length) {
+        if (Object.keys(billingFormErrors).length) {
             // respond with form data and errors
             res.json({
                 form: paymentForm,
-                fieldErrors: [billingFormErrors, creditCardErrors],
+                fieldErrors: [billingFormErrors],
                 serverErrors: [],
                 error: true
             });
@@ -70,54 +65,24 @@ server.replace(
                 htmlName: paymentForm.paymentMethod.value
             };
 
-            if (paymentForm.creditCardFields){
-            	viewData.paymentInformation = {
-                        cardType: {
-                            value: paymentForm.creditCardFields.cardType.value,
-                            htmlName: paymentForm.creditCardFields.cardType.htmlName
-                        },
-                        cardNumber: {
-                            value: paymentForm.creditCardFields.cardNumber.value,
-                            htmlName: paymentForm.creditCardFields.cardNumber.htmlName
-                        },
-                        securityCode: {
-                            value: paymentForm.creditCardFields.securityCode.value,
-                            htmlName: paymentForm.creditCardFields.securityCode.htmlName
-                        },
-                        expirationMonth: {
-                            value: parseInt(
-                                paymentForm.creditCardFields.expirationMonth.selectedOption,
-                                10
-                            ),
-                            htmlName: paymentForm.creditCardFields.expirationMonth.htmlName
-                        },
-                        expirationYear: {
-                            value: parseInt(paymentForm.creditCardFields.expirationYear.value, 10),
-                            htmlName: paymentForm.creditCardFields.expirationYear.htmlName
-                        }
-                    };
-            }
             
 
             if (req.form.storedPaymentUUID) {
                 viewData.storedPaymentUUID = req.form.storedPaymentUUID;
             }
 
-            if (paymentForm.creditCardFields){
-
-                viewData.saveCard = paymentForm.creditCardFields.saveCard.checked;
-
-            }
             
             /* Currently phone is hardcoded to credit card form so we will take phone from shipping address */
             var shippingAddress = currentBasket.defaultShipment.shippingAddress;
             
             viewData.phone = { value: shippingAddress.phone };
             viewData.email = {
-                    value: paymentForm.email.value
+                    value: req.currentCustomer.profile.email
                 };
             
-
+            var logger = require('dw/system').Logger.getLogger('Snow', '');
+        	logger.debug('customer email');
+        	logger.debug(req.currentCustomer.profile.email);
             
             res.setViewData(viewData);
 
@@ -155,10 +120,6 @@ server.replace(
                 var paymentMethodID = billingData.paymentMethod.value;
                 var result;
 
-                if (billingForm.creditCardFields){
-                	billingForm.creditCardFields.cardNumber.htmlValue = '';
-                    billingForm.creditCardFields.securityCode.htmlValue = '';
-                }
 
                 Transaction.wrap(function () {
                     if (!billingAddress) {
@@ -178,10 +139,10 @@ server.replace(
 
                     if (billingData.storedPaymentUUID) {
                         billingAddress.setPhone(req.currentCustomer.profile.phone);
-                        currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
+                        currentBasket.setCustomerEmail(profile.Customer.email);
                     } else {
                         billingAddress.setPhone(billingData.phone.value);
-                        currentBasket.setCustomerEmail(billingData.email.value);
+                        currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
                     }
                 });
 
@@ -223,17 +184,6 @@ server.replace(
                         return billingData.storedPaymentUUID === item.UUID;
                     });
 
-                    billingData.paymentInformation.cardNumber.value = paymentInstrument
-                        .creditCardNumber;
-                    billingData.paymentInformation.cardType.value = paymentInstrument
-                        .creditCardType;
-                    billingData.paymentInformation.securityCode.value = req.form.securityCode;
-                    billingData.paymentInformation.expirationMonth.value = paymentInstrument
-                        .creditCardExpirationMonth;
-                    billingData.paymentInformation.expirationYear.value = paymentInstrument
-                        .creditCardExpirationYear;
-                    billingData.paymentInformation.creditCardToken = paymentInstrument
-                        .raw.creditCardToken;
                 }
 
                 if (HookMgr.hasHook('app.payment.processor.' + processor.ID.toLowerCase())) {
@@ -291,7 +241,6 @@ server.replace(
                         raw: saveCardResult
                     });
                 }                
-
 
                 // Calculate the basket
                 Transaction.wrap(function () {
@@ -361,15 +310,7 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
 
     var currentBasket = BasketMgr.getCurrentBasket();
     
-    var viewData = {};
-    viewData.phone = { value: '1235' };
-    res.setViewData(viewData);
-    res.json({
-        error: false,
-        continueUrl: URLUtils.url('Sezzle-Redirect').toString()
-    });
-    logger.debug('368');
-    return next();
+    
     logger.debug('370');
     if (!currentBasket) {
         res.json({
@@ -382,6 +323,12 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
         logger.debug('373');
         return next();
     }
+    res.json({
+        error: false,
+        continueUrl: URLUtils.url('Sezzle-Redirect').toString()
+    });
+    logger.debug('368');
+    return next();
     logger.debug('376');
 
     // Check to make sure there is a shipping address

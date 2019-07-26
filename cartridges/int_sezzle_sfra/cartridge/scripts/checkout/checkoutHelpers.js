@@ -527,24 +527,32 @@ function handlePayments(order, orderNumber) {
  * @returns {void}
  */
 function sendConfirmationEmail(order, locale) {
+	var logger = require('dw/system').Logger.getLogger('Snow', '');
+	logger.debug('conf');
     var OrderModel = require('*/cartridge/models/order');
     var emailHelpers = require('*/cartridge/scripts/helpers/emailHelpers');
     var Locale = require('dw/util/Locale');
 
     var currentLocale = Locale.getLocale(locale);
-
+    logger.debug('537');
     var orderModel = new OrderModel(order, { countryCode: currentLocale.country });
-
+    logger.debug('539');
     var orderObject = { order: orderModel };
-
+    logger.debug('541');
+    logger.debug(order.customerEmail);
     var emailObj = {
-        to: order.customerEmail,
+        to: 'dearijit7@gmail.com',
         subject: Resource.msg('subject.order.confirmation.email', 'order', null),
         from: Site.current.getCustomPreferenceValue('customerServiceEmail') || 'no-reply@salesforce.com',
         type: emailHelpers.emailTypes.orderConfirmation
     };
-
+    logger.debug('548');
+    logger.debug(emailObj.to);
+    logger.debug(emailObj.from);
+    logger.debug(emailObj.subject);
+    logger.debug(emailObj.type);
     emailHelpers.sendEmail(emailObj, 'checkout/confirmation/confirmationEmail', orderObject);
+    logger.debug('550');
 }
 
 /**

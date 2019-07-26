@@ -157,6 +157,14 @@ function updatePaymentInformation(order) {
     // update payment details
     var $paymentSummary = $('.payment-details');
     var htmlToAppend = '';
+    
+    var logger = require('dw/system').Logger.getLogger('Snow', '');
+	logger.debug('update payment');
+	logger.debug(order.billing.payment);
+	logger.debug(order.billing.payment.selectedPaymentInstruments);
+	logger.debug(order.billing.payment.selectedPaymentInstruments.length);
+	logger.debug($('.payment-information').data('payment-method-id'));
+	
 
     if (order.billing.payment && order.billing.payment.selectedPaymentInstruments
         && order.billing.payment.selectedPaymentInstruments.length > 0 && ($('.payment-information').data('payment-method-id') === 'CREDIT_CARD')) {
