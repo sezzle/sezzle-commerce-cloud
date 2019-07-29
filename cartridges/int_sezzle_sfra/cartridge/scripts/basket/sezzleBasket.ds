@@ -158,7 +158,7 @@
 		self.getMerchant = function () {
 			var merchant = {
 				'user_confirmation_url' : web.URLUtils.https('Sezzle-Success').toString(),
-				'user_cancel_url' : web.URLUtils.https('COBilling-Start').toString(),
+				'user_cancel_url' : web.URLUtils.https('Checkout-Begin').toString(),
 				'user_confirmation_url_action' : 'GET'
 			};
 
