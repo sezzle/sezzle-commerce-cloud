@@ -3,10 +3,6 @@
 		{
 			"name": "app.payment.processor.sezzle_payment",
 			"script": "./payment/processor/SEZZLE_PAYMENT"
-		},
-		{
-			"name": "dw.int_sezzle_sfra.payment_instrument.basic_credit",
-			"script": "./payment/instrument/BASIC_CREDIT"
 		}
 	]
 }

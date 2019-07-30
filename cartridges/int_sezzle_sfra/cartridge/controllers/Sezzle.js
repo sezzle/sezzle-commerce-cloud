@@ -103,38 +103,6 @@ server.get('Success', function(req, res, next) {
         return next();
 });
 
-server.post('Update', function(req, res, next){
-	if (!dw.web.CSRFProtection.validateRequest()){
-		res.json({error: true});
-		return next();
-	}
-	var hookName = "dw.int_sezzle_sfra.payment_instrument." + sezzle.data.VCNPaymentInstrument().toLowerCase();
-	var basket = BasketMgr.getCurrentBasket();
-	var paymentMethodSezzle = PaymentMgr.getPaymentMethod(SEZZLE_PAYMENT_METHOD);
-	res.setContentType('application/json');
-    // TODO: Maybe will need fix for removing payment instrument
-	Transaction.wrap(function(){
-		//basket.removePaymentInstrument(paymentMethodSezzle);
-	});
-	if (dw.system.HookMgr.hasHook(hookName)){
-		var paymentInstrument = dw.system.HookMgr.callHook(hookName, "add", basket);
-		if (!paymentInstrument){
-			res.json({error: true});
-			return next();
-		} else {
-			Transaction.wrap(function(){
-				paymentInstrument.custom.sezzleed = true;
-			});
-		} 
-	} else {
-		res.json({error: true});
-		return next();
-	};
-
-	res.json({error: false});
-	return next();
-});
-
 
 server.get('CheckoutObject', function(req, res, next){
 	var basket = BasketMgr.getCurrentBasket();
