@@ -76,13 +76,11 @@ server.replace(
             var shippingAddress = currentBasket.defaultShipment.shippingAddress;
             
             viewData.phone = { value: shippingAddress.phone };
-            viewData.email = {
+            if (req.currentCustomer && req.currentCustomer.profile){
+            	viewData.email = {
                     value: req.currentCustomer.profile.email
                 };
-            
-            var logger = require('dw/system').Logger.getLogger('Snow', '');
-        	logger.debug('customer email');
-        	logger.debug(req.currentCustomer.profile.email);
+            }
             
             res.setViewData(viewData);
 
@@ -138,11 +136,15 @@ server.replace(
                     billingAddress.setCountryCode(billingData.address.countryCode.value);
 
                     if (billingData.storedPaymentUUID) {
-                        billingAddress.setPhone(req.currentCustomer.profile.phone);
-                        currentBasket.setCustomerEmail(profile.Customer.email);
+                    	if (req.currentCustomer && req.currentCustomer.profile.phone){
+                    		billingAddress.setPhone(req.currentCustomer.profile.phone);
+                        	currentBasket.setCustomerEmail(profile.Customer.email);
+                    	}
                     } else {
                         billingAddress.setPhone(billingData.phone.value);
-                        currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
+                        if (req.currentCustomer && req.currentCustomer.profile.email){
+                        	currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
+                        }
                     }
                 });
 
