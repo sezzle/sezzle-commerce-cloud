@@ -46,23 +46,6 @@ function checkCart(cart) {
 			authResponse: null
 		};
 	}
-	if (sezzle.data.getSezzleVCNStatus() == 'on'){
-		if (basket.totalGrossPrice.value != session.custom.sezzleTotal || basket.giftCertificateTotalPrice.value > 0){
-			logger.debug('51');
-			return {
-				status:{
-					error: true,
-					PlaceOrderError: new Status(Status.ERROR, 'basket.changed.error')
-				}
-			};
-		} else {
-			return {
-				status:{
-					error: false
-				}
-			};
-		}
-	} else {
 		var test = parametersMap;
 		var token = parametersMap.checkout_token.stringValue;
 		if (empty(token)) {
@@ -104,8 +87,6 @@ function checkCart(cart) {
                 }
             }
         }
-		
-	}
 }
 
 function postProcess(order){
@@ -130,7 +111,7 @@ function postProcess(order){
 function redirect() {
 	var logger = require('dw/system').Logger.getLogger('Snow', '');
 	logger.debug('redirection');
-	if(server.forms.getForm('billing').paymentMethod == SEZZLE_PAYMENT_METHOD  && sezzle.data.getSezzleVCNStatus() != 'on'){
+	if(server.forms.getForm('billing').paymentMethod == SEZZLE_PAYMENT_METHOD){
 	var basket = BasketMgr.getCurrentBasket();	
 		
 	res.render('sezzle/sezzlecheckout_mf',{
@@ -159,12 +140,6 @@ function isSezzleApplicable(){
 
 	return true;
 }
-
-
-/**
- * Redirects customer to sezzle's checkout if sezzle is enabled and there is no
- * gift certificates in basket
- */
 
 module.exports = {
 		Redirect: redirect,

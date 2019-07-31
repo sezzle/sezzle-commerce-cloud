@@ -115,29 +115,16 @@ server.get('CheckoutObject', function(req, res, next){
 		return next();
 	}
 	var sezzleTotal = basket.totalGrossPrice.value;
-	var vcndata = sezzle.basket.getCheckout(basket);
-	var enabled = sezzle.data.getSezzleVCNStatus() == 'on'?true:false;
 	var sezzleselected = true;
 	var errormessages = sezzle.data.getErrorMessages();
 
 	res.json({
 		sezzleTotal:sezzleTotal,
-		vcndata:vcndata,
-		enabled:enabled,
 		sezzleselected:sezzleselected,
 		errormessages:errormessages
 	});
     next();
 });
-
-/**
- * Checks authentication and synchronization DW Basket and Sezzle Basket
- */
-
-/**
- * Redirects customer to sezzle's checkout if sezzle is enabled and there is no
- * gift certificates in basket
- */
 
 
 module.exports = server.exports();

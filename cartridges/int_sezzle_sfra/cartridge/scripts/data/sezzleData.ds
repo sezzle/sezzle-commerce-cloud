@@ -129,14 +129,6 @@
             return currentSite.getCustomPreferenceValue('SezzleFPDateRange');
         };
         /**
-         * Return sezzle VCN status
-         *
-         * @returns {string} status on|off
-         */
-        this.getSezzleVCNStatus = function () {
-            return currentSite.getCustomPreferenceValue('SezzleVCNIntegration');
-        };
-        /**
          * Return sezzle minimal applying total
          *
          * @returns {Number} minimal applying total
@@ -165,9 +157,6 @@
                 'closed': web.Resource.msg('sezzle.error.closed', 'sezzle', ''),
                 'default': web.Resource.msg('sezzle.error.default', 'sezzle', '')
             });
-        }
-        this.VCNPaymentInstrument = function () {
-            return currentSite.getCustomPreferenceValue('SezzleVCNPaymentInstrument');
         }
     };
     module.exports = new Data();
