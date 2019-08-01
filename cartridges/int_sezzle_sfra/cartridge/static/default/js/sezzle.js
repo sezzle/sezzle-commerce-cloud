@@ -1,4 +1,4 @@
-var renderSezzleModal = function () {
+renderSezzleModal = function () {
   if (!document.getElementsByClassName('sezzle-checkout-modal-lightbox').length) {
     var modalNode = document.createElement('div');
     modalNode.className = 'sezzle-checkout-modal-lightbox close-sezzle-modal';
