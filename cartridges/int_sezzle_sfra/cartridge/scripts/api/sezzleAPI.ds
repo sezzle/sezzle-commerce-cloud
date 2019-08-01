@@ -22,14 +22,8 @@
 				var sezzleService = service.ServiceRegistry.get('sezzle.authenticate');
 				var public_key = sezzleData.getPublicKey();
 				var private_key = sezzleData.getPrivateKey();
-				
-				var logger = require('dw/system').Logger.getLogger('Snow', '');
-				logger.debug('auth');
-				logger.debug(public_key);
-				logger.debug(private_key);
 					
 				sezzleService.URL = sezzleData.getURLPath() + 'authentication/';
-				logger.debug(sezzleService.URL);
 				var resp = sezzleService.call({
 					'public_key' : public_key,
 					'private_key' : private_key
@@ -106,13 +100,7 @@
 				checkoutObject.authToken = authentication.response.token
 				var sezzleService = service.ServiceRegistry.get('sezzle.initiatecheckout');
 					
-				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/'
-				var logger = require('dw/system').Logger.getLogger('Snow', '');
-				logger.debug('inititate');
-				logger.debug(checkoutObject.authToken);
-				logger.debug(sezzleService.URL);
-				
-				
+				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/';
 				return sezzleService.call(checkoutObject).object;
 				
 			} catch (e) {

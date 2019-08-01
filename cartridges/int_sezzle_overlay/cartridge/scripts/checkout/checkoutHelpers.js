@@ -506,11 +506,6 @@ function handlePayments(order, orderNumber) {
                     paymentInstrument.paymentTransaction.setTransactionID(orderNumber);
                     Transaction.commit();
                 } else {
-                	var logger = require('dw/system').Logger.getLogger('Snow', '');
-                	logger.debug(orderNumber);
-                	logger.debug(paymentProcessor);
-                	logger.debug(paymentInstrument);
-                	logger.debug(paymentProcessor.ID);
                     if (HookMgr.hasHook('app.payment.processor.' +
                             paymentProcessor.ID.toLowerCase())) {
                         authorizationResult = HookMgr.callHook(

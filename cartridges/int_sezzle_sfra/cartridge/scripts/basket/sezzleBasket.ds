@@ -253,7 +253,8 @@
 		self.createPaymentInstrument = function (basket) {
 			self.removePaymentInstrument(basket);
 			var amount = sezzleUtils.calculateNonGiftCertificateAmount(basket);
-			return basket.createPaymentInstrument('Sezzle', amount);
+			basket.createPaymentInstrument('Sezzle', amount);
+			return basket;
 		};
 
 		/**

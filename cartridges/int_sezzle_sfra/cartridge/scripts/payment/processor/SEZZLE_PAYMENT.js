@@ -19,11 +19,6 @@ var Order = require('dw/order/Order');
  */
 
 function authorize(orderNumber, paymentInstrument, paymentProcessor){
-	var logger = require('dw/system').Logger.getLogger('Snow', '');
-	logger.debug('sezzle payment');
-	logger.debug(orderNumber);
-	logger.debug(paymentInstrument);
-	logger.debug(paymentProcessor);
 	var order = OrderMgr.getOrder(orderNumber);
 
 	if (!session.custom.sezzled && empty(session.custom.sezzleResponseID)){
@@ -64,9 +59,6 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor){
 function postProcess(order){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 	var payment_action = sezzleUtils.data.getSezzlePaymentAction();
-	var logger = require('dw/system').Logger.getLogger('Snow', '');
-	logger.debug('capture');
-	logger.debug(payment_action);
 	if (sezzleUtils.data.getSezzlePaymentAction() == 'CAPTURE'){
 		try {
 			Transaction.wrap(function(){

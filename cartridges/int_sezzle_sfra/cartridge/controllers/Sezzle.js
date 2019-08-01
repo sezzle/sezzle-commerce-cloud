@@ -25,11 +25,10 @@ var sezzle = require('int_sezzle_sfra/cartridge/scripts/sezzle.ds');
 var OrderModel = require('*/cartridge/models/order');
 
 server.get('Redirect', function(req, res, next) {
-	var logger = require('dw/system').Logger.getLogger('Snow', '');
-	logger.debug('redirect now');
+	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+	logger.debug('Sezzle Redirecting');
 	var basket = BasketMgr.getCurrentBasket();
 	var checkoutObject = sezzle.basket.initiateCheckout(basket);
-	logger.debug(checkoutObject['redirect_url']);
 	res.render('sezzle/sezzleredirect', {
 		SezzleRedirectUrl: checkoutObject['redirect_url']
     });
@@ -45,10 +44,9 @@ server.get('Redirect', function(req, res, next) {
  * Handle successful response from Sezzle
  */
 server.get('Success', function(req, res, next) {
-	var logger = require('dw/system').Logger.getLogger('Snow', '');
-	logger.debug('success-page');
 	// Creates a new order.
 	var currentBasket = BasketMgr.getCurrentBasket();
+	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 	
 	var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
 	
@@ -80,21 +78,19 @@ server.get('Success', function(req, res, next) {
     
     sezzleHelper.PostProcess(order);
     
-    COHelpers.sendConfirmationEmail(order, req.locale.id);
+    logger.debug('Order Successfully Created');
     
     var config = {
             numberOfLineItems: '*'
         };
         var orderModel = new OrderModel(order, { config: config });
         if (!req.currentCustomer.profile) {
-            var passwordForm = server.forms.getForm('newPasswords');
-            passwordForm.clear();
             res.render('checkout/confirmation/confirmation', {
                 order: orderModel,
-                returningCustomer: false,
-                passwordForm: passwordForm
+                returningCustomer: false
             });
         } else {
+        	COHelpers.sendConfirmationEmail(order, req.locale.id);
             res.render('checkout/confirmation/confirmation', {
                 order: orderModel,
                 returningCustomer: true
