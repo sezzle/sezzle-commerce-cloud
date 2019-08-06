@@ -1,0 +1,8 @@
+{
+	"hooks": [
+		{
+			"name": "app.payment.processor.sezzle_payment",
+			"script": "./payment/processor/SEZZLE_PAYMENT"
+		}
+	]
+}
