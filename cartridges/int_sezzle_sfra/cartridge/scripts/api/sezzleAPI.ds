@@ -8,7 +8,7 @@
 	 */
 	var Api = function () {
 		var self = this,
-			sezzleData = require('int_sezzle_sfra/cartridge/scripts/data/sezzleData.ds'),
+			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
 			service = require('dw/svc');
 		

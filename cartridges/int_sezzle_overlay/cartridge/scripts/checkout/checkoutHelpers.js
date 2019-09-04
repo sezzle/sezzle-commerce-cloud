@@ -25,7 +25,7 @@ var formErrors = require('*/cartridge/scripts/formErrors');
 var renderTemplateHelper = require('*/cartridge/scripts/renderTemplateHelper');
 var ShippingHelper = require('*/cartridge/scripts/checkout/shippingHelpers');
 
-//var sezzle = require('int_sezzle_sfra/cartridge/controllers/Sezzle')
+//var sezzle = require('*/cartridge/controllers/Sezzle')
 
 // static functions needed for Checkout Controller logic
 
@@ -418,7 +418,7 @@ function validatePayment(req, currentBasket) {
         paymentAmount
     );
     
-   // applicablePaymentMethods = require('int_sezzle_sfra/cartridge/scripts/sezzle.ds').Init(currentBasket, applicablePaymentMethods);
+   // applicablePaymentMethods = require('*/cartridge/scripts/sezzle.ds').Init(currentBasket, applicablePaymentMethods);
     
     applicablePaymentCards = creditCardPaymentMethod.getApplicablePaymentCards(
         currentCustomer,

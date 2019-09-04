@@ -12,7 +12,7 @@ var server = require('server');
 var BasketMgr = require('dw/order/BasketMgr');
 var ISML = require('dw/template/ISML');
 var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
-var sezzleSFRAHelper = require('int_sezzle_sfra/cartridge/scripts/checkout/checkoutHelpers');
+var sezzleSFRAHelper = require('*/cartridge/scripts/checkout/checkoutHelpers');
  
  
 var Status = require('dw/system/Status');
@@ -20,8 +20,8 @@ var Transaction = require('dw/system/Transaction');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var Order = require('dw/order/Order');
 var PaymentMgr = require('dw/order/PaymentMgr');
-var sezzleHelper = require('int_sezzle_sfra/cartridge/scripts/utils/sezzleHelper');
-var sezzle = require('int_sezzle_sfra/cartridge/scripts/sezzle.ds');
+var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
+var sezzle = require('*/cartridge/scripts/sezzle.ds');
 var OrderModel = require('*/cartridge/models/order');
 
 server.get('Redirect', function(req, res, next) {

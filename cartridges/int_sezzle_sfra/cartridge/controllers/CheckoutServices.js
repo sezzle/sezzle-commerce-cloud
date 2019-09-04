@@ -6,7 +6,7 @@ var server = require('server');
 
 var COHelpers = require('int_sezzle_overlay/cartridge/scripts/checkout/checkoutHelpers');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
-var sezzleHelper = require('int_sezzle_sfra/cartridge/scripts/utils/sezzleHelper');
+var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
 
 server.extend(page);
 
@@ -451,7 +451,7 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
         return next();
     }
     
-    //var sezzleHelper = require('int_sezzle_sfra/cartridge/controllers/Sezzle');
+    //var sezzleHelper = require('*/cartridge/controllers/Sezzle');
 //    var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
 //    if (sezzleCheck.status.error){
 //    	res.render('/error', {
