@@ -64,6 +64,7 @@ server.get(
                 returningCustomer: true,
                 reportingURLs: reportingURLs
             });
+            
         }
 
         return next();
