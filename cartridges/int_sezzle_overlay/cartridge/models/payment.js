@@ -3,8 +3,8 @@
 var PaymentMgr = require('dw/order/PaymentMgr');
 var PaymentInstrument = require('dw/order/PaymentInstrument');
 var collections = require('*/cartridge/scripts/util/collections');
-//var Sezzle = require('int_sezzle_sfra/cartridge/controllers/Sezzle.js');
-var sezzle = require('int_sezzle_sfra/cartridge/scripts/sezzle.ds');
+//var Sezzle = require('*/cartridge/controllers/Sezzle.js');
+var sezzle = require('*/cartridge/scripts/sezzle.ds');
 
 /**
  * Creates an array of objects containing applicable payment methods

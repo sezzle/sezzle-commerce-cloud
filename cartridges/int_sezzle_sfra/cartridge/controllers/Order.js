@@ -6,7 +6,7 @@ var Resource = require('dw/web/Resource');
 var URLUtils = require('dw/web/URLUtils');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 var userLoggedIn = require('*/cartridge/scripts/middleware/userLoggedIn');
-var sezzleHelper = require('int_sezzle_sfra/cartridge/scripts/utils/sezzleHelper');
+var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
 
 server.get(
     'Confirm',
@@ -64,6 +64,7 @@ server.get(
                 returningCustomer: true,
                 reportingURLs: reportingURLs
             });
+            
         }
 
         return next();

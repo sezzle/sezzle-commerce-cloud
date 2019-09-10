@@ -6,7 +6,7 @@ var server = require('server');
 
 var COHelpers = require('int_sezzle_overlay/cartridge/scripts/checkout/checkoutHelpers');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
-var sezzleHelper = require('int_sezzle_sfra/cartridge/scripts/utils/sezzleHelper');
+var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
 
 server.extend(page);
 
@@ -14,26 +14,27 @@ server.extend(page);
 /**
  *  Handle Ajax payment (and billing) form submit
  */
-server.replace(
+server.prepend(
 	    'SubmitPayment',
 	    server.middleware.https,
 	    csrfProtection.validateAjaxRequest,
 	    function (req, res, next) {
 	        var data = res.getViewData();
-	        var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 	        var BasketMgr = require('dw/order/BasketMgr');
+	        
 	        var currentBasket = BasketMgr.getCurrentBasket();
+	        
 	        if (data && data.csrfError) {
 	            res.json();
 	            return next();
 	        }
+	        
 	        var paymentForm = server.forms.getForm('billing');
 	        var paymentMethodID = paymentForm.paymentMethod.value;
 	        var billingFormErrors = {};
 	        var creditCardErrors = {};
 	        var viewData = {};
-	    	logger.debug('Payment Method - {0}', paymentMethodID);
-	    	
+
 
 	        // verify billing form data
 	        billingFormErrors = COHelpers.validateBillingForm(paymentForm.addressFields);
@@ -42,7 +43,7 @@ server.replace(
 	            // verify credit card form data
 	            creditCardErrors = COHelpers.validateCreditCard(paymentForm);
 	        }
-	        
+
 	        if (Object.keys(billingFormErrors).length) {
 	            // respond with form data and errors
 	            res.json({
@@ -109,7 +110,7 @@ server.replace(
 	                        }
 	                    };
 	            }
-	            
+
 
 	            if (paymentMethodID === "CREDIT_CARD" && req.form.storedPaymentUUID) {
 	                viewData.storedPaymentUUID = req.form.storedPaymentUUID;
@@ -118,18 +119,18 @@ server.replace(
 	            if (paymentMethodID === "CREDIT_CARD" && paymentForm.creditCardFields){
 	                viewData.saveCard = paymentForm.creditCardFields.saveCard.checked;
 	            }
-	            
+
 	            /* Currently phone is hardcoded to credit card form so we will take phone from shipping address */
 	            var shippingAddress = currentBasket.defaultShipment.shippingAddress;
-	            
+
 	            viewData.phone = { value: shippingAddress.phone };
-	            
+
 	            if(paymentMethodID === "CREDIT_CARD"){
 		            viewData.email = {
 	                    value: paymentForm.email.value
 	                };
 	            }
-	                        
+
 	            res.setViewData(viewData);
 
 	            this.on('route:BeforeComplete', function (req, res) { // eslint-disable-line no-shadow
@@ -145,7 +146,7 @@ server.replace(
 	                var Locale = require('dw/util/Locale');
 	                var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
 	                var hooksHelper = require('*/cartridge/scripts/helpers/hooks')
-	                
+
 	                var billingData = res.getViewData();
 
 	                if (!currentBasket) {
@@ -194,7 +195,7 @@ server.replace(
 	                        billingAddress.setPhone(billingData.phone.value);
 	                        currentBasket.setCustomerEmail(billingData.email.value);
 	                    }
-	                    
+
 	                    if(paymentMethodID === "Sezzle" && req.currentCustomer.profile){
 	                    	currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
 	                    }
@@ -227,7 +228,7 @@ server.replace(
 	                    ));
 	                }
 
-	                var processor = PaymentMgr.getPaymentMethod(paymentMethodID).getPaymentProcessor(); 
+	                var processor = PaymentMgr.getPaymentMethod(paymentMethodID).getPaymentProcessor();
 
 	                if (paymentMethodID === "CREDIT_CARD" && billingData.storedPaymentUUID
 	                    && req.currentCustomer.raw.authenticated
@@ -250,7 +251,7 @@ server.replace(
 	                    billingData.paymentInformation.creditCardToken = paymentInstrument
 	                        .raw.creditCardToken;
 	                }
-	                
+
 	                if (HookMgr.hasHook('app.payment.processor.' + processor.ID.toLowerCase())) {
 	                    result = HookMgr.callHook('app.payment.processor.' + processor.ID.toLowerCase(),
 	                        'Handle',
@@ -305,17 +306,17 @@ server.replace(
 	                            : null,
 	                        raw: saveCardResult
 	                    });
-	                    
+
 	                 // Calculate the basket
 		                Transaction.wrap(function () {
 		                	basketCalculationHelpers.calculateTotals(currentBasket);
 		                });
-	
+
 		                // Re-calculate the payments.
 		                var calculatedPaymentTransaction = COHelpers.calculatePaymentTransaction(
 		                    currentBasket
 		                );
-	
+
 		                if (calculatedPaymentTransaction.error) {
 		                    res.json({
 		                        form: paymentForm,
@@ -325,7 +326,7 @@ server.replace(
 		                    });
 		                    return;
 		                }
-	                }                
+	                }
 
 
 	                var usingMultiShipping = req.session.privacyCache.get('usingMultiShipping');
@@ -333,11 +334,11 @@ server.replace(
 	                    req.session.privacyCache.set('usingMultiShipping', false);
 	                    usingMultiShipping = false;
 	                }
-	                
+
 	                if(paymentMethodID !== "Sezzle"){
 	                	hooksHelper('app.customer.subscription', 'subscribeTo', [paymentForm.subscribe.checked, billingForm.email.htmlValue], function () {});
 	                }
-	                
+
 	                var currentLocale = Locale.getLocale(req.locale.id);
 
 	                var basketModel = new OrderModel(
@@ -367,7 +368,7 @@ server.replace(
 	);
 
 
-server.replace('PlaceOrder', server.middleware.https, function (req, res, next) {
+server.prepend('PlaceOrder', server.middleware.https, function (req, res, next) {
     var BasketMgr = require('dw/order/BasketMgr');
     var logger = require('dw/system').Logger.getLogger('Sezzle', '');
     var HookMgr = require('dw/system/HookMgr');
@@ -389,124 +390,15 @@ server.replace('PlaceOrder', server.middleware.https, function (req, res, next) 
 
         return next();
     }
-    
+
     if (currentBasket.paymentInstrument.paymentMethod == 'Sezzle') {
 	    res.json({
 	        error: false,
 	        continueUrl: URLUtils.url('Sezzle-Redirect').toString()
 	    });
-	    return next();
+	    this.emit('route:Complete', req, res);
+        return;
     }
-
-
-    // Check to make sure there is a shipping address
-    if (currentBasket.defaultShipment.shippingAddress === null) {
-        res.json({
-            error: true,
-            errorStage: {
-                stage: 'shipping',
-                step: 'address'
-            },
-            errorMessage: Resource.msg('error.no.shipping.address', 'checkout', null)
-        });
-        return next();
-    }
-
-    // Check to make sure billing address exists
-    if (!currentBasket.billingAddress) {
-        res.json({
-            error: true,
-            errorStage: {
-                stage: 'payment',
-                step: 'billingAddress'
-            },
-            errorMessage: Resource.msg('error.no.billing.address', 'checkout', null)
-        });
-        return next();
-    }
-    // Calculate the basket
-    Transaction.wrap(function () {
-        HookMgr.callHook('dw.order.calculate', 'calculate', currentBasket);
-    });
-    // Re-validates existing payment instruments
-    var validPayment = COHelpers.validatePayment(req, currentBasket);
-    if (validPayment.error) {
-        res.json({
-            error: true,
-            errorStage: {
-                stage: 'payment',
-                step: 'paymentInstrument'
-            },
-            errorMessage: Resource.msg('error.payment.not.valid', 'checkout', null)
-        });
-        return next();
-    }
-    // Re-calculate the payments.
-    var calculatedPaymentTransactionTotal = COHelpers.calculatePaymentTransaction(currentBasket);
-    if (calculatedPaymentTransactionTotal.error) {
-        res.json({
-            error: true,
-            errorMessage: Resource.msg('error.technical', 'checkout', null)
-        });
-        return next();
-    }
-    
-    //var sezzleHelper = require('int_sezzle_sfra/cartridge/controllers/Sezzle');
-//    var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
-//    if (sezzleCheck.status.error){
-//    	res.render('/error', {
-//    		error: true,
-//            errorMessage: Resource.msg('error.technical', 'checkout', null)
-//        });
-//    	logger.debug(sezzleCheck.status.error);
-//    	logger.debug('444');
-//        return next();
-//    }
-
-    // Creates a new order.
-    var order = COHelpers.createOrder(currentBasket);
-    if (!order) {
-        res.json({
-            error: true,
-            errorMessage: Resource.msg('error.technical', 'checkout', null)
-        });
-        return next();
-    }
-    // Handles payment authorization
-    var handlePaymentResult = COHelpers.handlePayments(order, order.orderNo);
-    if (handlePaymentResult.error) {
-        res.json({
-            error: true,
-            errorMessage: Resource.msg('error.technical', 'checkout', null)
-        });
-        return next();
-    }
-    // Places the order
-    var placeOrderResult = COHelpers.placeOrder(order);
-    if (placeOrderResult.error) {
-        res.json({
-            error: true,
-            errorMessage: Resource.msg('error.technical', 'checkout', null)
-        });
-        return next();
-    }
-    
-
-    //COHelpers.sendConfirmationEmail(order, req.locale.id);
-    // Reset usingMultiShip after successful Order placement
-    req.session.privacyCache.set('usingMultiShipping', false);
-
-    // TODO: Exposing a direct route to an Order, without at least encoding the orderID
-    //  is a serious PII violation.  It enables looking up every customers orders, one at a
-    //  time.
-    
-    res.json({
-        error: false,
-        orderID: order.orderNo,
-        orderToken: order.orderToken,
-        continueUrl: URLUtils.url('Order-Confirm').toString()
-    });
-    return next();
 });
 
 

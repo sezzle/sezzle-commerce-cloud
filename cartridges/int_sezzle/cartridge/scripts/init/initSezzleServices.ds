@@ -3,7 +3,7 @@
  *
  */
 var service = require('dw/svc'),
-	sezzleUtils = require('int_sezzle/cartridge/scripts/utils/sezzleUtils.ds'),
+	sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils.ds'),
 	StringUtils = require('dw/util/StringUtils'),
 	getAuthHeader = function(currentSite){
 		var authString = currentSite.getCustomPreferenceValue('SezzlePublicKey')

@@ -1,4 +1,4 @@
-<isif condition="${require('int_sezzle/cartridge/scripts/data/sezzleData').getSezzleOnlineStatus()}">
+<isif condition="${require('*/cartridge/scripts/data/sezzleData').getSezzleOnlineStatus()}">
 <div class="form-row label-inline sezzle-payment-method">
 	<isset name="radioID" value="${paymentMethodType.value}" scope="page"/>
 	<div class="field-wrapper">

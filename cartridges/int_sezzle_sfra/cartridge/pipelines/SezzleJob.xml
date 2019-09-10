@@ -22,7 +22,7 @@
       <node>
         <pipelet-node pipelet-name="Assign" pipelet-set-identifier="bc_api">
           <config-property key="Transactional" value="true"/>
-          <key-binding alias="require('int_sezzle_sfra/cartridge/scripts/sezzle.ds').order.refundOrders()" key="From_0"/>
+          <key-binding alias="require('*/cartridge/scripts/sezzle.ds').order.refundOrders()" key="From_0"/>
           <key-binding alias="doIt" key="To_0"/>
           <key-binding alias="null" key="From_1"/>
           <key-binding alias="null" key="To_1"/>
