@@ -10,7 +10,8 @@
 		var self = this,
 			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
-			service = require('dw/svc');
+			service = require('dw/svc'),
+			client = require('dw/net');
 		
 		/**
 		 * Authenticate the merchant by public and private key
@@ -19,16 +20,47 @@
 		 */
 		self.authenticate = function () {
 			try {
-				var sezzleService = service.ServiceRegistry.get('sezzle.authenticate');
+				
+				var httpClient : dw.net.HTTPClient = new dw.net.HTTPClient();
 				var public_key = sezzleData.getPublicKey();
 				var private_key = sezzleData.getPrivateKey();
-					
-				sezzleService.URL = sezzleData.getURLPath() + 'authentication/';
-				var resp = sezzleService.call({
+				var auth_url = sezzleData.getURLPath() + 'authentication/';
+				
+				var obj = new Object();
+				obj.public_key = public_key;
+				obj.private_key  = private_key;
+				var json= JSON.stringify(obj);
+				
+				var json = {
 					'public_key' : public_key,
 					'private_key' : private_key
-				});
-				return resp.object;
+				};
+				  
+       			var json= JSON.stringify(obj);
+				var message : String;
+				httpClient.open('POST', auth_url);
+				httpClient.setTimeout(3000);
+				httpClient.setRequestHeader('Content-Type', 'application/json');
+				httpClient.send(json);
+				if (httpClient.statusCode == 201)
+				{
+				 	 logger.debug(auth_url);
+				 	 logger.debug('35');
+				     message = httpClient.text;
+				     logger.debug(json);
+				     logger.debug(message);
+				     var obj = JSON.parse(message);
+				     logger.debug(obj.token);
+				}
+				else
+				{
+				 	logger.debug('40');
+				 	logger.debug(json);
+				 	logger.debug(httpClient.statusCode);
+				    // error handling
+				    message="An error occurred with status code "+httpClient.statusCode;
+				}
+				//return resp.object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
@@ -74,6 +106,7 @@
 					is_full_refund :true,
 					
 				}
+				
 				var sezzleService = service.ServiceRegistry.get('sezzle.refund');
 					
 				sezzleService.URL = sezzleData.getURLPath() + 'orders/' + order_reference_id + '/refund';
@@ -96,6 +129,7 @@
 		 */
 		self.initiateCheckout = function (checkoutObject) {
 			try {
+				logger.debug('Token');
 				var authentication = self.authenticate();
 				checkoutObject.authToken = authentication.response.token
 				var sezzleService = service.ServiceRegistry.get('sezzle.initiatecheckout');
