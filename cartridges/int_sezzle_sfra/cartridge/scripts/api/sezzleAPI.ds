@@ -9,9 +9,62 @@
 	var Api = function () {
 		var self = this,
 			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
+			sezzleBasket = require('*/cartridge/scripts/basket/sezzleBasket.ds'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
-			service = require('dw/svc'),
-			client = require('dw/net');
+			BasketMgr = require('dw/order/BasketMgr');
+			
+			
+		/**
+		 * Call Sezzle 
+		 *
+		 * @param {string} method
+		 * @param {string} url
+		 * @param {string} payload
+		 * @param {string} token
+		 * @returns result
+		 */
+		self.callSezzle = function (method, url, payload , token) {
+			try {
+				var httpClient : dw.net.HTTPClient = new dw.net.HTTPClient();
+				httpClient.setRequestHeader('Content-Type', 'application/json');
+				if (token != '') {
+					httpClient.setRequestHeader('Authorization', 'Bearer '+token);
+				}
+				var result : JSON;
+				var message : String;
+				switch (method) {
+					case 'POST':
+						httpClient.open('POST', url);
+						httpClient.send(payload);
+						break;
+					case 'GET':
+						httpClient.open('GET', url);
+						httpClient.send();
+					default:
+						break;
+					
+				}
+				
+				if (httpClient.statusCode == 201) {
+					message = httpClient.text;
+					var result = JSON.parse(message);
+					return result;
+				}
+				else if(httpClient.statusCode == 200) {
+					message = httpClient.text;
+					var result = JSON.parse(message);
+					return result;
+				}
+				return result;
+			}
+			catch (e) {
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					error : false
+				};
+			}
+			
+		}
 		
 		/**
 		 * Authenticate the merchant by public and private key
@@ -21,46 +74,16 @@
 		self.authenticate = function () {
 			try {
 				
-				var httpClient : dw.net.HTTPClient = new dw.net.HTTPClient();
 				var public_key = sezzleData.getPublicKey();
 				var private_key = sezzleData.getPrivateKey();
 				var auth_url = sezzleData.getURLPath() + 'authentication/';
-				
-				var obj = new Object();
-				obj.public_key = public_key;
-				obj.private_key  = private_key;
-				var json= JSON.stringify(obj);
-				
-				var json = {
+				var payload = {
 					'public_key' : public_key,
 					'private_key' : private_key
-				};
-				  
-       			var json= JSON.stringify(obj);
-				var message : String;
-				httpClient.open('POST', auth_url);
-				httpClient.setTimeout(3000);
-				httpClient.setRequestHeader('Content-Type', 'application/json');
-				httpClient.send(json);
-				if (httpClient.statusCode == 201)
-				{
-				 	 logger.debug(auth_url);
-				 	 logger.debug('35');
-				     message = httpClient.text;
-				     logger.debug(json);
-				     logger.debug(message);
-				     var obj = JSON.parse(message);
-				     logger.debug(obj.token);
-				}
-				else
-				{
-				 	logger.debug('40');
-				 	logger.debug(json);
-				 	logger.debug(httpClient.statusCode);
-				    // error handling
-				    message="An error occurred with status code "+httpClient.statusCode;
-				}
-				//return resp.object;
+				};	
+				var payload = JSON.stringify(payload);
+				var result = self.callSezzle('POST', auth_url, payload);
+				return result;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
@@ -77,14 +100,12 @@
 		 */
 		self.capture = function (order_reference_id, order_number) {
 			try {
+				var payload : String;
 				var authentication = self.authenticate();
-				var obj = {
-					authToken : authentication.response.token
-				}
-				
-				var sezzleService = service.ServiceRegistry.get('sezzle.capture');
-				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
-				return sezzleService.call(obj).object;
+				var token = authentication.token;
+				var capture_url = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
+				var result = self.callSezzle('POST', capture_url, payload, token);
+				return result;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
@@ -101,18 +122,14 @@
 		self.refund = function (order_reference_id) {
 			try {
 				var authentication = self.authenticate();
-				var obj = {
-					authToken : authentication.response.token,
-					is_full_refund :true,
-					
-				}
-				
-				var sezzleService = service.ServiceRegistry.get('sezzle.refund');
-					
-				sezzleService.URL = sezzleData.getURLPath() + 'orders/' + order_reference_id + '/refund';
-				
-				return sezzleService.call(obj).object;
-				
+				var token = authentication.token;
+				var refund_url = sezzleData.getURLPath() + 'orders/' + order_reference_id + '/refund';
+				var payload = {
+					'is_full_refund' :true	
+				};
+				var payload = JSON.stringify(payload);
+				var result = self.callSezzle('POST', refund_url, payload, token);
+				return result;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
@@ -122,6 +139,20 @@
 		};
 		
 		/**
+		 * Get Redirect Url 
+		 *
+		 * @param {json} checkoutObject
+		 * @param {string} token
+		 * @returns result
+		 */
+		self.getRedirectUrl = function (checkoutObject, token) {
+			var payload = JSON.stringify(checkoutObject);
+			var checkout_url = sezzleData.getURLPath() + 'checkouts/';
+			var result = self.callSezzle('POST', checkout_url, payload, token);
+			return result;
+		}
+		
+		/**
 		 * Initiate a checkout - fetch the checkout url
 		 *
 		 * @param {Object} - Checkout Object
@@ -129,14 +160,10 @@
 		 */
 		self.initiateCheckout = function (checkoutObject) {
 			try {
-				logger.debug('Token');
 				var authentication = self.authenticate();
-				checkoutObject.authToken = authentication.response.token
-				var sezzleService = service.ServiceRegistry.get('sezzle.initiatecheckout');
-					
-				sezzleService.URL = sezzleData.getURLPath() + 'checkouts/';
-				return sezzleService.call(checkoutObject).object;
-				
+				var token = authentication.token;
+				var result = self.getRedirectUrl(checkoutObject, token);
+				return result;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
