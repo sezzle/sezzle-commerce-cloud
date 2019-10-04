@@ -21,6 +21,7 @@ var PaymentMgr = require('dw/order/PaymentMgr');
 var Order = require('dw/order/Order');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var parametersMap = request.httpParameterMap;
+var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 
 /*
  * Export the publicly available controller methods
@@ -39,48 +40,17 @@ function checkCart(cart) {
 	var selectedPaymentMethod = cart.paymentInstrument.paymentMethod;
 	if (!sezzle.data.getSezzleOnlineStatus() || selectedPaymentMethod != 'Sezzle'){
 		return {
-			status: new Status(Status.OK),
-			authResponse: null
+			status: {
+				error : false
+			}
 		};
-	}
-		var test = parametersMap;
-		var token = parametersMap.checkout_token.stringValue;
-		if (empty(token)) {
-			return {
-				status:{
-					error: true,
-					PlaceOrderError: new Status(Status.ERROR, 'confirm.error.technical')
-				}
-			};
-		}
-		var sezzleResponse = sezzle.order.authOrder(token);
-		session.custom.sezzleResponseID = sezzleResponse.response.id;
-		session.custom.sezzleFirstEventID = sezzleResponse.response.events[0].id;
-		session.custom.sezzleAmount = sezzleResponse.response.amount;
-		if (empty(sezzleResponse) || sezzleResponse.error){
-			return {
-				status:{
-					error: true,
-					PlaceOrderError: new Status(Status.ERROR, 'confirm.error.technical')
-				}
-			};
-		}
-		var sezzleStatus = sezzle.basket.syncBasket(basket, sezzleResponse.response);
-		if (sezzleStatus.error){
-			sezzle.order.voidOrder(sezzleResponse.response.id);
-            return {
-    			status:{
-    				error: sezzleStatus.error,
-    				PlaceOrderError: new Status(Status.ERROR, 'basket.changed.error')
-    			}
-    		};
-        } else {
+	} else {
             return {
                 status: {
                     error: false
                 }
             }
-        }
+    }
 }
 
 function postProcess(order){
@@ -96,10 +66,10 @@ function postProcess(order){
 		} catch (e) {
 			sezzle.order.voidOrder(order.custom.SezzleExternalId);
 			logger.error('Sezzle Capturing error. Details - {0}', e);
-			return new Status(Status.ERROR);
+			return false;
 		}
 	}
-	return new Status(Status.OK);
+	return true;
 }
 
 function redirect() {

@@ -25,6 +25,7 @@
 		 */
 		self.callSezzle = function (method, url, payload , token) {
 			try {
+				logger.debug("****Requesting Sezzle****");
 				var httpClient : dw.net.HTTPClient = new dw.net.HTTPClient();
 				httpClient.setRequestHeader('Content-Type', 'application/json');
 				if (token != '') {
@@ -48,19 +49,24 @@
 				if (httpClient.statusCode == 201) {
 					message = httpClient.text;
 					var result = JSON.parse(message);
+					result.httpStatus = httpClient.statusCode;
+					logger.debug("****Response successful****");
 					return result;
 				}
 				else if(httpClient.statusCode == 200) {
 					message = httpClient.text;
 					var result = JSON.parse(message);
+					result.httpStatus = httpClient.statusCode;
+					logger.debug("****Response successful****");
 					return result;
 				}
+				logger.debug("****Response not successful**** : HTTP Code : {0}",httpClient.statusCode);
 				return result;
 			}
 			catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					CALL_SEZZLE_ERROR : false
 				};
 			}
 			
@@ -73,7 +79,7 @@
 		 */
 		self.authenticate = function () {
 			try {
-				
+				logger.debug("Authentication start");
 				var public_key = sezzleData.getPublicKey();
 				var private_key = sezzleData.getPrivateKey();
 				var auth_url = sezzleData.getURLPath() + 'authentication/';
@@ -83,11 +89,12 @@
 				};	
 				var payload = JSON.stringify(payload);
 				var result = self.callSezzle('POST', auth_url, payload);
+				logger.debug("Authentication end");
 				return result;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					AUTHENTICATE_ERROR : false
 				};
 			}
 		};
@@ -100,16 +107,18 @@
 		 */
 		self.capture = function (order_reference_id, order_number) {
 			try {
+				logger.debug("Capture start");
 				var payload : String;
 				var authentication = self.authenticate();
 				var token = authentication.token;
 				var capture_url = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
 				var result = self.callSezzle('POST', capture_url, payload, token);
+				logger.debug("Capture end");
 				return result;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					CAPTURE_ERROR : false
 				};
 			}
 		};
@@ -121,6 +130,7 @@
 		 * @returns status		 */
 		self.refund = function (order_reference_id) {
 			try {
+				logger.debug("Refund start");
 				var authentication = self.authenticate();
 				var token = authentication.token;
 				var refund_url = sezzleData.getURLPath() + 'orders/' + order_reference_id + '/refund';
@@ -129,11 +139,12 @@
 				};
 				var payload = JSON.stringify(payload);
 				var result = self.callSezzle('POST', refund_url, payload, token);
+				logger.debug("Refund end");
 				return result;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					REFUND_ERROR : false
 				};
 			}
 		};
@@ -146,10 +157,19 @@
 		 * @returns result
 		 */
 		self.getRedirectUrl = function (checkoutObject, token) {
-			var payload = JSON.stringify(checkoutObject);
-			var checkout_url = sezzleData.getURLPath() + 'checkouts/';
-			var result = self.callSezzle('POST', checkout_url, payload, token);
-			return result;
+			try {
+				logger.debug("Getting redirect url start");
+				var payload = JSON.stringify(checkoutObject);
+				var checkout_url = sezzleData.getURLPath() + 'checkouts/';
+				var result = self.callSezzle('POST', checkout_url, payload, token);
+				logger.debug("Getting redirect url end");
+				return result;
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					REDIRECT_ERROR : false
+				};
+			}
 		}
 		
 		/**
@@ -160,14 +180,16 @@
 		 */
 		self.initiateCheckout = function (checkoutObject) {
 			try {
+				logger.debug("Initiating checkout start");
 				var authentication = self.authenticate();
 				var token = authentication.token;
 				var result = self.getRedirectUrl(checkoutObject, token);
+				logger.debug("Initiating checkout end");
 				return result;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					INITIATE_CHECKOUT_ERROR : false
 				};
 			}
 		};
