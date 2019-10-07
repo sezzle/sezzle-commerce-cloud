@@ -300,7 +300,7 @@
 				'merchant_completes' : true	
 			};
 			checkoutResponse = sezzleAPI.initiateCheckout(checkoutObject) 
-			checkoutObject['redirect_url'] = checkoutResponse.response.checkout_url;
+			checkoutObject['redirect_url'] = checkoutResponse.checkout_url;
 			return checkoutObject;
 		};
 	};
