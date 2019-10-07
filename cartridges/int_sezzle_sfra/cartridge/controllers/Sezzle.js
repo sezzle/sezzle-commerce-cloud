@@ -7,6 +7,7 @@
  */
 var SEZZLE_PAYMENT_METHOD = 'Sezzle';
 var Resource = require('dw/web/Resource');
+var PaymentTransaction = require('dw/order/PaymentTransaction');
 var URLUtils = require('dw/web/URLUtils');
 var server = require('server');
 var BasketMgr = require('dw/order/BasketMgr');
@@ -23,10 +24,10 @@ var PaymentMgr = require('dw/order/PaymentMgr');
 var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
 var sezzle = require('*/cartridge/scripts/sezzle.ds');
 var OrderModel = require('*/cartridge/models/order');
+var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 
 server.get('Redirect', function(req, res, next) {
-	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	logger.debug('Sezzle Redirecting');
+	logger.debug("Sezzle Redirecting");
 	var basket = BasketMgr.getCurrentBasket();
 	var checkoutObject = sezzle.basket.initiateCheckout(basket);
 	res.render('sezzle/sezzleredirect', {
@@ -44,13 +45,16 @@ server.get('Redirect', function(req, res, next) {
  * Handle successful response from Sezzle
  */
 server.get('Success', function(req, res, next) {
+	var basket : Basket = BasketMgr.getCurrentBasket();
+	if (!basket) {
+		res.redirect(URLUtils.url('Home-Show'));
+        return next();
+	}
 	// Creates a new order.
+	var reportingUrlsHelper = require('*/cartridge/scripts/reportingUrls');
 	var currentBasket = BasketMgr.getCurrentBasket();
-	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	
 	var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
-	
-	
+	logger.debug("Cart successfully checked and moving forward {0}",sezzleCheck.status.error);
 	
     var order = COHelpers.createOrder(currentBasket);
     if (!order) {
@@ -60,6 +64,7 @@ server.get('Success', function(req, res, next) {
         });
         return next();
     }
+    logger.debug("Order Created");
     
     var handlePaymentResult = COHelpers.handlePayments(order, order.orderNo);
     if (handlePaymentResult.error) {
@@ -69,6 +74,7 @@ server.get('Success', function(req, res, next) {
         });
         return next();
     }
+    logger.debug("Payment handled successfully");
     
     var orderPlacementStatus = COHelpers.placeOrder(order);
 
@@ -76,26 +82,40 @@ server.get('Success', function(req, res, next) {
         return next(new Error('Could not place order'));
     }
     
-    sezzleHelper.PostProcess(order);
+    var result = sezzleHelper.PostProcess(order);
+    if (!result) {
+    	res.json({
+            error: true,
+            errorMessage: Resource.msg('error.technical', 'checkout', null)
+        });
+        return next();
+    }
+    logger.debug("Order placed successfully in Salesforce");
     
-    logger.debug('Order Successfully Created');
+    var passwordForm;
     
     var config = {
             numberOfLineItems: '*'
         };
         var orderModel = new OrderModel(order, { config: config });
         if (!req.currentCustomer.profile) {
+        	logger.debug("Guest order has been created");
+        	passwordForm = server.forms.getForm('newPasswords');
+            passwordForm.clear();
             res.render('checkout/confirmation/confirmation', {
                 order: orderModel,
-                returningCustomer: false
+                returningCustomer: false,
+                passwordForm: passwordForm
             });
         } else {
+        	logger.debug("Registered customer order has been created");
         	COHelpers.sendConfirmationEmail(order, req.locale.id);
             res.render('checkout/confirmation/confirmation', {
                 order: orderModel,
                 returningCustomer: true
             });
         }
+        logger.debug("****Checkout completed****");
         return next();
 });
 

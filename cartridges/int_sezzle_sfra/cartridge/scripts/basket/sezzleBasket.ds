@@ -13,7 +13,8 @@
 			PaymentMgr = require('dw/order/PaymentMgr'),
 			ProductMgr = require('dw/catalog/ProductMgr'),
 			sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils.ds'),
-			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
+			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
+			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
 			sezzleAPI = require('*/cartridge/scripts/api/sezzleAPI.ds');
 
 		self.utils = sezzleUtils;
@@ -301,7 +302,8 @@
 				'merchant_completes' : true	
 			};
 			checkoutResponse = sezzleAPI.initiateCheckout(checkoutObject); 
-			checkoutObject['redirect_url'] = checkoutResponse.response.checkout_url;
+			logger.debug("Sezzle Checkout URL : "+checkoutResponse.checkout_url);
+			checkoutObject['redirect_url'] = checkoutResponse.checkout_url;
 			return checkoutObject;
 		};
 	};
