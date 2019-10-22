@@ -13,7 +13,9 @@ var sezzleUtils = require('*/cartridge/scripts/sezzle');
 var OrderMgr = require('dw/order/OrderMgr');
 var Resource = require('dw/web/Resource');
 var Order = require('dw/order/Order');
-var Cart = require(Resource.msg('sezzle.controllers.cartridge','sezzle','app_storefront_controllers') + '/cartridge/scripts/models/CartModel');
+var SezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
+var storeFrontPath = SezzleData.getStoreFrontPath()
+var Cart = require(Resource.msg('sezzle.controllers.cartridge','sezzle',storeFrontPath) + '/cartridge/scripts/models/CartModel');
 
 /*
  * Export the publicly available controller methods
