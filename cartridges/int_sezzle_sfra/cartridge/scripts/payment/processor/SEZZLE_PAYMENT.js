@@ -22,7 +22,7 @@ var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 function authorize(orderNumber, paymentInstrument, paymentProcessor){
 	var order = OrderMgr.getOrder(orderNumber);
 
-	if (!session.custom.sezzled && empty(session.custom.sezzleResponseID)){
+	if (!session.privacy.sezzled && empty(session.privacy.sezzleResponseID)){
 		return {error: true};
 	}
 	
@@ -30,7 +30,7 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor){
 	var reference_id = request.httpParameterMap["order_reference_id"]
 	logger.debug('Sezzle Payment Reference Id - {0}', reference_id );
 	
-	if (session.custom.referenceId != reference_id){
+	if (session.privacy.referenceId != reference_id){
 		logger.debug('Sezzle Error - Reference ID has changed' );
 		return {error: true};
 	}
@@ -39,10 +39,10 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor){
 		paymentInstrument.paymentTransaction.transactionID = orderNumber;
 		paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
 		var sezzleResponseObject = {
-				'id' : session.custom.referenceId,
-				'events' : [{'id': session.custom.sezzleFirstEventID}],
-				'amount': session.custom.sezzleAmount,
-				'token': session.custom.sezzleToken
+				'id' : session.privacy.referenceId,
+				'events' : [{'id': session.privacy.sezzleFirstEventID}],
+				'amount': session.privacy.sezzleAmount,
+				'token': session.privacy.sezzleToken
 		};
 		sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
 		
@@ -83,12 +83,13 @@ function handle(){
 	var basket = BasketMgr.getCurrentBasket();
 	Transaction.wrap(function(){
 		sezzleUtils.basket.createPaymentInstrument(basket);
-		session.custom.sezzleResponseID = '';
-		session.custom.sezzleFirstEventID = '';
-		session.custom.sezzleAmount = '';
+		session.privacy.sezzleResponseID = '';
+		session.privacy.sezzleFirstEventID = '';
+		session.privacy.sezzleAmount = '';
 	});
 	return {success: true};
 }
 
 exports.Handle = handle;
 exports.Authorize = authorize;
+exports.PostProcess = postProcess;

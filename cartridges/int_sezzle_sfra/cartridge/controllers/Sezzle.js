@@ -34,10 +34,10 @@ server.get('Redirect', function(req, res, next) {
 		SezzleRedirectUrl: checkoutObject['redirect_url']
     });
 	
-	session.custom.sezzleToken=sezzle.utils.getQueryString("id", checkoutObject['redirect_url'])
-	session.custom.sezzled = true;
-	session.custom.sezzleAmount = checkoutObject['amount_in_cents']
-	session.custom.referenceId = checkoutObject['order_reference_id']
+	session.privacy.sezzleToken=sezzle.utils.getQueryString("id", checkoutObject['redirect_url'])
+	session.privacy.sezzled = true;
+	session.privacy.sezzleAmount = checkoutObject['amount_in_cents']
+	session.privacy.referenceId = checkoutObject['order_reference_id']
 	return next();
 });
 

@@ -19,7 +19,7 @@
 		/**
 		 * Calculate non-gift certificate amount
 		 *
-		 * @param {dw.order.Basket} Basket demandware basket
+		 * @param {dw.order.Basket}  basket
 		 * @returns {dw.value.Money} simple object with name and shipping address
 		 */
 		self.calculateNonGiftCertificateAmount = function (basket) {
@@ -31,7 +31,6 @@
 				let orderPI = giftCertificatePaymentInstrs.next();
 				giftCertTotal = giftCertTotal.add(orderPI.getPaymentTransaction().getAmount());
 			}
-
 			return basketTotal.subtract(giftCertTotal);
 		};
 
@@ -39,9 +38,9 @@
 		 * Compare line items from basket and from sezzle response.
 		 * If they are not identical, add error to status object
 		 *
-		 * @param {dw.order.Basket} Basket demandware basket
+		 * @param {dw.order.Basket}  basket
 		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status demandware basket
+		 * @param {dw.system.Status} status basket
 		 */
 		self.checkLineItems = function (basket, SezzleResponse, status) {
 			let productLineItems = basket.getProductLineItems().iterator();
@@ -110,9 +109,9 @@
 		 * Compare taxes from basket and from sezzle response.
 		 * If they are not identical, add error to status object
 		 *
-		 * @param {dw.order.Basket} Basket demandware basket
+		 * @param {dw.order.Basket}  basket
 		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status demandware basket
+		 * @param {dw.system.Status} status basket
 		 */
 		self.checkTaxation = function (basket, SezzleResponse, status) {
 			let basketTax = basket.getTotalTax().multiply(100).getValue();
@@ -137,9 +136,9 @@
 		 * Compare total price from basket and from sezzle response.
 		 * If they are not identical, add error to status object
 		 *
-		 * @param {dw.order.Basket} Basket demandware basket
+		 * @param {dw.order.Basket}  basket
 		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status demandware basket
+		 * @param {dw.system.Status} status basket
 		 */
 		self.checkTotalPrice = function (basket, SezzleResponse, status) {
 			let totalPrice = self.calculateNonGiftCertificateAmount(basket).multiply(100).getValue();
@@ -165,37 +164,42 @@
 
 		self.responseParser = function (svc, client) {
 			var response;
-			switch (client.statusCode) {
-				case 200:
-					response = {
-						error : false,
-						response : JSON.parse(client.text)
-					};
-					break;
-				case 201:
-					response = {
-						error : false,
-						response : JSON.parse(client.text)
-					};
-					break;
-				case 400:
-				case 401:
-				case 404:
-					response = {
-						error : true,
-						response : JSON.parse(client.text)
-					};
-					break;
-			}
-			return response;
+            			response = {
+            				error : true,
+            				response : JSON.parse(client.text)
+            			}
+
+            			switch (client.statusCode) {
+            				case 200:
+            					response = {
+            						error : false,
+            						response : JSON.parse(client.text)
+            					};
+            					break;
+            				case 201:
+            					response = {
+            						error : false,
+            						response : JSON.parse(client.text)
+            					};
+            					break;
+            				case 400:
+            				case 401:
+            				case 404:
+            					response = {
+            						error : true,
+            						response : JSON.parse(client.text)
+            					};
+            					break;
+            			}
+            			return response;
 		};
 
 		/**
 		 * Check Basket for gift certificates
 		 * If they are present, add error to status object
 		 *
-		 * @param {dw.order.Basket} Basket demandware basket
-		 * @param {dw.system.Status} status demandware basket
+		 * @param {dw.order.Basket}  basket
+		 * @param {dw.system.Status} status basket
 		 */
 		self.checkGiftCertificates = function (basket, status) {
 			if (!basket.getGiftCertificateLineItems().empty) {
@@ -272,7 +276,7 @@
 		/**
 		 * Get financing program details by category object
 		 *
-		 * @param {dw.catalog.Category} demandware category
+		 * @param {dw.catalog.Category} category
 		 * @param {Object} Financing program details or null
 		 */
 		self.getFinancingProgramByCategory = function (category) {
@@ -314,7 +318,7 @@
 		/**
 		 * Get HasnMap collection contains online categories of product
 		 *
-		 * @param {dw.catalog.Product} demandware product
+		 * @param {dw.catalog.Product} product
 		 * @param {dw.util.HasnMap} Categories collection
 		 */
 		self.getOnlineCategoriesByProduct = function(product){
@@ -335,7 +339,7 @@
 		/**
 		 * Get HasnMap collection contains online categories of all products from basket
 		 *
-		 * @param {dw.order.Basket} demandware basket
+		 * @param {dw.order.Basket} basket
 		 * @param {dw.util.HasnMap} Categories collection
 		 */
 		self.getOnlineCategoriesByBasket = function(basket){
@@ -505,7 +509,7 @@
 		/**
 		 * Get financing program details basket content
 		 *
-		 * @param {dw.order.Basket} demandware basket
+		 * @param {dw.order.Basket} basket
 		 * @param {Object} Financing program details
 		 */
 		self.getFPNameByBasket = function(basket){

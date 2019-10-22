@@ -31,6 +31,15 @@
 		this.getPrivateKey = function () {
 			return currentSite.getCustomPreferenceValue('SezzlePrivateKey');
 		};
+
+    /**
+     * Return StoreFront Path
+     *
+     * @returns {string} storeFront Path
+     */
+    this.getStoreFrontPath = function () {
+      return currentSite.getCustomPreferenceValue('StoreFrontPath');
+    };
 		
 		/**
 		 * Return Sezzle Online Status preference
@@ -95,7 +104,6 @@
 		 * @returns {Number} minimal applying total
 		 */
 		this.getSezzlePaymentMinTotal = function () {
-			//return currentSite.getCustomPreferenceValue('SezzlePaymentMinTotal');
 			return web.Resource.msg('payment.minTotal', 'sezzle', '')
 		};
 		
@@ -105,7 +113,6 @@
 		 * @returns {Number} maximal applying total
 		 */
 		this.getSezzlePaymentMaxTotal = function () {
-			//return currentSite.getCustomPreferenceValue('SezzlePaymentMaxTotal');
 			return web.Resource.msg('payment.maxTotal', 'sezzle', '')
 		};
 

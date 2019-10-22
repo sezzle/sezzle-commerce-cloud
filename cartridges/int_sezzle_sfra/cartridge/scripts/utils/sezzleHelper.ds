@@ -30,15 +30,23 @@ var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 function checkCart(cart) {
 	var basket = 'object' in cart ? cart.object : cart;
 	
-	if (!cart.paymentInstrument){
+	var paymentInstruments = basket.paymentInstruments;
+	var paymentMethod = "";
+	
+	for (var i = 0; i < paymentInstruments.length; i++) {
+        var paymentInstrument = paymentInstruments[i];
+        paymentMethod = paymentInstrument.paymentMethod;
+    }
+	
+	if (!paymentInstruments){
 		return {
 			status:{
 					error: true
 				}
 		}
 	}
-	var selectedPaymentMethod = cart.paymentInstrument.paymentMethod;
-	if (!sezzle.data.getSezzleOnlineStatus() || selectedPaymentMethod != 'Sezzle'){
+	
+	if (!sezzle.data.getSezzleOnlineStatus() || paymentMethod != 'Sezzle'){
 		return {
 			status: {
 				error : false
@@ -72,19 +80,6 @@ function postProcess(order){
 	return true;
 }
 
-function redirect() {
-	if(server.forms.getForm('billing').paymentMethod == SEZZLE_PAYMENT_METHOD){
-	var basket = BasketMgr.getCurrentBasket();	
-		
-	res.render('sezzle/sezzlecheckout_mf',{
-			Basket : basket
-	});
-		 return true;
-	} else {
-		return false;
-	}
-}
-
 
 function init(basket, applicablePaymentMethods) {
 	return sezzle.basket.validatePayments(basket, applicablePaymentMethods);
@@ -104,7 +99,6 @@ function isSezzleApplicable(){
 }
 
 module.exports = {
-		Redirect: redirect,
 		Init: init,
 		CheckCart: checkCart,
 		PostProcess: postProcess,
