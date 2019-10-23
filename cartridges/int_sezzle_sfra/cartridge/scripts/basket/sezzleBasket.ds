@@ -112,7 +112,6 @@
 			 		checkForParentCategory(category.category);
 			 		categoryNames.push(arr.reverse());
 			 	}
-        categoriesCollection.close()
 				var item_price = productLineItem.optionProductLineItem ?
 									productLineItem.getBasePrice().multiply(100).getValue() :
 									productLineItem.product.getPriceModel().getPrice().multiply(100).getValue();
@@ -129,6 +128,7 @@
 									'',
 					'categories' : categoryNames
 				});
+				
 			}
 
 			return items;

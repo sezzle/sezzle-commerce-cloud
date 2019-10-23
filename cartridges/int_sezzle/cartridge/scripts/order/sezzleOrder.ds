@@ -76,7 +76,7 @@
 		
 		this.captureOrder = api.capture;
 		/**
-		 * Refund captured orders and update their afirm status. Used in Sezzle job.
+		 * Refund captured orders and update their sezzle status. Used in Sezzle job.
 		 * 
 		 * @see pipeline "SezzleJob"
 		 */

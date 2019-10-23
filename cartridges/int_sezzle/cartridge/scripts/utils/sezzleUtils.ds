@@ -31,7 +31,6 @@
 				let orderPI = giftCertificatePaymentInstrs.next();
 				giftCertTotal = giftCertTotal.add(orderPI.getPaymentTransaction().getAmount());
 			}
-      giftCertificatePaymentInstrs.close()
 			return basketTotal.subtract(giftCertTotal);
 		};
 
@@ -104,7 +103,6 @@
 									);
 				}
 			}
-      productLineItems.close()
 		};
 
 		/**
@@ -330,7 +328,6 @@
 					categoriesCollection.put(prodCat.ID, prodCat);
 				}
 			}
-      productCategoriesIterator.close()
 			return categoriesCollection;
 		};
 
