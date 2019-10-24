@@ -78,19 +78,19 @@ Array.prototype.forEach.call(document.getElementsByClassName('sezzle-know-more')
       // Display the modal node
       modalNode.style.display = 'block';
       // Add hidden class hide the item
-      modalNode.getElementsByClassName('sezzle-checkout-modal')[0].className = 'sezzle-checkout-modal';
+      modalNode.getElementsByClassName('sezzle-modal')[0].className = 'sezzle-checkout-modal';
     });
   });
   
   
-  // Array.prototype.forEach.call(document.getElementsByClassName('close-sezzle-modal'), function (el) {
-  //   el.addEventListener('click', function () {
-  //     // Display the modal node
-  //     modalNode.style.display = 'none';
-  //     // Add hidden class hide the item
-  //     modalNode.getElementsByClassName('sezzle-checkout-modal')[0].className = 'sezzle-checkout-modal sezzle-checkout-modal-hidden';
-  //   });
-  // });
+  Array.prototype.forEach.call(document.getElementsByClassName('close-sezzle-modal'), function (el) {
+    el.addEventListener('click', function () {
+      // Display the modal node
+      modalNode.style.display = 'none';
+      // Add hidden class hide the item
+      modalNode.getElementsByClassName('sezzle-modal')[0].className = 'sezzle-checkout-modal sezzle-checkout-modal-hidden';
+    });
+  });
   
   let sezzleModal = document.getElementsByClassName('sezzle-modal')[0]
   // backwards compatability check
