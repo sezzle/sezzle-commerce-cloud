@@ -1,7 +1,7 @@
 (function () {
 	/**
 	 * Creates library for working with Order
-	 * Middleware layer between Sezzle API and Demandware orders
+	 * Middleware layer between Sezzle API and orders
 	 *
 	 * @constructor
 	 * @this {Order}
@@ -26,6 +26,7 @@
 			if (file.exists()){
 				var fileReader = new FileReader(file);
 				var strDate = fileReader.readLine();
+				fileReader.close()
 				if (strDate){
 					return new Date(Date.parse(strDate));
 				}
@@ -75,7 +76,7 @@
 		
 		this.captureOrder = api.capture;
 		/**
-		 * Refund captured orders and update their afirm status. Used in Sezzle job.
+		 * Refund captured orders and update their sezzle  status. Used in Sezzle job.
 		 * 
 		 * @see pipeline "SezzleJob"
 		 */

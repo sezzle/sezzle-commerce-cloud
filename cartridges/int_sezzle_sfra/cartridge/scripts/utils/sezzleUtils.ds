@@ -19,7 +19,7 @@
 		/**
 		 * Calculate non-gift certificate amount
 		 *
-		 * @param {dw.order.Basket} Basket demandware basket
+		 * @param {dw.order.Basket}  basket
 		 * @returns {dw.value.Money} simple object with name and shipping address
 		 */
 		self.calculateNonGiftCertificateAmount = function (basket) {
@@ -39,9 +39,9 @@
 		 * Compare line items from basket and from sezzle response.
 		 * If they are not identical, add error to status object
 		 *
-		 * @param {dw.order.Basket} Basket demandware basket
+		 * @param {dw.order.Basket}  basket
 		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status demandware basket
+		 * @param {dw.system.Status} status basket
 		 */
 		self.checkLineItems = function (basket, SezzleResponse, status) {
 			let productLineItems = basket.getProductLineItems().iterator();
@@ -110,9 +110,9 @@
 		 * Compare taxes from basket and from sezzle response.
 		 * If they are not identical, add error to status object
 		 *
-		 * @param {dw.order.Basket} Basket demandware basket
+		 * @param {dw.order.Basket}  basket
 		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status demandware basket
+		 * @param {dw.system.Status} status basket
 		 */
 		self.checkTaxation = function (basket, SezzleResponse, status) {
 			let basketTax = basket.getTotalTax().multiply(100).getValue();
@@ -137,9 +137,9 @@
 		 * Compare total price from basket and from sezzle response.
 		 * If they are not identical, add error to status object
 		 *
-		 * @param {dw.order.Basket} Basket demandware basket
+		 * @param {dw.order.Basket}  basket
 		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status demandware basket
+		 * @param {dw.system.Status} status basket
 		 */
 		self.checkTotalPrice = function (basket, SezzleResponse, status) {
 			let totalPrice = self.calculateNonGiftCertificateAmount(basket).multiply(100).getValue();
