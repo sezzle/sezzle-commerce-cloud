@@ -32,14 +32,6 @@
             return currentSite.getCustomPreferenceValue('SezzlePrivateKey');
         };
         /**
-        * Return StoreFront Path
-        *
-        * @returns {string} storeFront Path
-        */
-        this.get = function () {
-            return currentSite.getCustomPreferenceValue('StoreFrontPath');
-        };
-        /**
          * Return Sezzle Online Status preference
          *
          * @returns {boolean} Promo text

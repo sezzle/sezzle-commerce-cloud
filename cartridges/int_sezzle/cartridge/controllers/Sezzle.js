@@ -7,10 +7,8 @@
  */
 var SEZZLE_PAYMENT_METHOD = 'Sezzle';
 var Resource = require('dw/web/Resource');
-var SezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
-var storeFrontPath = SezzleData.getStoreFrontPath()
-var app = require(Resource.msg('sezzle.controllers.cartridge','sezzle', storeFrontPath) + '/cartridge/scripts/app');
-var guard = require(Resource.msg('sezzle.controllers.cartridge','sezzle', storeFrontPath) + '/cartridge/scripts/guard');
+var app = require(Resource.msg('sezzle.controllers.cartridge','sezzle','app_storefront_controllers') + '/cartridge/scripts/app');
+var guard = require(Resource.msg('sezzle.controllers.cartridge','sezzle','app_storefront_controllers') + '/cartridge/scripts/guard');
 var BasketMgr = require('dw/order/BasketMgr');
 var ISML = require('dw/template/ISML');
 var sezzle = require('*/cartridge/scripts/sezzle.ds');
