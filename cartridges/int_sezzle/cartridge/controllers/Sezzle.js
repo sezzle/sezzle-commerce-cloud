@@ -7,8 +7,10 @@
  */
 var SEZZLE_PAYMENT_METHOD = 'Sezzle';
 var Resource = require('dw/web/Resource');
-var app = require(Resource.msg('sezzle.controllers.cartridge','sezzle','app_storefront_controllers') + '/cartridge/scripts/app');
-var guard = require(Resource.msg('sezzle.controllers.cartridge','sezzle','app_storefront_controllers') + '/cartridge/scripts/guard');
+var SezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
+var storeFrontPath = SezzleData.getStoreFrontPath()
+var app = require(Resource.msg('sezzle.controllers.cartridge','sezzle', storeFrontPath) + '/cartridge/scripts/app');
+var guard = require(Resource.msg('sezzle.controllers.cartridge','sezzle', storeFrontPath) + '/cartridge/scripts/guard');
 var BasketMgr = require('dw/order/BasketMgr');
 var ISML = require('dw/template/ISML');
 var sezzle = require('*/cartridge/scripts/sezzle.ds');
@@ -26,15 +28,15 @@ function redirect() {
 	logger.debug('Selected Payment Method Id - {0}', CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value);
 	if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
 		var basket = BasketMgr.getCurrentBasket();
-		checkoutObject = sezzle.basket.initiateCheckout(basket)
+		var checkoutObject = sezzle.basket.initiateCheckout(basket)
 		
 		ISML.renderTemplate('sezzle/sezzleredirect', {
 			SezzleRedirectUrl : checkoutObject['redirect_url']
 		});
-		session.custom.sezzleToken=sezzle.utils.getQueryString("id", checkoutObject['redirect_url'])
-		session.custom.sezzled = true;
-		session.custom.sezzleAmount = checkoutObject['amount_in_cents']
-		session.custom.referenceId = checkoutObject['order_reference_id']
+		session.privacy.sezzleToken=sezzle.utils.getQueryString("id", checkoutObject['redirect_url'])
+		session.privacy.sezzled = true;
+		session.privacy.sezzleAmount = checkoutObject['amount_in_cents']
+		session.privacy.referenceId = checkoutObject['order_reference_id']
 		return true;
 	} else {
 		return false;
@@ -56,7 +58,26 @@ function success() {
 		});
 	} else if (placeOrderResult.order_created) {
 		app.getController('COSummary').ShowConfirmation(placeOrderResult.Order);
+		postProcess(placeOrderResult.Order);
 	}
+}
+
+function postProcess(order){
+	var logger = require('dw/system').Logger.getLogger('Snow', '');
+	if (sezzle.data.getSezzlePaymentAction() == 'CAPTURE'){
+		try {
+			Transaction.wrap(function(){
+				sezzle.order.captureOrder(order.custom.SezzleExternalId, order.orderNo);
+				order.custom.SezzleStatus = 'CAPTURE';
+				order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
+				order.setStatus(Order.ORDER_STATUS_COMPLETED);
+			});
+		} catch (e) {
+			logger.error('Sezzle Capturing error. Details - {0}', e);
+			return new Status(Status.ERROR);
+		}
+	}
+	return new Status(Status.OK);
 }
 
 /**
@@ -65,4 +86,5 @@ function success() {
  */
 exports.Redirect = redirect;
 exports.Success = guard.ensure([ 'get' ], success);
+exports.PostProcess = postProcess;
 exports.Init = init;

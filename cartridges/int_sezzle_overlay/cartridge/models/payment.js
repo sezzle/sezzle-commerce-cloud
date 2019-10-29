@@ -3,7 +3,6 @@
 var PaymentMgr = require('dw/order/PaymentMgr');
 var PaymentInstrument = require('dw/order/PaymentInstrument');
 var collections = require('*/cartridge/scripts/util/collections');
-//var Sezzle = require('*/cartridge/controllers/Sezzle.js');
 var sezzle = require('*/cartridge/scripts/sezzle.ds');
 
 /**
@@ -84,8 +83,6 @@ function Payment(currentBasket, currentCustomer, countryCode) {
         .getApplicablePaymentCards(currentCustomer, countryCode, paymentAmount.value);
     var paymentInstruments = currentBasket.paymentInstruments;
 
-    // TODO: Should compare currentBasket and currentCustomer and countryCode to see
-    //     if we need them or not
     this.applicablePaymentMethods =
         paymentMethods ? applicablePaymentMethods(paymentMethods) : null;
 

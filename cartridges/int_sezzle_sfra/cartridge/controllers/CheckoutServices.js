@@ -4,7 +4,7 @@ var page = module.superModule;
 
 var server = require('server');
 
-var COHelpers = require('int_sezzle_overlay/cartridge/scripts/checkout/checkoutHelpers');
+var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
@@ -377,8 +377,17 @@ server.prepend('PlaceOrder', server.middleware.https, function (req, res, next) 
     var Resource = require('dw/web/Resource');
     var Transaction = require('dw/system/Transaction');
     var URLUtils = require('dw/web/URLUtils');
+    var PaymentMgr = require('dw/order/PaymentMgr');
+    var paymentMethod = "";
 
     var currentBasket = BasketMgr.getCurrentBasket();
+    
+    var paymentInstruments = currentBasket.paymentInstruments;
+    
+    for (var i = 0; i < paymentInstruments.length; i++) {
+        var paymentInstrument = paymentInstruments[i];
+        paymentMethod = paymentInstrument.paymentMethod;
+    }
 
     if (!currentBasket) {
         res.json({
@@ -392,8 +401,8 @@ server.prepend('PlaceOrder', server.middleware.https, function (req, res, next) 
         return next();
     }
 
-    if (currentBasket.paymentInstrument.paymentMethod == 'Sezzle') {
-    	logger.debug("Selected payment method : {0}",currentBasket.paymentInstrument.paymentMethod);
+    if (paymentMethod === "Sezzle") {
+    	logger.debug("Selected payment method : {0}",paymentMethod);
 	    res.json({
 	        error: false,
 	        continueUrl: URLUtils.url('Sezzle-Redirect').toString()

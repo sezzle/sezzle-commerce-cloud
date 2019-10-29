@@ -25,7 +25,6 @@ var formErrors = require('*/cartridge/scripts/formErrors');
 var renderTemplateHelper = require('*/cartridge/scripts/renderTemplateHelper');
 var ShippingHelper = require('*/cartridge/scripts/checkout/shippingHelpers');
 
-//var sezzle = require('*/cartridge/controllers/Sezzle')
 
 // static functions needed for Checkout Controller logic
 
@@ -383,7 +382,6 @@ function calculatePaymentTransaction(currentBasket) {
 
     try {
         Transaction.wrap(function () {
-            // TODO: This function will need to account for gift certificates at a later date
             var orderTotal = currentBasket.totalGrossPrice;
             var paymentInstrument = currentBasket.paymentInstrument;
             paymentInstrument.paymentTransaction.setAmount(orderTotal);
@@ -417,8 +415,7 @@ function validatePayment(req, currentBasket) {
         countryCode,
         paymentAmount
     );
-    
-   // applicablePaymentMethods = require('*/cartridge/scripts/sezzle.ds').Init(currentBasket, applicablePaymentMethods);
+
     
     applicablePaymentCards = creditCardPaymentMethod.getApplicablePaymentCards(
         currentCustomer,
