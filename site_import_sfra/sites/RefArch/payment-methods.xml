@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<payment-settings xmlns="http://www.demandware.com/xml/impex/paymentsettings/2009-09-15">
+    <payment-method method-id="Sezzle">
+        <name xml:lang="x-default">Sezzle</name>
+        <description xml:lang="x-default">&lt;style&gt;
+.sezzle-payment-method-description {
+    margin-left: 200px;
+}
+&lt;/style&gt;</description>
+        <image>blue_logo-transparent_bg.png</image>
+        <enabled-flag>true</enabled-flag>
+        <processor-id>SEZZLE_PAYMENT</processor-id>
+    </payment-method>
+</payment-settings>

@@ -22,7 +22,7 @@
 		/**
 		 * Build shipping address object based on Basket
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {Object} simple object with name and shipping address
 		 */
 		self.getShippingAddress = function (basket) {
@@ -49,7 +49,7 @@
 		/**
 		 * Build billing address object based on Basket
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {Object} simple object with name and billing address
 		 */
 		self.getBillingAddress = function (basket) {
@@ -81,7 +81,7 @@
 		/**
 		 * Build items object based on Basket
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {Object} simple object contained product data
 		 */
 		self.getItems = function (basket) {
@@ -128,7 +128,6 @@
 									'',
 					'categories' : categoryNames
 				});
-				
 			}
 
 			return items;
@@ -138,8 +137,8 @@
 		 * Checks possibility of using Sezzle payment method
 		 * Removes one if it cann't be accepted
 		 *
-		 * @param {dw.order.Basket}  basket
-		 * @param {dw.util.Collection} ApplicablePaymentMethods basket
+		 * @param {dw.order.Basket} Basket demandware basket
+		 * @param {dw.util.Collection} ApplicablePaymentMethods demandware basket
 		 * @returns {Object} simple object contained product data
 		 */
 		self.validatePayments = function (basket, ApplicablePaymentMethods) {
@@ -189,7 +188,7 @@
 		/**
 		 * Build object with metadata
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {Object} simple object contained metadata
 		 */
 		self.getMetadata = function (basket) {
@@ -213,7 +212,7 @@
 		/**
 		 * Return shipping amount in cents
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {Number} shipping amount in cents
 		 */
 		self.getShippingAmmout = function (basket) {
@@ -225,7 +224,7 @@
 		/**
 		 * Return tax amount in cents
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {Number} tax amount in cents
 		 */
 		self.getTaxAmount = function (basket) {
@@ -237,7 +236,7 @@
 		/**
 		 * Return total amount in cents
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {Number} total amount in cents
 		 */
 		self.getTotal = function (basket) {
@@ -249,7 +248,7 @@
 		/**
 		 * Create Sezzle payment instrument
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {dw.order.PaymentInstrument} payment instrument
 		 */
 		self.createPaymentInstrument = function (basket) {
@@ -262,7 +261,7 @@
 		/**
 		 * Remove Sezzle payment instrument
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 */
 		self.removePaymentInstrument = function (basket) {
 			var paymentInstruments = basket.getPaymentInstruments('Sezzle').iterator();
@@ -278,7 +277,7 @@
 		/**
 		 * Build object with checkout data and fetch the checkout url
 		 *
-		 * @param {dw.order.Basket}  basket
+		 * @param {dw.order.Basket} Basket demandware basket
 		 * @returns {string} checkout data object in JSON format
 		 */
 		self.initiateCheckout = function (basket) {

@@ -31,15 +31,6 @@
 		this.getPrivateKey = function () {
 			return currentSite.getCustomPreferenceValue('SezzlePrivateKey');
 		};
-
-    /**
-     * Return StoreFront Path
-     *
-     * @returns {string} storeFront Path
-     */
-    this.getStoreFrontPath = function () {
-      return currentSite.getCustomPreferenceValue('StoreFrontPath');
-    };
 		
 		/**
 		 * Return Sezzle Online Status preference
