@@ -18,9 +18,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:sezzle/salesforce-ee.git"
+    "url": "git@github.com:SalesforceCommerceCloud/link_sezzle.git"
   },
-  "author": "Sebastian Ninse <s.ninse@dotsource.de>",
+  "author": "Rajan Bhuyan <rajan.bhuyan@sezzle.com>",
   "license": "MIT",
   "devDependencies": {
     "@tridnguyen/config": "^2.3.1",
