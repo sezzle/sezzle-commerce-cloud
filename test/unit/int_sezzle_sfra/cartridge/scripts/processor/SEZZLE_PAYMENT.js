@@ -57,7 +57,7 @@ var SezzlePayment = proxyquire('../../../../../../cartridges/int_sezzle_sfra/car
 describe('processor/sezzlePayment', function () {
   it('authorize', function () {
     global.session = {
-      "custom" : {
+      "privacy" : {
         "referenceId" : "123",
           "sezzled" : true,
       }
@@ -76,7 +76,7 @@ describe('processor/sezzlePayment', function () {
   });
   it('authorize - mismatched reference Id', function () {
     global.session = {
-      "custom" : {
+      "privacy" : {
         "referenceId" : "1234",
         "sezzled" : true,
       }
@@ -95,7 +95,7 @@ describe('processor/sezzlePayment', function () {
   });
   it('postProcess', function () {
     global.session = {
-      "custom" : {
+      "privacy" : {
         "referenceId" : "1234",
         "sezzled" : true,
       }
