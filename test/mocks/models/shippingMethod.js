@@ -2,8 +2,7 @@
 
 var proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 
-var defaultShippingMethod =
-{
+var defaultShippingMethod = {
     description: 'Order received within 7-10 business days',
     displayName: 'Ground',
     ID: '001',

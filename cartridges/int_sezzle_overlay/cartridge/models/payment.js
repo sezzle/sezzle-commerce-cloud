@@ -3,7 +3,6 @@
 var PaymentMgr = require('dw/order/PaymentMgr');
 var PaymentInstrument = require('dw/order/PaymentInstrument');
 var collections = require('*/cartridge/scripts/util/collections');
-var sezzle = require('*/cartridge/scripts/sezzle.ds');
 
 /**
  * Creates an array of objects containing applicable payment methods
@@ -83,14 +82,12 @@ function Payment(currentBasket, currentCustomer, countryCode) {
         .getApplicablePaymentCards(currentCustomer, countryCode, paymentAmount.value);
     var paymentInstruments = currentBasket.paymentInstruments;
 
-    this.applicablePaymentMethods =
-        paymentMethods ? applicablePaymentMethods(paymentMethods) : null;
+    this.applicablePaymentMethods = paymentMethods ? applicablePaymentMethods(paymentMethods) : null;
 
-    this.applicablePaymentCards =
-        paymentCards ? applicablePaymentCards(paymentCards) : null;
+    this.applicablePaymentCards = paymentCards ? applicablePaymentCards(paymentCards) : null;
 
-    this.selectedPaymentInstruments = paymentInstruments ?
-        getSelectedPaymentInstruments(paymentInstruments) : null;
+    this.selectedPaymentInstruments = paymentInstruments
+        ? getSelectedPaymentInstruments(paymentInstruments) : null;
 }
 
 module.exports = Payment;

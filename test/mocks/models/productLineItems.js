@@ -11,8 +11,8 @@ function proxyModel() {
                 return { bonusProducts: null, bonusProductLineItemUUID: null };
             }
         },
-      'dw/web/URLUtils' : require('../dw.web.URLUtils'),
-      'dw/web/Resource' : require('../dw/web/Resource'),
+        'dw/web/URLUtils': require('../dw.web.URLUtils'),
+        'dw/web/Resource': require('../dw/web/Resource')
     });
 }
 

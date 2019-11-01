@@ -7,14 +7,14 @@
      * @returns Data instance
      */
     var Data = function () {
-    var system = require('dw/system');
-    var web = require('dw/web');
-    var currentSite = system.Site.getCurrent();
-    var Site = require('dw/system/Site').getCurrent();
-    var test = Site.getCustomPreferenceValue('SezzleMode');
-    var mode = !empty(currentSite.getCustomPreferenceValue('SezzleMode')) ?
-                    currentSite.getCustomPreferenceValue('SezzleMode').getValue() :
-                    'sandbox';
+        var system = require('dw/system');
+        var web = require('dw/web');
+        var currentSite = system.Site.getCurrent();
+        var Site = require('dw/system/Site').getCurrent();
+        var test = Site.getCustomPreferenceValue('SezzleMode');
+        var mode = !empty(currentSite.getCustomPreferenceValue('SezzleMode'))
+            ? currentSite.getCustomPreferenceValue('SezzleMode').getValue()
+            : 'sandbox';
         /**
          * Return Sezzle public key
          *
@@ -45,9 +45,9 @@
          * @returns {boolean} Promo text
          */
         this.getSezzleOnlineStatus = function () {
-            return !empty(currentSite.getCustomPreferenceValue('SezzleOnline')) ?
-                    currentSite.getCustomPreferenceValue('SezzleOnline') :
-                    false;
+            return !empty(currentSite.getCustomPreferenceValue('SezzleOnline'))
+                ? currentSite.getCustomPreferenceValue('SezzleOnline')
+                : false;
         };
         /**
          * Return Sezzle Payment Action preference
@@ -123,11 +123,11 @@
         };
         /**
 		 * @description Due to CyberSource changes payment can be disabled from the BM (Requirement 09.12.2017)
-		 * @returns {Boolean}
+		 * @returns {boolean}
 		 */
-		this.getSezzlePaymentOnlineStatus = function() {
-			return currentSite.getCustomPreferenceValue('SezzlePaymentOnlineStatus');
-		};
+        this.getSezzlePaymentOnlineStatus = function () {
+            return currentSite.getCustomPreferenceValue('SezzlePaymentOnlineStatus');
+        };
         /**
          * Return financing program to date mapping
          *
@@ -139,7 +139,7 @@
         /**
          * Return sezzle minimal applying total
          *
-         * @returns {Number} minimal applying total
+         * @returns {number} minimal applying total
          */
         this.getSezzleMinTotal = function () {
             return currentSite.getCustomPreferenceValue('SezzleMinTotal');
@@ -147,7 +147,7 @@
         /**
          * Return sezzle minimal applying total
          *
-         * @returns {Number} minimal applying total
+         * @returns {number} minimal applying total
          */
         this.getSezzlePaymentMinTotal = function () {
             return currentSite.getCustomPreferenceValue('SezzlePaymentMinTotal');
@@ -155,17 +155,17 @@
         /**
          * Return sezzle maximal applying total
          *
-         * @returns {Number} maximal applying total
+         * @returns {number} maximal applying total
          */
         this.getSezzlePaymentMaxTotal = function () {
             return currentSite.getCustomPreferenceValue('SezzlePaymentMaxTotal');
         };
         this.getErrorMessages = function () {
             return JSON.stringify({
-                'closed': web.Resource.msg('sezzle.error.closed', 'sezzle', ''),
-                'default': web.Resource.msg('sezzle.error.default', 'sezzle', '')
+                closed: web.Resource.msg('sezzle.error.closed', 'sezzle', ''),
+                default: web.Resource.msg('sezzle.error.default', 'sezzle', '')
             });
-        }
+        };
     };
     module.exports = new Data();
 }());

@@ -351,8 +351,7 @@ function validateCreditCard(form) {
 
     if (!form.paymentMethod.value) {
         if (currentBasket.totalGrossPrice.value > 0) {
-            result[form.paymentMethod.htmlName] =
-                Resource.msg('error.no.selected.payment.method', 'creditCard', null);
+            result[form.paymentMethod.htmlName] = Resource.msg('error.no.selected.payment.method', 'creditCard', null);
         }
 
         return result;
@@ -490,8 +489,8 @@ function handlePayments(order, orderNumber) {
                     paymentInstrument.paymentTransaction.setTransactionID(orderNumber);
                     Transaction.commit();
                 } else {
-                    if (HookMgr.hasHook('app.payment.processor.' +
-                            paymentProcessor.ID.toLowerCase())) {
+                    if (HookMgr.hasHook('app.payment.processor.'
+                            + paymentProcessor.ID.toLowerCase())) {
                         authorizationResult = HookMgr.callHook(
                             'app.payment.processor.' + paymentProcessor.ID.toLowerCase(),
                             'Authorize',
@@ -696,7 +695,6 @@ function getNonGiftCertificateAmount(basket) {
 }
 
 
-
 module.exports = {
     getFirstNonDefaultShipmentWithProductLineItems: getFirstNonDefaultShipmentWithProductLineItems,
     ensureNoEmptyShipments: ensureNoEmptyShipments,
@@ -724,5 +722,5 @@ module.exports = {
     ensureValidShipments: ensureValidShipments,
     setGift: setGift,
     getNonGiftCertificateAmount: getNonGiftCertificateAmount
-    
+
 };

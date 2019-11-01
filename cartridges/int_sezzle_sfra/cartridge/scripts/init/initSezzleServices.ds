@@ -3,30 +3,28 @@
  *
  */
 var getAuthHeader = function (currentSite) {
-        var authString = currentSite.getCustomPreferenceValue('SezzlePublicKey')
+    var authString = currentSite.getCustomPreferenceValue('SezzlePublicKey')
             + ':' + currentSite.getCustomPreferenceValue('SezzlePrivateKey');
-        return 'Basic ' + require('dw/util/StringUtils').encodeBase64(authString);
-    };
-    
-var commonCreateRequest = function (svc, args) {
-        svc.setRequestMethod('POST');
-        svc.addHeader('Content-Type', 'application/json');
-        if (!empty(args)) {
-			if (args.authToken){
-				svc.addHeader('Authorization', 'Bearer ' + args.authToken);
-			}
-			return JSON.stringify(args);
-		}
+    return 'Basic ' + require('dw/util/StringUtils').encodeBase64(authString);
+};
 
-    };
-    
-function initService(serviceName){
-	var service = require('dw/svc/LocalServiceRegistry').createService(serviceName, {
+var commonCreateRequest = function (svc, args) {
+    svc.setRequestMethod('POST');
+    svc.addHeader('Content-Type', 'application/json');
+    if (!empty(args)) {
+        if (args.authToken) {
+            svc.addHeader('Authorization', 'Bearer ' + args.authToken);
+        }
+        return JSON.stringify(args);
+    }
+};
+
+function initService(serviceName) {
+    var service = require('dw/svc/LocalServiceRegistry').createService(serviceName, {
     	createRequest: commonCreateRequest,
     	parseResponse: require('~/cartridge/scripts/utils/sezzleUtils.ds').responseParser
-	});
-	return service;
+    });
+    return service;
 }
-  
+
 module.exports.initService = initService;
- 
