@@ -7,9 +7,9 @@
  */
 var SEZZLE_PAYMENT_METHOD = 'Sezzle';
 var Resource = require('dw/web/Resource');
-var SezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
-    storeFrontPath = SezzleData.getStoreFrontPath(),
-    fullStoreFrontPath = Resource.msg('sezzle.controllers.cartridge', 'sezzle', storeFrontPath);
+var sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
+var storeFrontPath = sezzleData.getStoreFrontPath();
+var fullStoreFrontPath = Resource.msg('sezzle.controllers.cartridge', 'sezzle', storeFrontPath);
 var app = require(fullStoreFrontPath + '/cartridge/scripts/app');
 var guard = require(fullStoreFrontPath + '/cartridge/scripts/guard');
 var BasketMgr = require('dw/order/BasketMgr');
@@ -31,8 +31,8 @@ function redirect() {
     logger.debug('Selected Payment Method Id - {0}',
         CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value);
     if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
-        var basket = BasketMgr.getCurrentBasket(),
-            checkoutObject = sezzle.basket.initiateCheckout(basket);
+        var basket = BasketMgr.getCurrentBasket();
+        var checkoutObject = sezzle.basket.initiateCheckout(basket);
 
         ISML.renderTemplate('sezzle/sezzleredirect',
             {

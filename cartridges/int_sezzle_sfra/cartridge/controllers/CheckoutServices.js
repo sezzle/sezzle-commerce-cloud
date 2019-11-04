@@ -123,7 +123,7 @@ server.prepend(
             }
 
             /* Currently phone is hardcoded to credit card form so we will take phone from shipping address */
-            var shippingAddress = currentBasket.defaultShipment;
+            var shippingAddress = currentBasket.defaultShipment.shippingAddress;
 
             viewData.phone = { value: shippingAddress.phone };
 
@@ -166,7 +166,7 @@ server.prepend(
                         return;
                     }
 
-                    var billingAddress = currentBasket;
+                    var billingAddress = currentBasket.billingAddress;
                     var billingForm = server.forms.getForm('billing');
                     var result;
                     paymentMethodID = billingData.paymentMethod.value;
@@ -240,7 +240,7 @@ server.prepend(
             && req.currentCustomer.raw.authenticated
             && req.currentCustomer.raw.registered
                     ) {
-                        var paymentInstruments = req.currentCustomer.wallet;
+                        var paymentInstruments = req.currentCustomer.wallet.paymentInstruments;
                         var paymentInstrument = array.find(paymentInstruments,
                             function (item) {
                                 return billingData.storedPaymentUUID === item.UUID;
@@ -397,7 +397,7 @@ server.prepend('PlaceOrder',
 
         var currentBasket = BasketMgr.getCurrentBasket(),
 
-            paymentInstruments = currentBasket;
+            paymentInstruments = currentBasket.paymentInstruments;
 
         for (var i = 0; i < paymentInstruments.length; i++) {
             var paymentInstrument = paymentInstruments[i];
@@ -414,7 +414,7 @@ server.prepend('PlaceOrder',
                 redirectUrl: URLUtils.url('Cart-Show').toString()
             });
 
-            return next();
+            return;
         }
 
         if (paymentMethod === 'Sezzle') {
@@ -428,8 +428,6 @@ server.prepend('PlaceOrder',
                 req,
                 res);
         }
-        return next();
     });
-
 
 module.exports = server.exports();

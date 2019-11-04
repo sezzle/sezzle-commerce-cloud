@@ -29,7 +29,7 @@ var ShippingHelper = require('*/cartridge/scripts/checkout/shippingHelpers');
 // Static functions needed for Checkout Controller logic
 
 function ensureValidShipments(lineItemContainer) {
-    var shipments = lineItemContainer,
+    var shipments = lineItemContainer.shipments,
         allValid = collections.every(
             shipments,
             function (shipment) {
@@ -94,7 +94,6 @@ function prepareShippingForm() {
  */
 function prepareBillingForm() {
     var billingForm = server.forms.getForm('billing');
-
     billingForm.clear();
 
     return billingForm;
@@ -145,9 +144,9 @@ function isShippingAddressInitialized(shipment) {
  * @param {dw.order.Shipment} [shipmentOrNull] - The target shipment
  */
 function copyCustomerAddressToShipment(address, shipmentOrNull) {
-    var currentBasket = BasketMgr.getCurrentBasket(),
-        shipment = shipmentOrNull || currentBasket.defaultShipment,
-        shippingAddress = shipment;
+    var currentBasket = BasketMgr.getCurrentBasket();
+    var shipment = shipmentOrNull || currentBasket.defaultShipment;
+    var shippingAddress = shipment.shippingAddress;
 
     Transaction.wrap(function () {
         if (shippingAddress === null) {
@@ -172,8 +171,8 @@ function copyCustomerAddressToShipment(address, shipmentOrNull) {
  * @param {dw.customer.CustomerAddress} address - The customer address
  */
 function copyCustomerAddressToBilling(address) {
-    var currentBasket = BasketMgr.getCurrentBasket(),
-        billingAddress = currentBasket;
+    var currentBasket = BasketMgr.getCurrentBasket();
+    var billingAddress = currentBasket.billingAddress;
 
     Transaction.wrap(function () {
         if (!billingAddress) {
@@ -201,10 +200,10 @@ function copyCustomerAddressToBilling(address) {
  * @param {dw.order.Shipment} [shipmentOrNull] - the target Shipment
  */
 function copyShippingAddressToShipment(shippingData, shipmentOrNull) {
-    var currentBasket = BasketMgr.getCurrentBasket(),
-        shipment = shipmentOrNull || currentBasket.defaultShipment,
+    var currentBasket = BasketMgr.getCurrentBasket();
+    var shipment = shipmentOrNull || currentBasket.defaultShipment;
 
-        shippingAddress = shipment;
+    var shippingAddress = shipment.shippingAddress;
 
     Transaction.wrap(function () {
         if (shippingAddress === null) {
@@ -230,8 +229,8 @@ function copyShippingAddressToShipment(shippingData, shipmentOrNull) {
  * @param {Object} address - an address-similar Object (firstName, ...)
  */
 function copyBillingAddressToBasket(address) {
-    var currentBasket = BasketMgr.getCurrentBasket(),
-        billingAddress = currentBasket;
+    var currentBasket = BasketMgr.getCurrentBasket();
+    var billingAddress = currentBasket.billingAddress;
 
     Transaction.wrap(function () {
         if (!billingAddress) {
@@ -422,14 +421,14 @@ function calculatePaymentTransaction(currentBasket) {
  * @returns {Object} an object that has error information
  */
 function validatePayment(req, currentBasket) {
-    var applicablePaymentCards,
-        applicablePaymentMethods,
-        creditCardPaymentMethod = PaymentMgr.getPaymentMethod(PaymentInstrument.METHOD_CREDIT_CARD),
-        paymentAmount = currentBasket.totalGrossPrice.value,
-        countryCode = req.geolocation,
-        currentCustomer = req.currentCustomer.raw,
-        paymentInstruments = currentBasket,
-        result = {};
+    var applicablePaymentCards;
+    var applicablePaymentMethods;
+    var creditCardPaymentMethod = PaymentMgr.getPaymentMethod(PaymentInstrument.METHOD_CREDIT_CARD);
+    var paymentAmount = currentBasket.totalGrossPrice.value;
+    var countryCode = req.geolocation.countryCode;
+    var currentCustomer = req.currentCustomer.raw;
+    var paymentInstruments = currentBasket.paymentInstruments;
+    var result = {};
 
     applicablePaymentMethods = PaymentMgr.getApplicablePaymentMethods(
         currentCustomer,
@@ -507,7 +506,7 @@ function handlePayments(order, orderNumber) {
     var result = {};
 
     if (order.totalNetPrice !== 0.00) {
-        var paymentInstruments = order;
+        var paymentInstruments = order.paymentInstruments;
 
         if (paymentInstruments.length === 0) {
             Transaction.wrap(function () { OrderMgr.failOrder(order); });
@@ -518,7 +517,7 @@ function handlePayments(order, orderNumber) {
             for (var i = 0; i < paymentInstruments.length; i++) {
                 var paymentInstrument = paymentInstruments[i],
                     paymentProcessor = PaymentMgr
-                        .getPaymentMethod(paymentInstrument.paymentMethod),
+                        .getPaymentMethod(paymentInstrument.paymentMethod).paymentProcessor,
                     authorizationResult;
 
                 if (paymentProcessor === null) {
@@ -584,7 +583,7 @@ function sendConfirmationEmail(order, locale) {
     confirmationEmail.setFrom(Site.current.getCustomPreferenceValue('customerServiceEmail')
     || 'no-reply@salesforce.com');
 
-    Object.keys(orderObject).forEach(function () {
+    Object.keys(orderObject).forEach(function (key) {
         context.put(key, orderObject[key]);
     });
 
@@ -626,7 +625,47 @@ function placeOrder(order) {
 }
 
 /**
- * Renders the user's stored payment Instruments
+ * saves payment instruemnt to customers wallet
+ * @param {Object} billingData - billing information entered by the user
+ * @param {dw.order.Basket} currentBasket - The current basket
+ * @param {dw.customer.Customer} customer - The current customer
+ * @returns {dw.customer.CustomerPaymentInstrument} newly stored payment Instrument
+ */
+function savePaymentInstrumentToWallet(billingData, currentBasket, customer) {
+    var wallet = customer.getProfile().getWallet();
+
+    return Transaction.wrap(function () {
+        var storedPaymentInstrument = wallet.createPaymentInstrument('CREDIT_CARD');
+
+        storedPaymentInstrument.setCreditCardHolder(
+            currentBasket.billingAddress.fullName
+        );
+        storedPaymentInstrument.setCreditCardNumber(
+            billingData.paymentInformation.cardNumber.value
+        );
+        storedPaymentInstrument.setCreditCardType(
+            billingData.paymentInformation.cardType.value
+        );
+        storedPaymentInstrument.setCreditCardExpirationMonth(
+            billingData.paymentInformation.expirationMonth.value
+        );
+        storedPaymentInstrument.setCreditCardExpirationYear(
+            billingData.paymentInformation.expirationYear.value
+        );
+
+        var token = HookMgr.callHook(
+            'app.payment.processor.basic_credit',
+            'createMockToken'
+        );
+
+        storedPaymentInstrument.setCreditCardToken(token);
+
+        return storedPaymentInstrument;
+    });
+}
+
+/**
+ * renders the user's stored payment Instruments
  * @param {Object} req - The request object
  * @param {Object} accountModel - The account model for the current customer
  * @returns {string|null} newly stored payment Instrument

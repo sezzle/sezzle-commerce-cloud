@@ -30,10 +30,11 @@ function authorize(args) {
     // Check the reference token passed during redirection
     var reference_id = request.httpParameterMap.order_reference_id;
 
-    dw.system.Logger.debug('Sezzle Payment Reference Id - {0}',
-        reference_id);
+    dw.system.Logger.debug('Sezzle Payment Reference Id - {0} {1}',
+        reference_id,
+        session.privacy.referenceId);
 
-    if (session.privacy.referenceId !== reference_id) {
+    if (session.privacy.referenceId != reference_id) {
         dw.system.Logger.debug('Sezzle Error - Reference ID has changed');
 
         return { error: true };
@@ -103,4 +104,4 @@ function handle() {
 }
 
 exports.Handle = handle;
-exports.Authorize = authorize();
+exports.Authorize = authorize;

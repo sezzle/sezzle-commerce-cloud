@@ -7,6 +7,7 @@
         "camelcase": "off",
         "no-param-reassign": "off",
         "one-var" : "off",
-        "no-unused-vars" : "off"
+        "no-unused-vars" : "off",
+        "eqeqeq": "off"
      }
 }

@@ -6,6 +6,7 @@
         "require-jsdoc" : "off",
         "camelcase": "off",
         "no-param-reassign": "off",
-        "one-var": "off"
+        "one-var": "off",
+        "eqeqeq": "off"
      }
 }
