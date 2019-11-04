@@ -11,91 +11,96 @@ var PaymentMgr = require('dw/order/PaymentMgr');
 var Transaction = require('dw/system/Transaction');
 var sezzleUtils = require('*/cartridge/scripts/sezzle');
 var OrderMgr = require('dw/order/OrderMgr');
-var Resource = require('dw/web/Resource');
 var Order = require('dw/order/Order');
-var SezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
-var storeFrontPath = SezzleData.getStoreFrontPath()
-var Cart = require(Resource.msg('sezzle.controllers.cartridge','sezzle',storeFrontPath) + '/cartridge/scripts/models/CartModel');
 
 /*
  * Export the publicly available controller methods
  */
 
-function authorize(args){
-	var orderNo = args.OrderNo;
-	var paymentInstrument = args.PaymentInstrument;
-	var paymentProcessor = PaymentMgr.getPaymentMethod(paymentInstrument.getPaymentMethod()).getPaymentProcessor();
-	var order = OrderMgr.getOrder(orderNo);
+function authorize(args) {
+    var orderNo = args.OrderNo,
+        paymentInstrument = args.PaymentInstrument,
+        paymentProcessor = PaymentMgr.getPaymentMethod(paymentInstrument.getPaymentMethod()).getPaymentProcessor(),
+        order = OrderMgr.getOrder(orderNo);
 
-	if (!session.privacy.sezzled && empty(session.privacy.sezzleResponseID)){
-		return {error: true};
-	}
-	
-	//Check the reference token passed during redirection
-	var reference_id = request.httpParameterMap["order_reference_id"]
-	dw.system.Logger.debug('Sezzle Payment Reference Id - {0}', reference_id );
-	
-	if (session.privacy.referenceId != reference_id){
-		dw.system.Logger.debug('Sezzle Error - Reference ID has changed' );
-		return {error: true};
-	}
+    if (!session.privacy.sezzled && empty(session.privacy.sezzleResponseID)) {
+        return { error: true };
+    }
 
-	Transaction.wrap(function () {
-		paymentInstrument.paymentTransaction.transactionID = orderNo;
-		paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
-		dw.system.Logger.debug('Sezzle Payment Reference Id - {0}', session.privacy.referenceId );
-		var sezzleResponseObject = {
-				'id' : session.privacy.referenceId,
-				'events' : [{'id': session.privacy.sezzleFirstEventID}],
-				'amount': session.privacy.sezzleAmount,
-				'token': session.privacy.sezzleToken
-		};
-		sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
-		
-	});
+    // Check the reference token passed during redirection
+    var reference_id = request.httpParameterMap.order_reference_id;
 
-	return {authorized: true};
+    dw.system.Logger.debug('Sezzle Payment Reference Id - {0} {1}',
+        reference_id,
+        session.privacy.referenceId);
+
+    if (session.privacy.referenceId != reference_id) {
+        dw.system.Logger.debug('Sezzle Error - Reference ID has changed');
+
+        return { error: true };
+    }
+
+    Transaction.wrap(function () {
+        paymentInstrument.paymentTransaction.transactionID = orderNo;
+        paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
+        dw.system.Logger.debug('Sezzle Payment Reference Id - {0}', session.privacy.referenceId);
+        var sezzleResponseObject = {
+            id: session.privacy.referenceId,
+            events: [{ id: session.privacy.sezzleFirstEventID }],
+            amount: session.privacy.sezzleAmount,
+            token: session.privacy.sezzleToken
+        };
+        sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
+    });
+
+    return { authorized: true };
 }
 
-function postProcess(order){
-	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	var payment_action = sezzleUtils.data.getSezzlePaymentAction()
-	if (sezzleUtils.data.getSezzlePaymentAction() == 'CAPTURE'){
-		try {
-			Transaction.wrap(function(){
-				var resp = sezzleUtils.order.captureOrder(order.custom.SezzleExternalId, order.orderNo);
-				if (resp){
-					if (!resp.error){
-						order.custom.SezzleStatus = 'CAPTURE';
-						order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-					}
-					else{
-						logger.debug('Sezzle Capturing error');
-						return {error: true};
-					}
-				}
-				else{
-					logger.debug('Sezzle Capturing error. Details');
-					return {error: true};
-				}
-			});
-		} catch (e) {
-			logger.debug('Sezzle Capturing error. Details - {0}', e);
-			return {error: true};
-		}
-	}
-	return {error: false};
+function postProcess(order) {
+    var logger = require('dw/system').Logger.getLogger('Sezzle',
+            ''),
+        payment_action = sezzleUtils.data.getSezzlePaymentAction();
+
+    if (sezzleUtils.data.getSezzlePaymentAction() === 'CAPTURE') {
+        try {
+            Transaction.wrap(function () {
+                var resp = sezzleUtils.order.captureOrder(order.custom.SezzleExternalId, order.orderNo);
+                if (resp) {
+                    if (!resp.error) {
+                        order.custom.SezzleStatus = 'CAPTURE';
+                        order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
+                    } else {
+                        logger.debug('Sezzle Capturing error');
+                        return { error: true };
+                    }
+                } else {
+                    logger.debug('Sezzle Capturing error. Details');
+                    return { error: true };
+                }
+                return { error: false };
+            });
+        } catch (e) {
+            logger.debug('Sezzle Capturing error. Details - {0}',
+                e);
+
+            return { error: true };
+        }
+    }
+
+    return { error: false };
 }
 
-function handle(){
-	var basket = BasketMgr.getCurrentBasket();
-	Transaction.wrap(function(){
-		sezzleUtils.basket.createPaymentInstrument(basket);
-		session.privacy.sezzleResponseID = '';
-		session.privacy.sezzleFirstEventID = '';
-		session.privacy.sezzleAmount = '';
-	});
-	return {success: true};
+function handle() {
+    var basket = BasketMgr.getCurrentBasket();
+
+    Transaction.wrap(function () {
+        sezzleUtils.basket.createPaymentInstrument(basket);
+        session.privacy.sezzleResponseID = '';
+        session.privacy.sezzleFirstEventID = '';
+        session.privacy.sezzleAmount = '';
+    });
+
+    return { success: true };
 }
 
 exports.Handle = handle;

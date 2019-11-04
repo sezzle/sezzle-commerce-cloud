@@ -26,22 +26,33 @@ var renderTemplateHelper = require('*/cartridge/scripts/renderTemplateHelper');
 var ShippingHelper = require('*/cartridge/scripts/checkout/shippingHelpers');
 
 
-// static functions needed for Checkout Controller logic
+// Static functions needed for Checkout Controller logic
 
 function ensureValidShipments(lineItemContainer) {
-    var shipments = lineItemContainer.shipments;
-    var allValid = collections.every(shipments, function (shipment) {
-        if (shipment) {
-            var address = shipment.shippingAddress;
-            return address && address.address1;
-        }
-        return false;
-    });
+    var shipments = lineItemContainer.shipments,
+        allValid = collections.every(
+            shipments,
+            function (shipment) {
+                if (shipment) {
+                    var address = shipment.shippingAddress;
+
+
+                    return address && address.address1;
+                }
+
+                return false;
+            }
+        );
+
+
     return allValid;
 }
 
 function setGift(shipment, isGift, giftMessage) {
-    var result = { error: false, errorMessage: null };
+    var result = {
+        error: false,
+        errorMessage: null
+    };
 
     try {
         Transaction.wrap(function () {
@@ -55,7 +66,11 @@ function setGift(shipment, isGift, giftMessage) {
         });
     } catch (e) {
         result.error = true;
-        result.errorMessage = Resource.msg('error.message.could.not.be.attached', 'checkout', null);
+        result.errorMessage = Resource.msg(
+            'error.message.could.not.be.attached',
+            'checkout',
+            null
+        );
     }
 
     return result;
@@ -109,14 +124,14 @@ function validateShippingForm(form) {
  * @returns {boolean} returns true if defaulShipment.shippingAddress is not null
  */
 function isShippingAddressInitialized(shipment) {
-    var currentBasket = BasketMgr.getCurrentBasket();
-    var initialized = false;
+    var currentBasket = BasketMgr.getCurrentBasket(),
+        initialized = false;
 
     if (currentBasket) {
         if (shipment) {
-            initialized = !!shipment.shippingAddress;
+            initialized = Boolean(shipment.shippingAddress);
         } else {
-            initialized = !!currentBasket.defaultShipment.shippingAddress;
+            initialized = Boolean(currentBasket.defaultShipment.shippingAddress);
         }
     }
 
@@ -242,8 +257,8 @@ function copyBillingAddressToBasket(address) {
  * @returns {dw.order.Shipment} - the shipment
  */
 function getFirstNonDefaultShipmentWithProductLineItems(currentBasket) {
-    var shipment;
-    var match;
+    var match,
+        shipment;
 
     for (var i = 0, ii = currentBasket.shipments.length; i < ii; i++) {
         shipment = currentBasket.shipments[i];
@@ -329,8 +344,9 @@ function recalculateBasket(currentBasket) {
  * @returns {dw.order.ProductLineItem} the associated ProductLineItem
  */
 function getProductLineItem(currentBasket, pliUUID) {
-    var productLineItem;
-    var pli;
+    var pli,
+        productLineItem;
+
     for (var i = 0, ii = currentBasket.productLineItems.length; i < ii; i++) {
         pli = currentBasket.productLineItems[i];
         if (pli.UUID === pliUUID) {
@@ -338,6 +354,7 @@ function getProductLineItem(currentBasket, pliUUID) {
             break;
         }
     }
+
     return productLineItem;
 }
 
@@ -357,13 +374,16 @@ function validateBillingForm(form) {
  * @returns {Object} the names of the invalid form fields
  */
 function validateCreditCard(form) {
-    var result = {};
-    var currentBasket = BasketMgr.getCurrentBasket();
+    var result = {},
+        currentBasket = BasketMgr.getCurrentBasket();
 
     if (!form.paymentMethod.value) {
         if (currentBasket.totalGrossPrice.value > 0) {
-            result[form.paymentMethod.htmlName] =
-                Resource.msg('error.no.selected.payment.method', 'creditCard', null);
+            result[form.paymentMethod.htmlName] = Resource.msg(
+                'error.no.selected.payment.method',
+                'creditCard',
+                null
+            );
         }
 
         return result;
@@ -416,13 +436,13 @@ function validatePayment(req, currentBasket) {
         paymentAmount
     );
 
-    
+
     applicablePaymentCards = creditCardPaymentMethod.getApplicablePaymentCards(
         currentCustomer,
         countryCode,
         paymentAmount
     );
-   
+
     var invalid = true;
 
     for (var i = 0; i < paymentInstruments.length; i++) {
@@ -448,11 +468,12 @@ function validatePayment(req, currentBasket) {
         }
 
         if (invalid) {
-            break; // there is an invalid payment instrument
+            break; // There is an invalid payment instrument
         }
     }
 
     result.error = invalid;
+
     return result;
 }
 
@@ -471,11 +492,12 @@ function createOrder(currentBasket) {
     } catch (error) {
         return null;
     }
+
     return order;
 }
 
 /**
- * handles the payment authorization for each payment instrument
+ * Handles the payment authorization for each payment instrument
  * @param {dw.order.Order} order - the order object
  * @param {string} orderNumber - The order number for the order
  * @returns {Object} an error object
@@ -493,18 +515,17 @@ function handlePayments(order, orderNumber) {
 
         if (!result.error) {
             for (var i = 0; i < paymentInstruments.length; i++) {
-                var paymentInstrument = paymentInstruments[i];
-                var paymentProcessor = PaymentMgr
-                    .getPaymentMethod(paymentInstrument.paymentMethod)
-                    .paymentProcessor;
-                var authorizationResult;
+                var paymentInstrument = paymentInstruments[i],
+                    paymentProcessor = PaymentMgr
+                        .getPaymentMethod(paymentInstrument.paymentMethod).paymentProcessor,
+                    authorizationResult;
+
                 if (paymentProcessor === null) {
                     Transaction.begin();
                     paymentInstrument.paymentTransaction.setTransactionID(orderNumber);
                     Transaction.commit();
                 } else {
-                    if (HookMgr.hasHook('app.payment.processor.' +
-                            paymentProcessor.ID.toLowerCase())) {
+                    if (HookMgr.hasHook('app.payment.processor.' + paymentProcessor.ID.toLowerCase())) {
                         authorizationResult = HookMgr.callHook(
                             'app.payment.processor.' + paymentProcessor.ID.toLowerCase(),
                             'Authorize',
@@ -540,28 +561,40 @@ function handlePayments(order, orderNumber) {
  */
 function sendConfirmationEmail(order, locale) {
     var OrderModel = require('*/cartridge/models/order');
-    var Locale = require('dw/util/Locale');
+    var Locale = require('dw/util/Locale'),
 
-    var confirmationEmail = new Mail();
-    var context = new HashMap();
-    var currentLocale = Locale.getLocale(locale);
+        confirmationEmail = new Mail(),
+        context = new HashMap(),
+        currentLocale = Locale.getLocale(locale),
 
-    var orderModel = new OrderModel(order, { countryCode: currentLocale.country });
+        orderModel = new OrderModel(
+            order,
+            { countryCode: currentLocale.country }
+        ),
 
-    var orderObject = { order: orderModel };
+        orderObject = { order: orderModel };
 
     confirmationEmail.addTo(order.customerEmail);
-    confirmationEmail.setSubject(Resource.msg('subject.order.confirmation.email', 'order', null));
+    confirmationEmail.setSubject(Resource.msg(
+        'subject.order.confirmation.email',
+        'order',
+        null
+    ));
     confirmationEmail.setFrom(Site.current.getCustomPreferenceValue('customerServiceEmail')
-        || 'no-reply@salesforce.com');
+    || 'no-reply@salesforce.com');
 
     Object.keys(orderObject).forEach(function (key) {
         context.put(key, orderObject[key]);
     });
 
-    var template = new Template('checkout/confirmation/confirmationEmail');
-    var content = template.render(context).text;
-    confirmationEmail.setContent(content, 'text/html', 'UTF-8');
+    var template = new Template('checkout/confirmation/confirmationEmail'),
+        content = template.render(context).text;
+
+    confirmationEmail.setContent(
+        content,
+        'text/html',
+        'UTF-8'
+    );
     confirmationEmail.send();
 }
 
@@ -576,6 +609,7 @@ function placeOrder(order) {
     try {
         Transaction.begin();
         var placeOrderStatus = OrderMgr.placeOrder(order);
+
         if (placeOrderStatus === Status.ERROR) {
             throw new Error();
         }
@@ -640,11 +674,11 @@ function getRenderedPaymentInstruments(req, accountModel) {
     var result;
 
     if (req.currentCustomer.raw.authenticated
-        && req.currentCustomer.raw.registered
-        && req.currentCustomer.raw.profile.wallet.paymentInstruments.getLength()
+    && req.currentCustomer.raw.registered
+    && req.currentCustomer.raw.profile.wallet.paymentInstruments.getLength()
     ) {
-        var context;
-        var template = 'checkout/billing/storedPaymentInstruments';
+        var context,
+            template = 'checkout/billing/storedPaymentInstruments';
 
         context = { customer: accountModel };
         result = renderTemplateHelper.getRenderedHtml(
@@ -658,12 +692,15 @@ function getRenderedPaymentInstruments(req, accountModel) {
 
 function getNonGiftCertificateAmount(basket) {
     // The total redemption amount of all gift certificate payment instruments in the basket.
-    var giftCertTotal = new Money(0.0, basket.getCurrencyCode());
+    var giftCertTotal = new Money(
+            0.0,
+            basket.getCurrencyCode()
+        ),
 
-    // Gets the list of all gift certificate payment instruments
-    var gcPaymentInstrs = basket.getGiftCertificatePaymentInstruments();
-    var iter = gcPaymentInstrs.iterator();
-    var orderPI = null;
+        // Gets the list of all gift certificate payment instruments
+        gcPaymentInstrs = basket.getGiftCertificatePaymentInstruments(),
+        iter = gcPaymentInstrs.iterator(),
+        orderPI = null;
 
     // Sums the total redemption amount.
     while (iter.hasNext()) {
@@ -672,11 +709,11 @@ function getNonGiftCertificateAmount(basket) {
     }
 
     // Gets the order total.
-    var orderTotal = basket.getTotalGrossPrice();
+    var orderTotal = basket.getTotalGrossPrice(),
 
-    // Calculates the amount to charge for the payment instrument.
-    // This is the remaining open order total that must be paid.
-    var amountOpen = orderTotal.subtract(giftCertTotal);
+        // Calculates the amount to charge for the payment instrument.
+        // This is the remaining open order total that must be paid.
+        amountOpen = orderTotal.subtract(giftCertTotal);
 
     // Returns the open amount to be paid.
     return amountOpen;

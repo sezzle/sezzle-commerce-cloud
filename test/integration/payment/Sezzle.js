@@ -3,7 +3,6 @@ var request = require('request-promise');
 var config = require('../it.config');
 var chai = require('chai');
 var chaiSubset = require('chai-subset');
-const log = require("log");
 chai.use(chaiSubset);
 
 describe('Get request data for Sezzle Checkout Object', function () {
@@ -23,20 +22,18 @@ describe('Get request data for Sezzle Checkout Object', function () {
         myRequest = {
             url: config.baseUrl + '/Sezzle-CheckoutObject',
             method: 'GET',
-            rejectUnauthorized: false,
+            rejectUnauthorized: false
         };
 
 
         return request(myRequest)
             .then(function (response) {
-              responseJSON = JSON.parse(response)
-                if (!responseJSON.action){
-                  throw new Error("error in fetching response")
-                }else{
-                  var responseJSON = JSON.parse(response)
-                  assert.equal(responseJSON.action, "Sezzle-CheckoutObject", "Invalid Request");
+                var responseJSON = JSON.parse(response);
+                if (!responseJSON.action) {
+                    throw new Error('error in fetching response');
+                } else {
+                    assert.equal(responseJSON.action, 'Sezzle-CheckoutObject', 'Invalid Request');
                 }
-
             });
     });
 });

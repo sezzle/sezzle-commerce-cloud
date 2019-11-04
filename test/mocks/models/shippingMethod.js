@@ -2,8 +2,7 @@
 
 var proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 
-var defaultShippingMethod =
-{
+var defaultShippingMethod = {
     description: 'Order received within 7-10 business days',
     displayName: 'Ground',
     ID: '001',
@@ -65,7 +64,7 @@ function createShipmentShippingModel() {
 }
 
 function proxyModel() {
-    return proxyquire('../../../cartridges/storefront-reference-architecture/cartridges/app_storefront_base/cartridge/models/shipping/shippingMethod', {
+    return proxyquire('../../../cartridges/app_storefront_base/cartridge/models/shipping/shippingMethod', {
         '*/cartridge/scripts/util/formatting': {
             formatCurrency: function () {
                 return '$0.00';

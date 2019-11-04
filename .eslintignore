@@ -1,0 +1,7 @@
+cartridges/app_storefront_base/cartridge/
+coverage/
+doc/
+bin/
+node_modules/
+cartridges/int_sezzle_sfra/cartridge/static/
+cartridges/int_sezzle/cartridge/static/

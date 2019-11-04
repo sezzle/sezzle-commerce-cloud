@@ -44,7 +44,7 @@ server.get(
             { config: config, countryCode: currentLocale.country, containerView: 'order' }
         );
         var passwordForm;
-        
+
         sezzleHelper.PostProcess(order);
 
         var reportingURLs = reportingUrls.getOrderReportingURLs(order);
@@ -64,7 +64,6 @@ server.get(
                 returningCustomer: true,
                 reportingURLs: reportingURLs
             });
-            
         }
 
         return next();
@@ -232,8 +231,7 @@ server.get(
                 { config: config, countryCode: currentLocale.country, containerView: 'order' }
             );
             var exitLinkText = Resource.msg('link.orderdetails.orderhistory', 'account', null);
-            var exitLinkUrl =
-                URLUtils.https('Order-History', 'orderFilter', req.querystring.orderFilter);
+            var exitLinkUrl = URLUtils.https('Order-History', 'orderFilter', req.querystring.orderFilter);
             res.render('account/orderDetails', {
                 order: orderModel,
                 exitLinkText: exitLinkText,
@@ -299,8 +297,7 @@ server.post(
         if (newPassword !== confirmPassword) {
             passwordForm.valid = false;
             passwordForm.newpasswordconfirm.valid = false;
-            passwordForm.newpasswordconfirm.error =
-                Resource.msg('error.message.mismatch.newpassword', 'forms', null);
+            passwordForm.newpasswordconfirm.error = Resource.msg('error.message.mismatch.newpassword', 'forms', null);
         }
 
         var order = OrderMgr.getOrder(req.querystring.ID);
@@ -337,8 +334,7 @@ server.post(
                 try {
                     Transaction.wrap(function () {
                         newCustomer = CustomerMgr.createCustomer(login, password);
-                        authenticatedCustomer =
-                            CustomerMgr.loginCustomer(login, password, false);
+                        authenticatedCustomer = CustomerMgr.loginCustomer(login, password, false);
                         if (newCustomer && authenticatedCustomer.authenticated) {
                             // assign values to the profile
                             newCustomerProfile = newCustomer.getProfile();
@@ -356,8 +352,7 @@ server.post(
                             res.json({
                                 success: true,
                                 redirectUrl: URLUtils.url('Account-Show',
-                                    'registration', 'submitted'
-                                ).toString()
+                                    'registration', 'submitted').toString()
                             });
                         }
                     });
