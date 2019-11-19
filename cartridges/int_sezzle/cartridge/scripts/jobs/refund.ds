@@ -1,7 +1,6 @@
 'use strict';
 
 var Status = require('dw/system/Status');
-var sezzleService = require('dw/svc').ServiceRegistry;
 
 function execute(args) {
     try {
