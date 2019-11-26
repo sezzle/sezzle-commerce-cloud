@@ -12,7 +12,7 @@ var ArrayList = require('../dw.util.Collection');
 var Money = require('../dw.value.Money');
 
 function proxyModel() {
-    return proxyquire('../../../cartridges/app_storefront_base/cartridge/models/cart', {
+    return proxyquire('../../../../storefront-reference-architecture/cartridges/app_storefront_base/cartridge/models/cart', {
         '*/cartridge/scripts/util/collections': {},
         'dw/campaign/PromotionMgr': {
             getDiscounts: function () {
