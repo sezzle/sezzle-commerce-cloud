@@ -38,7 +38,7 @@ var shippingHelpers = {
 };
 
 function proxyModel() {
-    return proxyquire('../../../cartridges/app_storefront_base/cartridge/models/shipping', {
+    return proxyquire('../../../../storefront-reference-architecture/cartridges/app_storefront_base/cartridge/models/shipping', {
         '*/cartridge/models/address': AddressModel,
         '*/cartridge/models/productLineItems': ProductLineItemsModel,
         '*/cartridge/models/shipping/shippingMethod': ShippingMethodModel,

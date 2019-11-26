@@ -29,7 +29,7 @@ var stubRaw = sinon.stub();
 
 function proxyModel() {
     return {
-        mocks: proxyquire('../../cartridges/app_storefront_base/cartridge/models/product/decorators/index', {
+        mocks: proxyquire('../../../storefront-reference-architecture/cartridges/app_storefront_base/cartridge/models/product/decorators/index', {
             '*/cartridge/models/product/decorators/base': stubBase,
             '*/cartridge/models/product/decorators/availability': stubAvailability,
             '*/cartridge/models/product/decorators/description': stubDescription,

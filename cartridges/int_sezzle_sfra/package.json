@@ -35,7 +35,7 @@
         "stylelint-scss": "^1.3.4"
     },
     "paths": {
-        "base": "../storefront-reference-architecture/cartridges/app_storefront_base/"
+        "base": "../../../storefront-reference-architecture/cartridges/app_storefront_base/"
     },
     "hooks": "./cartridge/scripts/hooks.json"
 }

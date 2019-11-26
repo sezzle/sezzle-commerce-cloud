@@ -22,7 +22,7 @@ var stubPreOrderUUID = sinon.stub();
 
 function proxyModel() {
     return {
-        mocks: proxyquire('../../cartridges/app_storefront_base/cartridge/models/productLineItem/decorators/index', {
+        mocks: proxyquire('../../../storefront-reference-architecture/cartridges/app_storefront_base/cartridge/models/productLineItem/decorators/index', {
             '*/cartridge/models/productLineItem/decorators/gift': stubGift,
             '*/cartridge/models/productLineItem/decorators/bonusProductLineItem': stubBonusProductLineItem,
             '*/cartridge/models/productLineItem/decorators/appliedPromotions': stubAppliedPromotions,

@@ -5,7 +5,7 @@ var proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 var Money = require('../dw.value.Money');
 
 function proxyModel() {
-    return proxyquire('../../../cartridges/app_storefront_base/cartridge/models/totals', {
+    return proxyquire('../../../../storefront-reference-architecture/cartridges/app_storefront_base/cartridge/models/totals', {
         'dw/util/StringUtils': {
             formatMoney: function () {
                 return 'formatted money';
