@@ -12,6 +12,9 @@ var commonCreateRequest = function (svc, args) {
     svc.setRequestMethod('POST');
     svc.addHeader('Content-Type', 'application/json');
     if (!empty(args)) {
+    	if (args.httpMethod) {
+    		svc.setRequestMethod(args.httpMethod);	
+    	}
         if (args.authToken) {
             svc.addHeader('Authorization', 'Bearer ' + args.authToken);
         }

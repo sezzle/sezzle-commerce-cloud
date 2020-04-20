@@ -26,24 +26,19 @@
 		 * @returns {Object} simple object with name and shipping address
 		 */
 		self.getShippingAddress = function (basket) {
-			var shippingAddress = basket.getDefaultShipment().getShippingAddress(),
-				shippingContact = {
-					'name' : {
-						'first' : shippingAddress.getFirstName(),
-						'last' : shippingAddress.getLastName(),
-						'full' : shippingAddress.getFullName()
-					},
-					'address' : {
-						'line1' : shippingAddress.getAddress1(),
-						'line2' : shippingAddress.getAddress2(),
-						'city' : shippingAddress.getCity(),
-						'state' : shippingAddress.getStateCode(),
-						'zipcode' : shippingAddress.getPostalCode(),
-						'country' : shippingAddress.getCountryCode().getValue()
-					}
+			var basketShippingAddress = basket.getDefaultShipment().getShippingAddress(),
+				shippingAddress = {
+					'name' : basketShippingAddress.getFullName(),
+					'street' : basketShippingAddress.getAddress1(),
+					'street2' : basketShippingAddress.getAddress2(),
+					'city' : basketShippingAddress.getCity(),
+					'state' : basketShippingAddress.getStateCode(),
+					'postal_code' : basketShippingAddress.getPostalCode(),
+					'country_code' : basketShippingAddress.getCountryCode().getValue(),
+					'phone' : basketShippingAddress.getPhone()	
 				};
 
-			return shippingContact;
+			return shippingAddress;
 		};
 
 		/**
@@ -53,29 +48,22 @@
 		 * @returns {Object} simple object with name and billing address
 		 */
 		self.getBillingAddress = function (basket) {
-			var billingAddress = basket.getBillingAddress();
+			var basketBillingAddress = basket.getBillingAddress();
 			if (empty(billingAddress)){
 				return null;
 			}
-			var billingConact = {
-					'name' : {
-						'first' : billingAddress.getFirstName(),
-						'last' : billingAddress.getLastName(),
-						'full' : billingAddress.getFullName()
-					},
-					'address' : {
-						'line1' : billingAddress.getAddress1(),
-						'line2' : billingAddress.getAddress2(),
-						'city' : billingAddress.getCity(),
-						'state' : billingAddress.getStateCode(),
-						'zipcode' : billingAddress.getPostalCode(),
-						'country' : billingAddress.getCountryCode().getValue()
-					},
-					'phone_number' : billingAddress.getPhone(),
-					'email' : basket.getCustomerEmail()
+			var billingAddress = {
+					'name' : basketBillingAddress.getFullName(),
+					'street' : basketBillingAddress.getAddress1(),
+					'street2' : basketBillingAddress.getAddress2(),
+					'city' : basketBillingAddress.getCity(),
+					'state' : basketBillingAddress.getStateCode(),
+					'postal_code' : basketBillingAddress.getPostalCode(),
+					'country_code' : basketBillingAddress.getCountryCode().getValue(),
+					'phone' : basketBillingAddress.getPhone()	
 				};
 
-			return billingConact;
+			return billingAddress;
 		};
 
 		/**
@@ -91,42 +79,14 @@
 			while (!empty(productLineItems) && productLineItems.hasNext()) {
 				let productLineItem = productLineItems.next();
 				
-				var product = ProductMgr.getProduct(productLineItem.productID);
-				var categoriesCollection = product.getAllCategoryAssignments().iterator();
-				//If no assigned categories to product and it is not a master then get categories by master
-				if(!categoriesCollection.hasNext() && !product.master){
-					categoriesCollection = product.masterProduct.getAllCategoryAssignments().iterator()
-				}
-			 	var categoryNames = [];
-			 	
-			 	while(categoriesCollection.hasNext()){
-			 		var category = 	categoriesCollection.next();
-			 		var arr = [];
-			 		
-					function checkForParentCategory(obj) {
-						if (('parent' in obj) && obj.parent != null) {
-							arr.push(obj.displayName);
-							checkForParentCategory(obj.parent)
-						}
-					}
-			 		checkForParentCategory(category.category);
-			 		categoryNames.push(arr.reverse());
-			 	}
 				var item_price = productLineItem.optionProductLineItem ?
 									productLineItem.getBasePrice().multiply(100).getValue() :
 									productLineItem.product.getPriceModel().getPrice().multiply(100).getValue();
 				items.push({
 					'name' : productLineItem.getProductName(),
 					'sku' : productLineItem.getProductID(),
-					'price' : {'amount_in_cents' : item_price, 'currency' :'USD'},
-					'quantity' : productLineItem.getQuantityValue(),
-					'item_image_url' : !empty(productLineItem.product) ?
-										productLineItem.product.getImage('medium').getHttpURL().toString() :
-										'',
-					'item_url' : !empty(productLineItem.product) ?
-									web.URLUtils.abs('Product-Show', 'pid', productLineItem.product.getID()).toString() :
-									'',
-					'categories' : categoryNames
+					'price' : {'amount_in_cents' : item_price, 'currency' :basket.getCurrencyCode()},
+					'quantity' : productLineItem.getQuantityValue()
 				});
 				
 			}
@@ -305,6 +265,89 @@
 			checkoutResponse = sezzleAPI.initiateCheckout(checkoutObject);
 			checkoutObject['redirect_url'] = checkoutResponse.response.checkout_url;
 			return checkoutObject;
+		};
+		
+		/**
+		 * Build object with checkout data and fetch the checkout url
+		 *
+		 * @param {dw.order.Basket}  basket
+		 * @returns {string} checkout data object in JSON format
+		 */
+		self.initiateCheckout = function (basket) {
+			
+			var checkoutObject = {
+				'cancel_url' : {
+					'href' : self.getMerchant().user_cancel_url
+				},
+				'success_url' : {
+					'href' : self.getMerchant().user_confirmation_url + "?order_reference_id="+order_ref_id
+				},
+				'customer' : self.getCustomer(basket),
+				'order' : self.getOrder(basket)
+			};
+			checkoutResponse = sezzleAPI.initiateCheckout(checkoutObject);
+			checkoutObject['uuid'] = checkoutResponse.response.uuid;
+			checkoutObject['order_uuid'] = checkoutResponse.response.order.uuid;
+			// TODO : Check with Dan Ross if checkout_url has been added
+			checkoutObject['checkout_url'] = checkoutResponse.response.order.checkout_url;
+			return checkoutObject;
+		};
+		
+		
+		/**
+		 * Get customer 
+		 *
+		 * @param {dw.order.Basket}  basket
+		 * @returns {string} customer data object in JSON format
+		 */
+		self.getCustomer = function (basket) {
+			var customer = {
+				"tokenize": true,
+				"email": basket.getCustomerEmail(),
+				"first_name": basket.getCustomer().getProfile().getFirstName(),
+				"last_name": basket.getCustomer().getProfile().getLastName(),
+				"phone": basket.getCustomer().getProfile().getPhoneMobile(),
+				"dob": basket.getCustomer().getProfile().getBirthday(),
+				"status": "Active",
+				'billing_address' : self.getBillingAddress(basket),
+				'shipping_address': self.getShippingAddress(basket),
+			};
+			return customer;
+				
+		};
+		
+		
+		/**
+		 * Get order 
+		 *
+		 * @param {dw.order.Basket}  basket
+		 * @returns {string} order data object in JSON format
+		 */
+		self.getOrder = function(basket) {
+			var order = {
+				"intent": "AUTH",
+				"reference_id": sezzleUtils.generateUUID(),
+				"description": "Commerce cloud order",
+				"store_name": "string",
+				"requires_shipping_info": false,
+				"items": self.getItems(basket),
+				"discounts": self.getDiscounts(basket),
+				"metadata": {},
+				"shipping_amount": {
+					'amount_in_cents' : self.getShippingAmmout(basket),
+					'currency': basket.getCurrencyCode()
+				 },
+				"tax_amount": {
+					'amount_in_cents' : self.getTaxAmount(basket),
+				    'currency': basket.getCurrencyCode()
+				 },
+				"amount": {
+					'amount_in_cents' : self.getTaxAmount(basket),
+				    'currency': basket.getCurrencyCode()
+				 }	
+                 	
+			};
+			return order;
 		};
 	};
 

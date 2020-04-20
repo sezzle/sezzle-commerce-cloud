@@ -1,0 +1,5 @@
+<ismodule template = "sezzlebm/components/pagination"
+	name="sezzlepagination"
+	attribute="pageurl"
+	attribute="pagingmodel"
+/>

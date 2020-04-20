@@ -58,6 +58,24 @@ function validateFields(form) {
     return formErrors.getFormErrors(form);
 }
 
+function getSezzlePaymentInstrument(basket) {
+    var paymentInstruments = basket.getPaymentInstruments();
+    var iterator = paymentInstruments.iterator();
+    var paymentInstrument = null;
+    while (iterator.hasNext()) {
+        paymentInstrument = iterator.next();
+        var paymentMethod = dw.order.PaymentMgr.getPaymentMethod(paymentInstrument.getPaymentMethod());
+        if (paymentMethod) {
+            var paymentProcessorId = paymentMethod.getPaymentProcessor().getID();
+            if (paymentProcessorId === 'SEZZLE_PAYMENT') {
+                return paymentInstrument;
+            }
+        }
+    }
+    return null;
+}
+
+
 /**
  * Validate shipping form fields
  * @param {Object} form - the form object with pre-validated form fields
