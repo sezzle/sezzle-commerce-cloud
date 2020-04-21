@@ -60,22 +60,35 @@ function checkCart(cart) {
     }
 }
 
-function postProcess(order){
+function postProcess(order, tokenizedOrder){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	if (sezzle.data.getSezzlePaymentAction() == 'CAPTURE'){
-		try {
-			Transaction.wrap(function(){
-				sezzle.order.captureOrder(order);
-				order.custom.SezzleStatus = 'CAPTURE';
-				order.custom.SezzleCapturedAmount = dw.value.Money(order.totalGrossPrice,order.currencyCode);
-				order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-				order.setStatus(Order.ORDER_STATUS_COMPLETED);
-			});
-		} catch (e) {
-			sezzle.order.voidOrder(order.custom.SezzleExternalId);
-			logger.error('Sezzle Capturing error. Details - {0}', e);
-			return false;
+	var capture = false;
+	var doTransaction = false;
+	try {
+		if (tokenizedOrder){
+			capture = false;
+			doTransaction = true;
+			
 		}
+		if (sezzle.data.getSezzlePaymentAction() == 'CAPTURE'){
+			capture = true;
+			doTransaction = true;
+		}
+		
+		if (doTransaction) {
+			Transaction.wrap(function(){
+					if (capture) {
+						sezzle.order.captureOrder(order);
+					}
+					order.custom.SezzleStatus = 'CAPTURE';
+					order.custom.SezzleCapturedAmount = dw.value.Money(order.totalGrossPrice,order.currencyCode);
+					order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
+					order.setStatus(Order.ORDER_STATUS_COMPLETED);
+				});
+		}
+	} catch (e) {
+		logger.error('Sezzle Capturing error. Details - {0}', e);
+		return false;
 	}
 	return true;
 }

@@ -162,14 +162,14 @@
             <attribute-definition attribute-id="SezzlePrivateKey">
                 <display-name xml:lang="x-default">Sezzle Private Key</display-name>
                 <type>string</type>
-                <mandatory-flag>false</mandatory-flag>
+                <mandatory-flag>true</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
             <attribute-definition attribute-id="SezzlePublicKey">
                 <display-name xml:lang="x-default">Sezzle Public Key</display-name>
                 <type>string</type>
-                <mandatory-flag>false</mandatory-flag>
+                <mandatory-flag>true</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
@@ -179,6 +179,22 @@
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="SezzleTokenize">
+                <display-name xml:lang="x-default">Tokenize Customer?</display-name>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+                <default-value>false</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="SezzleCheckout">
+                <display-name xml:lang="x-default">Create Checkout?</display-name>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+                <default-value>true</default-value>
             </attribute-definition>
         </custom-attribute-definitions>
         <group-definitions>

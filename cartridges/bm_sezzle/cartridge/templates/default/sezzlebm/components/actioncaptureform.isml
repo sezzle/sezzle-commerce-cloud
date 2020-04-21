@@ -28,7 +28,7 @@
 		<table class="sezzlebm_transaction_detail_table infobox w e s n">
 			
 			<tr>
-				<td class="infobox_title top">${Resource.msg('transaction.detail.authorizationid', 'sezzlebm', null)}:</td>
+				<td class="infobox_title top">${Resource.msg('transaction.detail.referenceid', 'sezzlebm', null)}:</td>
 				<td class="infobox_item top">${order.custom.SezzleExternalId}</td>
 			</tr>
 			<tr class="sezzlebm_gray">

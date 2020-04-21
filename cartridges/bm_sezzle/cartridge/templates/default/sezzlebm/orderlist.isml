@@ -31,7 +31,7 @@ if (!isSearchByOrderNo && !isSearchByTransaction) {
 			<td class="infobox_title_search">${Resource.msg('search.order.title', 'sezzlebm', null)}</td>
 			<td align="right" nowrap="nowrap" class="infobox_item_search">
 				<span class="switch_link">${Resource.msg('search.orderbynumber', 'sezzlebm', null)}</span>&nbsp;
-				<a href="#sezzlebm_search_transaction_by_id" class="switch_link js_sezzlebm_switch">${Resource.msg('search.transactionbyid', 'sezzlebm', null)}</a>
+				<a href="#sezzlebm_search_transaction_by_id" class="switch_link js_sezzlebm_switch">${Resource.msg('search.referencebyid', 'sezzlebm', null)}</a>
 			</td>
 		</tr>
 		<tr>
@@ -58,7 +58,7 @@ if (!isSearchByOrderNo && !isSearchByTransaction) {
 			<td class="infobox_title_search">${Resource.msg('search.order.title', 'sezzlebm', null)}</td>
 			<td align="right" nowrap="nowrap" class="infobox_item_search">
 				<a href="#sezzlebm_search_order_by_id" class="switch_link js_sezzlebm_switch">${Resource.msg('search.orderbynumber', 'sezzlebm', null)}</a>&nbsp;
-				<span class="switch_link">${Resource.msg('search.transactionbyid', 'sezzlebm', null)}</span>
+				<span class="switch_link">${Resource.msg('search.referencebyid', 'sezzlebm', null)}</span>
 			</td>
 		</tr>
 		<tr>
@@ -136,7 +136,6 @@ if (!isSearchByOrderNo && !isSearchByTransaction) {
 
 <div class="sezzlebm_footer">
 	<a class="button" href="${ordersUrl}">&lt;&lt; ${Resource.msg('transactions.backordering', 'sezzlebm', null)}</a>
-	<button class="button js_sezzle_create_reference_transaction" title="${Resource.msgf('transaction.newtransaction.title', 'sezzlebm', null)}" data-url="${URLUtils.https('SezzleAdmin-CreateNewTransaction')}">${Resource.msg('transactions.newtransaction', 'sezzlebm', null)}</button>
 </div>
 
 </isdecorate>

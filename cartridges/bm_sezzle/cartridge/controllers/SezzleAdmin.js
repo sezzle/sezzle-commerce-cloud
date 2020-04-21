@@ -285,25 +285,27 @@ function orderTransaction() {
     
 
     
-    //var sezzleOrder = sezzleApi.getOrder(order);
+    // var sezzleOrder = sezzleApi.getOrder(order);
 
     if (!order) {
         render('sezzlebm/components/servererror');
         return;
     }
     
-    if ((order.paymentStatus == 0 
-    	|| order.paymentStatus == 1) 
-    	&& order.status == 3 
-    	&& (order.custom.SezzleStatus == 'AUTH' 
-    	|| order.custom.SezzleStatus == 'PARTIAL_CAPTURE')) {
+    logger.debug(sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH);
+    
+    if ((order.paymentStatus == dw.order.Order.PAYMENT_STATUS_NOTPAID 
+    	|| order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PARTPAID) 
+    	&& order.status == dw.order.Order.ORDER_STATUS_NEW 
+    	&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH 
+    	|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE)) {
     	canCapture = true;
     }
     
-	if (order.paymentStatus == 2 
-		&& order.status == 5 
-		&& (order.custom.SezzleStatus == 'CAPTURE' 
-		|| order.custom.SezzleStatus == 'PARTIAL_REFUNDED')) {
+	if (order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PAID 
+		&& order.status == dw.order.Order.ORDER_STATUS_COMPLETED 
+		&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE
+		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED)) {
 		canRefund = true;
 	}
 	
@@ -363,11 +365,11 @@ function action() {
         
         if (methodName == 'DoCapture') {
         	callApiResponse = sezzleApi.capture(order.custom.SezzleExternalId, order.orderNo);
-        	sezzlePaymentStatus = orderTotalInCents == amtInCents ? 'CAPTURE' : 'PARTIAL_CAPTURE';
+        	sezzlePaymentStatus = orderTotalInCents == amtInCents ? sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE : sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE;
         	
         } else if (methodName == 'DoRefund') {
         	callApiResponse = sezzleApi.refund(order.custom.SezzleExternalId);
-        	sezzlePaymentStatus = orderTotalInCents == amtInCents ? 'REFUNDED' : 'PARTIAL_REFUNDED';
+        	sezzlePaymentStatus = orderTotalInCents == amtInCents ? sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED : sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED;
         }
         
         if (!callApiResponse.error) {

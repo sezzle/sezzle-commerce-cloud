@@ -69,7 +69,7 @@
 				order.custom.SezzleStatus = 'AUTH';
 				order.custom.SezzlePaymentAction = data.getSezzlePaymentAction();
 				order.custom.SezzleOrderUUID = response.order_uuid;
-				order.custom.SezzleOrderAmount = response.amount;
+				order.custom.SezzleOrderAmount = new Money(response.amount, order.currencyCode).divide(100);
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 			}

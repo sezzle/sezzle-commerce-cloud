@@ -71,6 +71,31 @@
 		};
 		
 		/**
+		 * Get customer UUID by token
+		 *
+		 * @param {string} token 
+		 * @returns status
+		 */
+		self.getCustomerUUID = function (token) {
+			try {
+				var authentication = self.authenticate();
+				var obj = {
+					'authToken' : authentication.response.token,
+					'httpMethod': 'GET'
+				};
+				
+				var sezzleService = service.initService('sezzle.getcustomeruuid');
+				sezzleService.URL = sezzleData.getV2URLPath() + 'token/user/' + token + '/customer';
+				return sezzleService.call(obj).object;
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					error : false
+				};
+			}
+		};
+		
+		/**
 		 * Get order by order UUID
 		 *
 		 * @param {dw.order.Order} order 
@@ -86,6 +111,30 @@
 				
 				var sezzleService = service.initService('sezzle.order');
 				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID;
+				return sezzleService.call(obj).object;
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					error : false
+				};
+			}
+		};
+		
+		/**
+		 * Authorize payment by customer uuid
+		 *
+		 * @param {string} customerUUID 
+		 * @returns {Object}
+		 */
+		self.authorizepayment = function (customerUUID) {
+			try {
+				var authentication = self.authenticate();
+				var obj = {
+					'authToken' : authentication.response.token
+				};
+				
+				var sezzleService = service.initService('sezzle.authorizepayment');
+				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + customerUUID + '/authorize';
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
