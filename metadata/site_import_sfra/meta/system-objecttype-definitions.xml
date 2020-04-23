@@ -18,6 +18,14 @@
                 <externally-managed-flag>true</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
+            <attribute-definition attribute-id="SezzleAuthUUID">
+                <display-name xml:lang="x-default">Sezzle Auth UUID</display-name>
+                <description xml:lang="x-default">Sezzle Auth UUID</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>true</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
             <attribute-definition attribute-id="SezzleOrderAmount">
                 <display-name xml:lang="x-default">Sezzle Order Amount</display-name>
                 <description xml:lang="x-default">Order Amount in Cents</description>
@@ -109,6 +117,7 @@
                 <attribute attribute-id="SezzleToken"/>
                 <attribute attribute-id="SezzleStatus"/>
                 <attribute attribute-id="SezzleOrderUUID"/>
+                <attribute attribute-id="SezzleAuthUUID"/>
                 <attribute attribute-id="SezzleOrderAmount"/>
                 <attribute attribute-id="SezzleCapturedAmount"/>
                 <attribute attribute-id="SezzleRefundedAmount"/>
@@ -205,6 +214,8 @@
                 <attribute attribute-id="SezzlePublicKey"/>
                 <attribute attribute-id="SezzlePrivateKey"/>
                 <attribute attribute-id="SezzlePaymentAction"/>
+                <attribute attribute-id="SezzleTokenize"/>
+                <attribute attribute-id="SezzleCheckout"/>
                 <attribute attribute-id="StoreFrontPath"/>
             </attribute-group>
         </group-definitions>

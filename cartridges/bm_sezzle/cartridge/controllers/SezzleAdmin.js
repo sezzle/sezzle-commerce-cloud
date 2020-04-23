@@ -364,11 +364,15 @@ function action() {
         var sezzlePaymentStatus = order.custom.SezzleStatus;
         
         if (methodName == 'DoCapture') {
-        	callApiResponse = sezzleApi.capture(order.custom.SezzleExternalId, order.orderNo);
+        	if (order.custom.SezzleAuthUUID) {
+        		callApiResponse = sezzleApi.captureByAuthUUID(order, amtInCents, order.custom.SezzleAuthUUID);
+        	} else {
+        		callApiResponse = sezzleApi.capture(order, amtInCents);
+        	}
         	sezzlePaymentStatus = orderTotalInCents == amtInCents ? sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE : sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE;
         	
         } else if (methodName == 'DoRefund') {
-        	callApiResponse = sezzleApi.refund(order.custom.SezzleExternalId);
+        	callApiResponse = sezzleApi.refund(order, amtInCents);
         	sezzlePaymentStatus = orderTotalInCents == amtInCents ? sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED : sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED;
         }
         

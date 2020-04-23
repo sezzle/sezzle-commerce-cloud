@@ -46,21 +46,56 @@
 		self.capture = function (order, amount) {
 			try {
 				var authentication = self.authenticate();
-				var captureAmount = order.custom.SezzleAmount;
+				var captureAmount = order.custom.SezzleOrderAmount;
 				if (amount != null) {
 					captureAmount = amount;
 				}
+				var isPartialCapture = order.custom.SezzleOrderAmount > captureAmount ? true : false;
 				var obj = {
 					'authToken' : authentication.response.token,
 					'amount': {
 								'amount_in_cents': captureAmount,
 								'currency': order.getCurrencyCode()
 							  },
-					'partial_capture': false
+					'partial_capture': isPartialCapture
 				};
 				
 				var sezzleService = service.initService('sezzle.capture');
 				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/capture';
+				return sezzleService.call(obj).object;
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					error : false
+				};
+			}
+		};
+		
+		/**
+		 * Capture charge by auth UUID
+		 *
+		 * @param {dw.order.Order} order 
+		 * @returns status
+		 */
+		self.captureByAuthUUID = function (order, amount, authUUID) {
+			try {
+				var authentication = self.authenticate();
+				var captureAmount = order.custom.SezzleOrderAmount;
+				if (amount != null) {
+					captureAmount = amount;
+				}
+				var isPartialCapture = order.custom.SezzleOrderAmount > captureAmount ? true : false;
+				var obj = {
+					'authToken' : authentication.response.token,
+					'capture_amount': {
+						    'amount_in_cents': captureAmount,
+						    'currency': order.getCurrencyCode()
+					     },
+				    'partial_capture': isPartialCapture
+				};
+				
+				var sezzleService = service.initService('sezzle.capturebyauthuuid');
+				sezzleService.URL = sezzleData.getV2URLPath() + 'authorization/' + authUUID + '/capture';
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
@@ -126,13 +161,10 @@
 		 * @param {string} customerUUID 
 		 * @returns {Object}
 		 */
-		self.authorizepayment = function (customerUUID) {
+		self.authorizepayment = function (requestObj) {
 			try {
 				var authentication = self.authenticate();
-				var obj = {
-					'authToken' : authentication.response.token
-				};
-				
+				requestObj.authToken = authentication.response.token;
 				var sezzleService = service.initService('sezzle.authorizepayment');
 				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + customerUUID + '/authorize';
 				return sezzleService.call(obj).object;
@@ -152,7 +184,7 @@
 		self.refund = function (order, amount) {
 			try {
 				var authentication = self.authenticate();
-				var refundAmount = order.custom.SezzleAmount;
+				var refundAmount = order.custom.SezzleOrderAmount;
 				if (amount != null) {
 					refundAmount = amount;
 				}
@@ -160,7 +192,6 @@
 					'authToken' : authentication.response.token,
 					'amount_in_cents': refundAmount,
 					'currency': order.getCurrencyCode()
-					
 				}
 				var sezzleService = service.initService('sezzle.refund');		
 				sezzleService.URL = sezzleData.getURLPath() + 'order/' + order.custom.SezzleOrderUUID + '/refund';	
@@ -184,11 +215,12 @@
 			try {
 				var authentication = self.authenticate();
 				checkoutObject.authToken = authentication.response.token
-				logger.debug('Token', checkoutObject.authToken);
+				logger.debug(checkoutObject.authToken);
 				var sezzleService = service.initService('sezzle.initiatecheckout');		
-				sezzleService.URL = sezzleData.getV2URLPath() + 'session/'
-				return sezzleService.call(checkoutObject).object;
-				
+				sezzleService.URL = sezzleData.getV2URLPath() + 'session/';
+				var r = sezzleService.call(checkoutObject).object;
+				logger.debug(JSON.stringify(r));
+				return r;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {

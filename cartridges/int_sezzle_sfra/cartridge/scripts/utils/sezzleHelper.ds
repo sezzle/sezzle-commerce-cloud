@@ -60,31 +60,19 @@ function checkCart(cart) {
     }
 }
 
-function postProcess(order, tokenizedOrder){
+function postProcess(order, isCaptured){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	var capture = false;
-	var doTransaction = false;
 	try {
-		if (tokenizedOrder){
-			capture = false;
-			doTransaction = true;
-			
-		}
-		if (sezzle.data.getSezzlePaymentAction() == 'CAPTURE'){
-			capture = true;
-			doTransaction = true;
-		}
-		
-		if (doTransaction) {
+		if (sezzle.data.getSezzlePaymentAction() == 'CAPTURE') {
 			Transaction.wrap(function(){
-					if (capture) {
-						sezzle.order.captureOrder(order);
-					}
-					order.custom.SezzleStatus = 'CAPTURE';
-					order.custom.SezzleCapturedAmount = dw.value.Money(order.totalGrossPrice,order.currencyCode);
-					order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-					order.setStatus(Order.ORDER_STATUS_COMPLETED);
-				});
+				if (!isCaptured) {
+					sezzle.order.captureOrder(order);
+				}
+				order.custom.SezzleStatus = 'CAPTURE';
+				order.custom.SezzleCapturedAmount = dw.value.Money(order.totalGrossPrice,order.currencyCode);
+				order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
+				order.setStatus(Order.ORDER_STATUS_COMPLETED);
+			});
 		}
 	} catch (e) {
 		logger.error('Sezzle Capturing error. Details - {0}', e);

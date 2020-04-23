@@ -115,6 +115,9 @@
 						<span class="js_sezzle_action" data-action="capture" data-title="${Resource.msg('transaction.capture.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.capture', 'sezzlebm', null)}</span>
 					</li>
 				</isif>
+				<li>
+						<span class="js_sezzle_action" data-action="capture" data-title="${Resource.msg('transaction.capture.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.capture', 'sezzlebm', null)}</span>
+					</li>
 				<isif condition="${canRefund}">
 					<li>
 						<span class="js_sezzle_action" data-action="refund" data-title="${Resource.msg('transaction.refund.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.refund', 'sezzlebm', null)}</span>

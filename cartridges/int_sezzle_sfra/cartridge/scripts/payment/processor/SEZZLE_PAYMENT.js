@@ -43,7 +43,8 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor){
 				'order_uuid' : session.privacy.orderUUID,
 				'events' : [{'id': session.privacy.sezzleFirstEventID}],
 				'amount': session.privacy.sezzleOrderAmount,
-				'token': session.privacy.sezzleToken
+				'token': session.privacy.sezzleToken,
+				'auth_uuid': session.privacy.authUUID
 		};
 		sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
 		

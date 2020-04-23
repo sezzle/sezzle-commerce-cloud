@@ -33,25 +33,28 @@ server.get('Redirect', function(req, res, next) {
 	logger.debug("Sezzle Redirecting");
 	var basket = BasketMgr.getCurrentBasket();
 	var checkoutObject = sezzle.basket.initiateCheckout(basket);
-	var redirectURL = checkoutObject['checkout_url'];
-	if (checkoutObject['tokenized_order']) {
-		redirectURL = URLUtils.url('Sezzle-Success').toString() + "?tokenizedOrder=" + checkoutObject['tokenized_order']
+	var redirectURL = checkoutObject['checkout']['checkout_url'];
+	if (checkoutObject['tokenize']['auth_uuid']) {
+		redirectURL = URLUtils.url('Sezzle-Success').toString() + "?order_reference_id="+checkoutObject['checkout']['reference_id']+"?isCaptured="+checkoutObject['tokenize']['is_captured'];
 	}
 	if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
-		redirectURL = checkoutObject['approval_url'];
+		redirectURL = checkoutObject['tokenize']['approval_url'];
 	}
 	res.render('sezzle/sezzleredirect', {
 		SezzleRedirectUrl: redirectURL
     });
 	
-	session.privacy.sezzleToken=checkoutObject['token'];
-	session.privacy.tokenExpiration=checkoutObject['token_expiration'];
+	
 	session.privacy.sezzled = true;
-	session.privacy.sezzleOrderAmount = checkoutObject['amount_in_cents']
-	session.privacy.referenceId = checkoutObject['reference_id']
-	session.privacy.orderUUID = checkoutObject['order_uuid'];
-	session.privacy.auth_uuid = checkoutObject['auth_uuid']
-	session.privacy.approved = checkoutObject['approved'];
+	session.privacy.sezzleOrderAmount = checkoutObject['checkout']['amount_in_cents']
+	session.privacy.referenceId = checkoutObject['checkout']['reference_id']
+	session.privacy.orderUUID = checkoutObject['checkout']['order_uuid'];
+	
+	session.privacy.authUUID = checkoutObject['tokenize']['auth_uuid']
+	session.privacy.approved = checkoutObject['tokenize']['approved'];
+	session.privacy.isCaptured = checkoutObject['tokenize']['is_captured'];
+	session.privacy.sezzleToken=checkoutObject['tokenize']['token'];
+	session.privacy.tokenExpiration=checkoutObject['tokenize']['token_expiration'];
 	return next();
 });
 
@@ -60,6 +63,7 @@ server.get('Tokenize', server.middleware.https, csrfProtection.validateAjaxReque
 	var customerID = request.httpParameterMap.customerID.stringValue;
 	var error = 'Unable to tokenize the account.';
 	if (isApproved) {
+		error = '';
 		var tokenizeRecord = dw.object.CustomObjectMgr.createCustomObject('SezzleTokenize', customerID);
 		tokenizeRecord.custom.token = session.privacy.sezzleToken;
 		tokenizeRecord.custom.is_approved = isApproved;
@@ -114,8 +118,8 @@ server.get('Success', function(req, res, next) {
         return next(new Error('Could not place order'));
     }
     
-    var tokenizedOrder = request.httpParameterMap.tokenizedOrder.booleanValue;
-    var result = sezzleHelper.PostProcess(order, tokenizedOrder);
+    var isCaptured = request.httpParameterMap.isCaptured.booleanValue;
+    var result = sezzleHelper.PostProcess(order, isCaptured);
     if (!result) {
     	res.json({
             error: true,
