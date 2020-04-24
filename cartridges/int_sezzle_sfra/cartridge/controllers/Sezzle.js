@@ -40,6 +40,7 @@ server.get('Redirect', function(req, res, next) {
 	if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
 		redirectURL = checkoutObject['tokenize']['approval_url'];
 	}
+	logger.debug(redirectURL);
 	res.render('sezzle/sezzleredirect', {
 		SezzleRedirectUrl: redirectURL
     });

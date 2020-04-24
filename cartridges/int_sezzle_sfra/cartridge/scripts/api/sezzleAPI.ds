@@ -304,7 +304,7 @@
 				checkoutObject.authToken = authentication.response.token
 				logger.debug(checkoutObject.authToken);
 				var sezzleService = service.initService('sezzle.initiatecheckout');		
-				sezzleService.URL = sezzleData.getV2URLPath() + 'session/';
+				sezzleService.URL = sezzleData.getV2URLPath() + 'session';
 				var r = sezzleService.call(checkoutObject).object;
 				logger.debug(JSON.stringify(r));
 				return r;
