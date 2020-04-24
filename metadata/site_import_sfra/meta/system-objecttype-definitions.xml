@@ -50,6 +50,14 @@
                 <externally-managed-flag>true</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
+            <attribute-definition attribute-id="SezzleReleasedAmount">
+                <display-name xml:lang="x-default">Sezzle Released Amount</display-name>
+                <description xml:lang="x-default">Released Amount in Cents</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>true</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
             <attribute-definition attribute-id="SezzlePaymentAction">
                 <display-name xml:lang="x-default">Sezzle Payment Action</display-name>
                 <description xml:lang="x-default">Defines by what action order was placed</description>
@@ -121,6 +129,7 @@
                 <attribute attribute-id="SezzleOrderAmount"/>
                 <attribute attribute-id="SezzleCapturedAmount"/>
                 <attribute attribute-id="SezzleRefundedAmount"/>
+                <attribute attribute-id="SezzleReleasedAmount"/>
             </attribute-group>
         </group-definitions>
     </type-extension>

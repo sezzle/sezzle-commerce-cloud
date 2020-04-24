@@ -263,6 +263,7 @@ function orderTransaction() {
     var transactionIdFromOrder = null;
     var canCapture = false;
     var canRefund = false;
+    var canRelease = false;
     
     
 
@@ -305,9 +306,18 @@ function orderTransaction() {
 	if (order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PAID 
 		&& order.status == dw.order.Order.ORDER_STATUS_COMPLETED 
 		&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE
+		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE
 		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED)) {
 		canRefund = true;
 	}
+	
+	if ((order.paymentStatus == dw.order.Order.PAYMENT_STATUS_NOTPAID 
+    	|| order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PARTPAID)
+    	&& order.status == dw.order.Order.ORDER_STATUS_NEW 
+    	&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH
+		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE)) {
+    	canRelease = true;
+    }
 	
 	
 
@@ -316,7 +326,8 @@ function orderTransaction() {
         isCustomOrder: false,
         Order: order,
         CanCapture: canCapture,
-        CanRefund: canRefund
+        CanRefund: canRefund,
+        CanRelease: canRelease
         //TransactionDetails: result.responseData
     });
 }
@@ -372,8 +383,20 @@ function action() {
         	sezzlePaymentStatus = orderTotalInCents == amtInCents ? sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE : sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE;
         	
         } else if (methodName == 'DoRefund') {
-        	callApiResponse = sezzleApi.refund(order, amtInCents);
+        	if (order.custom.SezzleAuthUUID) {
+        		callApiResponse = sezzleApi.refundByAuthUUID(order, amtInCents, order.custom.SezzleAuthUUID);
+        	} else {
+        		callApiResponse = sezzleApi.refund(order, amtInCents);
+        	}
+        	
         	sezzlePaymentStatus = orderTotalInCents == amtInCents ? sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED : sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED;
+        } else if (methodName == 'DoRelease') {
+        	if (order.custom.SezzleAuthUUID) {
+        		callApiResponse = sezzleApi.releaseByAuthUUID(order, amtInCents, order.custom.SezzleAuthUUID);
+        	} else {
+        		callApiResponse = sezzleApi.release(order, amtInCents);
+        	}
+        	sezzlePaymentStatus = orderTotalInCents == amtInCents ? sezzleHelper.SEZZLE_PAYMENT_STATUS_RELEASED : sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_RELEASED;
         }
         
         if (!callApiResponse.error) {

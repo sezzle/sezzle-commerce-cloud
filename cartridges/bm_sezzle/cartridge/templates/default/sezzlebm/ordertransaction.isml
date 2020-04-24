@@ -8,6 +8,7 @@
 	var order = pdict.Order;
 	var canCapture = pdict.CanCapture;
 	var canRefund = pdict.CanRefund;
+	var canRelease = pdict.CanRelease;
 	var shippingAmount = order.getShippingTotalPrice();
 	var taxAmount = order.getTotalTax();
 	var subtotal =  sezzleHelper.getSubtotal(order);
@@ -15,6 +16,7 @@
 	var email = order.customerEmail || 'Unknown';
 	var capturedAmount = order.custom.SezzleCapturedAmount;
 	var refundedAmount = order.custom.SezzleRefundedAmount;	
+	var releasedAmount = order.custom.SezzleReleasedAmount;	
 	var shippingAddress = order.getDefaultShipment().getShippingAddress();
 </isscript>
 
@@ -92,6 +94,12 @@
     			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, refundedAmount)}</td>
     		</tr>
         </isif>
+        <isif condition="${releasedAmount}">
+    		<tr>
+    			<td class="infobox_title top">${Resource.msg('transaction.detail.releasedamt', 'sezzlebm', null)}:</td>
+    			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, releasedAmount)}</td>
+    		</tr>
+        </isif>
 </table>
 
 <table class="sezzlebm_transaction_detail_table infobox w e s n">
@@ -115,15 +123,16 @@
 						<span class="js_sezzle_action" data-action="capture" data-title="${Resource.msg('transaction.capture.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.capture', 'sezzlebm', null)}</span>
 					</li>
 				</isif>
-				<li>
-						<span class="js_sezzle_action" data-action="capture" data-title="${Resource.msg('transaction.capture.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.capture', 'sezzlebm', null)}</span>
-					</li>
 				<isif condition="${canRefund}">
 					<li>
 						<span class="js_sezzle_action" data-action="refund" data-title="${Resource.msg('transaction.refund.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.refund', 'sezzlebm', null)}</span>
 					</li>
 				</isif>
-				
+				<isif condition="${canRelease}">
+					<li>
+						<span class="js_sezzle_action" data-action="release" data-title="${Resource.msg('transaction.release.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.release', 'sezzlebm', null)}</span>
+					</li>
+				</isif>
 			</ul>
 		</td>
 	</tr>
@@ -145,5 +154,5 @@
 </div>
 <isinclude template="sezzlebm/components/actioncaptureform"/>
 <isinclude template="sezzlebm/components/actionrefundform"/>
-
+<isinclude template="sezzlebm/components/actionreleaseform"/>
 </isdecorate>

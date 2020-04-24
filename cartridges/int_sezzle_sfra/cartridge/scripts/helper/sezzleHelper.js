@@ -10,7 +10,9 @@ var sezzleHelper = {
 		SEZZLE_PAYMENT_STATUS_CAPTURE : 'CAPTURE',
 		SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE : 'PARTIAL_CAPTURE',
 		SEZZLE_PAYMENT_STATUS_REFUNDED : 'REFUNDED',
-		SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED : 'PARTIAL_REFUNDED'
+		SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED : 'PARTIAL_REFUNDED',
+		SEZZLE_PAYMENT_STATUS_RELEASED : 'RELEASED',
+		SEZZLE_PAYMENT_STATUS_PARTIAL_RELEASED : 'PARTIAL_RELEASED'
 };
 
 
@@ -80,6 +82,12 @@ function updateOrderData(order, transactionId, methodName, amount, sezzlePayment
     } else if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED) {
         //order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
         order.custom.SezzleRefundedAmount = amount;
+    } else if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_RELEASED) {
+        //order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
+        order.custom.SezzleReleasedAmount = amount;
+    } else if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_RELEASED) {
+        //order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
+        order.custom.SezzleReleasedAmount = amount;
     }
 }
 
