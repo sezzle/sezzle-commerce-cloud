@@ -109,8 +109,8 @@
                 </value-definitions>
             </attribute-definition>
             <attribute-definition attribute-id="SezzleToken">
-                <display-name xml:lang="x-default">Sezzle Checkout Token</display-name>
-                <description xml:lang="x-default">Sezzle Checkout token</description>
+                <display-name xml:lang="x-default">Sezzle Token</display-name>
+                <description xml:lang="x-default">Sezzle Tokenized token</description>
                 <type>string</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>true</externally-managed-flag>

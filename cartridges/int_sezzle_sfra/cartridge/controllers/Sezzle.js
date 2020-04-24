@@ -9,7 +9,6 @@ var SEZZLE_PAYMENT_METHOD = 'Sezzle';
 var Resource = require('dw/web/Resource');
 var PaymentTransaction = require('dw/order/PaymentTransaction');
 var URLUtils = require('dw/web/URLUtils');
-var session = require('dw/system/Session');
 var server = require('server');
 var BasketMgr = require('dw/order/BasketMgr');
 var ISML = require('dw/template/ISML');
@@ -34,13 +33,12 @@ server.get('Redirect', function(req, res, next) {
 	var basket = BasketMgr.getCurrentBasket();
 	var checkoutObject = sezzle.basket.initiateCheckout(basket);
 	var redirectURL = checkoutObject['checkout']['checkout_url'];
-	if (checkoutObject['tokenize']['auth_uuid']) {
+	if (checkoutObject.tokenize && checkoutObject.tokenize.auth_uuid) {
 		redirectURL = URLUtils.url('Sezzle-Success').toString() + "?order_reference_id="+checkoutObject['checkout']['reference_id']+"?isCaptured="+checkoutObject['tokenize']['is_captured'];
 	}
 	if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
 		redirectURL = checkoutObject['tokenize']['approval_url'];
 	}
-	logger.debug(redirectURL);
 	res.render('sezzle/sezzleredirect', {
 		SezzleRedirectUrl: redirectURL
     });
@@ -51,11 +49,13 @@ server.get('Redirect', function(req, res, next) {
 	session.privacy.referenceId = checkoutObject['checkout']['reference_id']
 	session.privacy.orderUUID = checkoutObject['checkout']['order_uuid'];
 	
-	session.privacy.authUUID = checkoutObject['tokenize']['auth_uuid']
-	session.privacy.approved = checkoutObject['tokenize']['approved'];
-	session.privacy.isCaptured = checkoutObject['tokenize']['is_captured'];
-	session.privacy.sezzleToken=checkoutObject['tokenize']['token'];
-	session.privacy.tokenExpiration=checkoutObject['tokenize']['token_expiration'];
+	if (checkoutObject.tokenize) {
+		session.privacy.authUUID = checkoutObject['tokenize']['auth_uuid'] ? checkoutObject['tokenize']['auth_uuid'] : '';
+		session.privacy.approved = checkoutObject['tokenize']['approved'] ? checkoutObject['tokenize']['approved'] : '';
+		session.privacy.isCaptured = checkoutObject['tokenize']['is_captured'] ? checkoutObject['tokenize']['is_captured'] : '';
+		session.privacy.sezzleToken = checkoutObject['tokenize']['token'] ? checkoutObject['tokenize']['token'] : '';
+		session.privacy.tokenExpiration = checkoutObject['tokenize']['token_expiration'] ? checkoutObject['tokenize']['token_expiration'] : '';
+	}
 	return next();
 });
 

@@ -23,7 +23,7 @@
 				var public_key = sezzleData.getPublicKey();
 				var private_key = sezzleData.getPrivateKey();
 					
-				sezzleService.URL = sezzleData.getV2URLPath() + 'authentication/';
+				sezzleService.URL = sezzleData.getV2URLPath() + 'authentication';
 				var resp = sezzleService.call({
 					'public_key' : public_key,
 					'private_key' : private_key
@@ -305,9 +305,7 @@
 				logger.debug(checkoutObject.authToken);
 				var sezzleService = service.initService('sezzle.initiatecheckout');		
 				sezzleService.URL = sezzleData.getV2URLPath() + 'session';
-				var r = sezzleService.call(checkoutObject).object;
-				logger.debug(JSON.stringify(r));
-				return r;
+				return sezzleService.call(checkoutObject).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {

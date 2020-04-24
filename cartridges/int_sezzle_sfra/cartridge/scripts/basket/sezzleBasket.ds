@@ -285,19 +285,19 @@
 				if (sezzleData.getCreateCheckoutStatus()) {
 					checkoutObject.order = self.getOrder(basket, referenceID);
 				}
-				logger.debug(JSON.stringify(checkoutObject));
 				var checkoutResponse = sezzleAPI.initiateCheckout(checkoutObject);
-				logger.debug(checkoutResponse.response.uuid);
 				returnObj['checkout'] = {
 					'amount_in_cents': self.getTotal(basket),
 					'reference_id' : referenceID,
 					'order_uuid' : checkoutResponse.response.order.uuid,
 					'checkout_url' : checkoutResponse.response.order.checkout_url
 				}
-				returnObj['tokenize'] = {
-					'token' : checkoutResponse.response.tokenize.token,
-					'token_expiration' : checkoutResponse.response.tokenize.expiration,
-					'approval_url' : checkoutResponse.response.tokenize.approval_url
+				if (checkoutResponse.response.tokenize) {
+					returnObj['tokenize'] = {
+						'token' : checkoutResponse.response.tokenize.token,
+						'token_expiration' : checkoutResponse.response.tokenize.expiration,
+						'approval_url' : checkoutResponse.response.tokenize.approval_url
+					}
 				}
 			}
 			return returnObj;
@@ -335,7 +335,7 @@
 		 */
 		self.getCustomer = function (basket) {
 			var customer = {
-				"tokenize": true,
+				"tokenize": sezzleData.getTokenizeStatus(),
 				"email": basket.getCustomerEmail(),
 				"first_name": basket.getCustomer().getProfile().getFirstName(),
 				"last_name": basket.getCustomer().getProfile().getLastName(),

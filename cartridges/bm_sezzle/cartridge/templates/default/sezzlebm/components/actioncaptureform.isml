@@ -5,7 +5,9 @@
 		var orderTotal = String.replace(order.totalGrossPrice, order.currencyCode);
 		var capturedAmountStr = order.custom.SezzleCapturedAmount || '0.00';
 		var capturedAmount = capturedAmountStr.replace(order.currencyCode, '');
-		var captureInputAmount = orderTotal-capturedAmount;
+		var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
+		var releasedAmount = releasedAmountStr.replace(order.currencyCode, '');
+		var captureInputAmount = (orderTotal-releasedAmount)-capturedAmount;
 	
 	
 	</isscript>
