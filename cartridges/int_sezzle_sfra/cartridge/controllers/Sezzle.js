@@ -59,23 +59,23 @@ server.get('Redirect', function(req, res, next) {
 	return next();
 });
 
-server.get('Tokenize', server.middleware.https, csrfProtection.validateAjaxRequest, function(req, res, next) {
+server.get('Tokenize', function(req, res, next) {
 	var isApproved = request.httpParameterMap.isApproved.booleanValue;
-	var customerID = request.httpParameterMap.customerID.stringValue;
+	var customerNo = request.httpParameterMap.customerNo.stringValue;
 	var error = 'Unable to tokenize the account.';
 	if (isApproved) {
 		error = '';
-		var tokenizeRecord = dw.object.CustomObjectMgr.createCustomObject('SezzleTokenize', customerID);
-		tokenizeRecord.custom.token = session.privacy.sezzleToken;
-		tokenizeRecord.custom.is_approved = isApproved;
-		tokenizeRecord.custom.expiration = session.privacy.tokenExpiration;
+		Transaction.wrap(function () {
+			var tokenizeRecord = dw.object.CustomObjectMgr.createCustomObject('SezzleTokenize', customerNo);
+			tokenizeRecord.custom.token = session.privacy.sezzleToken;
+			tokenizeRecord.custom.is_approved = isApproved;
+			tokenizeRecord.custom.expiration = session.privacy.tokenExpiration;
+		});
 	}
-	res.json({
-        error: isApproved,
-        serverErrors: [error],
-        continueUrl: URLUtils.url('Home-Show').toString()
+	res.render('sezzle/sezzleredirect', {
+		SezzleRedirectUrl: URLUtils.url('Home-Show').toString()
     });
-	return;
+	return next();
 });
 
 /**

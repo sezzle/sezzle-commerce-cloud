@@ -5,7 +5,7 @@
         <description xml:lang="x-default">List of Customer Tokenization Records</description>
         <staging-mode>no-staging</staging-mode>
         <storage-scope>site</storage-scope>
-        <key-definition attribute-id="customerID">
+        <key-definition attribute-id="customerNo">
             <type>string</type>
             <min-length>0</min-length>
         </key-definition>
@@ -32,6 +32,14 @@
                 <min-length>0</min-length>
             </attribute-definition>
         </attribute-definitions>
+        <group-definitions>
+            <attribute-group group-id="general">
+                <display-name xml:lang="x-default">General</display-name>
+                <attribute attribute-id="customerNo"/>
+                <attribute attribute-id="token"/>
+                <attribute attribute-id="is_approved"/>
+                <attribute attribute-id="expiration"/>
+            </attribute-group>
+        </group-definitions>
     </custom-type>
-
 </metadata>

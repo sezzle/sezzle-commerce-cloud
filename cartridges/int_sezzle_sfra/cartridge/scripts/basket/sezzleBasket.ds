@@ -271,7 +271,7 @@
 			} else {
 				var successURL = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID;
 				if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
-					successURL = self.getMerchant().user_tokenize_url+ "?isApproved=true&customerID="+basket.getCustomer().ID;
+					successURL = self.getMerchant().user_tokenize_url+ "?isApproved=true&customerNo="+basket.getCustomer().profile.customerNo;
 				}
 				var checkoutObject = {
 					'cancel_url' : {
@@ -288,9 +288,13 @@
 				var checkoutResponse = sezzleAPI.initiateCheckout(checkoutObject);
 				returnObj['checkout'] = {
 					'amount_in_cents': self.getTotal(basket),
-					'reference_id' : referenceID,
-					'order_uuid' : checkoutResponse.response.order.uuid,
-					'checkout_url' : checkoutResponse.response.order.checkout_url
+					'reference_id' : referenceID
+				}
+				if (checkoutResponse.response.order) {
+					returnObj['checkout'] = {
+						'order_uuid' : checkoutResponse.response.order.uuid,
+						'checkout_url' : checkoutResponse.response.order.checkout_url
+					}
 				}
 				if (checkoutResponse.response.tokenize) {
 					returnObj['tokenize'] = {
