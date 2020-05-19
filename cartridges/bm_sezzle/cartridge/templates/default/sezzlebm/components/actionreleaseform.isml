@@ -1,16 +1,16 @@
 <div id="sezzle_release_form" class="sezzle_hide">
 	<isscript>
 		var orderTotalStr = order.custom.SezzleOrderAmount || '0.00';
-		var capturedAmountStr = order.custom.SezzleCapturedAmount || '0.00';
+		var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
 		var orderTotal = orderTotalStr.replace(order.currencyCode, '');
-		var capturedAmount = capturedAmountStr.replace(order.currencyCode, '');
-		var releaseInputAmount = orderTotal-capturedAmount;
+		var releasedAmount = releasedAmountStr.replace(order.currencyCode, '');
+		var releaseInputAmountInFloat = orderTotal-releasedAmount;
+		var releaseInputAmount = dw.util.Decimal(releaseInputAmountInFloat).round(2);
 	</isscript>
-	<form class="sezzle_action_form sezzlebm_content" action="${URLUtils.url('PaypalAdmin-Action')}">
+	<form class="sezzle_action_form sezzlebm_content" action="${URLUtils.url('SezzleAdmin-Action')}">
 		
 		<input type="hidden" name="methodName" value="DoRelease" />
-		<input type="hidden" name="transactionId" value="${transaction.transactionid}" />
-		<input type="hidden" name="invoiceId" value="${transaction.invnum}" />
+		<input type="hidden" name="transactionId" value="${order.custom.SezzleExternalId}" />
 		<input type="hidden" name="currencyCode" value="${order.currencyCode}" />
 		<input type="hidden" name="maxAmount" value="${releaseInputAmount}" />
 		<input type="hidden" name="orderNo" value="${order.orderNo}" />

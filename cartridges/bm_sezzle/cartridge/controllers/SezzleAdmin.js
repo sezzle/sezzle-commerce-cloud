@@ -293,13 +293,13 @@ function orderTransaction() {
         return;
     }
     
-    logger.debug(sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH);
-    
     if ((order.paymentStatus == dw.order.Order.PAYMENT_STATUS_NOTPAID 
     	|| order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PARTPAID) 
-    	&& order.status == dw.order.Order.ORDER_STATUS_NEW 
+    	&& (order.status == dw.order.Order.ORDER_STATUS_NEW 
+    	|| order.status == dw.order.Order.ORDER_STATUS_OPEN)		
     	&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH 
-    	|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE)) {
+    	|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE
+    	|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_RELEASED)) {
     	canCapture = true;
     }
     
@@ -313,9 +313,11 @@ function orderTransaction() {
 	
 	if ((order.paymentStatus == dw.order.Order.PAYMENT_STATUS_NOTPAID 
     	|| order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PARTPAID)
-    	&& order.status == dw.order.Order.ORDER_STATUS_NEW 
+    	&& (order.status == dw.order.Order.ORDER_STATUS_NEW 
+    	|| order.status == dw.order.Order.ORDER_STATUS_OPEN) 
     	&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH
-		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE)) {
+		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE
+		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_RELEASED)) {
     	canRelease = true;
     }
 	
@@ -375,16 +377,17 @@ function action() {
         var sezzlePaymentStatus = order.custom.SezzleStatus;
         
         if (methodName == 'DoCapture') {
+        	var isPartialCapture = (amtInCents < orderTotalInCents);
         	if (order.custom.SezzleAuthUUID) {
-        		callApiResponse = sezzleApi.captureByAuthUUID(order, amtInCents, order.custom.SezzleAuthUUID);
+        		callApiResponse = sezzleApi.captureByAuthUUID(order, amtInCents, isPartialCapture);
         	} else {
-        		callApiResponse = sezzleApi.capture(order, amtInCents);
+        		callApiResponse = sezzleApi.capture(order, amtInCents, isPartialCapture);
         	}
-        	sezzlePaymentStatus = orderTotalInCents == amtInCents ? sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE : sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE;
+        	sezzlePaymentStatus = isPartialCapture ? sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE : sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE;
         	
         } else if (methodName == 'DoRefund') {
         	if (order.custom.SezzleAuthUUID) {
-        		callApiResponse = sezzleApi.refundByAuthUUID(order, amtInCents, order.custom.SezzleAuthUUID);
+        		callApiResponse = sezzleApi.refundByAuthUUID(order, amtInCents);
         	} else {
         		callApiResponse = sezzleApi.refund(order, amtInCents);
         	}
@@ -392,7 +395,7 @@ function action() {
         	sezzlePaymentStatus = orderTotalInCents == amtInCents ? sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED : sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED;
         } else if (methodName == 'DoRelease') {
         	if (order.custom.SezzleAuthUUID) {
-        		callApiResponse = sezzleApi.releaseByAuthUUID(order, amtInCents, order.custom.SezzleAuthUUID);
+        		callApiResponse = sezzleApi.releaseByAuthUUID(order, amtInCents);
         	} else {
         		callApiResponse = sezzleApi.release(order, amtInCents);
         	}

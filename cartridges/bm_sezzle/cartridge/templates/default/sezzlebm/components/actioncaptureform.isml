@@ -7,7 +7,8 @@
 		var capturedAmount = capturedAmountStr.replace(order.currencyCode, '');
 		var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
 		var releasedAmount = releasedAmountStr.replace(order.currencyCode, '');
-		var captureInputAmount = (orderTotal-releasedAmount)-capturedAmount;
+		var captureInputAmountInFloat = (orderTotal-releasedAmount)-capturedAmount;
+		var captureInputAmount = dw.util.Decimal(captureInputAmountInFloat).round(2);
 	
 	
 	</isscript>

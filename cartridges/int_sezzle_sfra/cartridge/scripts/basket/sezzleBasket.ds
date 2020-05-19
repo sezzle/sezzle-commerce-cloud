@@ -242,7 +242,7 @@
 		 */
 		self.initiateCheckout = function (basket) {
 			var referenceID = sezzleUtils.generateUUID();
-			var customerToken = self.getCustomerToken(basket.getCustomer().ID);
+			var customerToken = self.getCustomerToken(basket.getCustomer().getProfile().customerNo);
 			var paymentAction = sezzleData.getSezzlePaymentAction();
 			var doCapture = paymentAction == 'CAPTURE' ? true : false;
 			var returnObj = {};
@@ -269,7 +269,7 @@
 					}
 				}
 			} else {
-				var successURL = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID;
+				var successURL = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID+"&isCaptured=false";
 				if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
 					successURL = self.getMerchant().user_tokenize_url+ "?isApproved=true&customerNo="+basket.getCustomer().profile.customerNo;
 				}
@@ -277,7 +277,7 @@
 					'cancel_url' : {
 						'href' : self.getMerchant().user_cancel_url
 					},
-					'success_url' : {
+					'complete_url' : {
 						'href' : successURL
 					},
 					'customer' : self.getCustomer(basket)
@@ -291,17 +291,13 @@
 					'reference_id' : referenceID
 				}
 				if (checkoutResponse.response.order) {
-					returnObj['checkout'] = {
-						'order_uuid' : checkoutResponse.response.order.uuid,
-						'checkout_url' : checkoutResponse.response.order.checkout_url
-					}
+					returnObj['checkout'].order_uuid = checkoutResponse.response.order.uuid;
+					returnObj['checkout'].checkout_url = checkoutResponse.response.order.checkout_url;
 				}
 				if (checkoutResponse.response.tokenize) {
-					returnObj['tokenize'] = {
-						'token' : checkoutResponse.response.tokenize.token,
-						'token_expiration' : checkoutResponse.response.tokenize.expiration,
-						'approval_url' : checkoutResponse.response.tokenize.approval_url
-					}
+					returnObj['tokenize'].token = checkoutResponse.response.tokenize.token;
+					returnObj['tokenize'].token_expiration = checkoutResponse.response.tokenize.expiration;
+					returnObj['tokenize'].approval_url = checkoutResponse.response.tokenize.approval_url;
 				}
 			}
 			return returnObj;
@@ -311,7 +307,7 @@
 			var apiResponse = sezzleAPI.getCustomerUUID(request.token);
 			if (!apiResponse.error) {
 				delete request['token'];
-				request.customer_uuid = apiResponse.response.customer_uuid;
+				request.customer_uuid = apiResponse.response.customer.uuid;
 				var apiResponse = sezzleAPI.authorizePayment(request);
 				if (!apiResponse.error) {
 					return apiResponse.response;
@@ -322,9 +318,10 @@
 			};
 		};
 		
-		self.getCustomerToken = function (customerID) {
-			var tokenizeRecord = dw.object.CustomObjectMgr.getCustomObject('SezzleTokenize', customerID);
-			if (tokenizeRecord && tokenizeRecord.custom.is_approved) {
+		self.getCustomerToken = function (customerNo) {
+			var tokenizeRecord = dw.object.CustomObjectMgr.getCustomObject('SezzleTokenize', customerNo);
+			var currentTimestamp = new Date().toISOString();
+			if (tokenizeRecord && tokenizeRecord.custom.is_approved && tokenizeRecord.custom.expiration <= currentTimestamp) {
 				return tokenizeRecord.custom.token;	
 			}
 			return '';

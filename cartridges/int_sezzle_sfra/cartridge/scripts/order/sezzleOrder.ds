@@ -78,7 +78,14 @@
 		};
 		
 		
-		this.captureOrder = api.capture;
+		this.captureOrder = function (order) {
+			try {
+				var captureAmount = order.totalGrossPrice.multiply(100).getValue();
+				response = api.capture(order, captureAmount, false);
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+			}
+		};
 		/**
 		 * Refund captured orders and update their sezzle  status. Used in Sezzle job.
 		 * 
@@ -87,7 +94,8 @@
 		this.refundOrders = function () {
 			OrderMgr.processOrders(function (order) {
 				try {
-					response = api.refund(order);
+					var refundAmount = order.totalGrossPrice.multiply(100).getValue();
+					response = api.refund(order, refundAmount);
 					if (!response.error){
 						order.custom.SezzleStatus = 'REFUNDED';
 					}

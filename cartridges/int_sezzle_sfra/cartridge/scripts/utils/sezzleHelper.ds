@@ -69,7 +69,7 @@ function postProcess(order, isCaptured){
 					sezzle.order.captureOrder(order);
 				}
 				order.custom.SezzleStatus = 'CAPTURE';
-				order.custom.SezzleCapturedAmount = dw.value.Money(order.totalGrossPrice,order.currencyCode);
+				order.custom.SezzleCapturedAmount = order.totalGrossPrice.toString();
 				order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
 				order.setStatus(Order.ORDER_STATUS_COMPLETED);
 			});

@@ -4,7 +4,8 @@
 		var refundedAmountStr = order.custom.SezzleRefundedAmount || '0.00';
 		var capturedAmount = capturedAmountStr.replace(order.currencyCode, '');
 		var refundedAmount = refundedAmountStr.replace(order.currencyCode, '');
-		var refundInputAmount = capturedAmount-refundedAmount;
+		var refundInputAmountInFloat = capturedAmount-refundedAmount;
+		var refundInputAmount = dw.util.Decimal(refundInputAmountInFloat).round(2);
 	</isscript>
 	<form class="sezzle_action_form sezzlebm_content" action="${URLUtils.url('SezzleAdmin-Action')}">
 		
