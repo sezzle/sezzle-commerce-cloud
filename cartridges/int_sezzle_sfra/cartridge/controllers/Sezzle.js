@@ -34,11 +34,12 @@ server.get('Redirect', function(req, res, next) {
 	var checkoutObject = sezzle.basket.initiateCheckout(basket);
 	var redirectURL = checkoutObject['checkout']['checkout_url'];
 	if (checkoutObject.tokenize && checkoutObject.tokenize.auth_uuid) {
-		redirectURL = URLUtils.url('Sezzle-Success').toString() + "?order_reference_id="+checkoutObject['checkout']['reference_id']+"?isCaptured="+checkoutObject['tokenize']['is_captured'];
+		redirectURL = URLUtils.url('Sezzle-Success').toString() + "?order_reference_id="+checkoutObject['checkout']['reference_id']+"&isCaptured="+checkoutObject['tokenize']['is_captured'];
 	}
-	if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
+	else if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
 		redirectURL = checkoutObject['tokenize']['approval_url'];
 	}
+	
 	res.render('sezzle/sezzleredirect', {
 		SezzleRedirectUrl: redirectURL
     });

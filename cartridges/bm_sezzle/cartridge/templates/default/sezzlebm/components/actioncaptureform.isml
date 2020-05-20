@@ -2,12 +2,13 @@
 
 	<isscript>
 	
-		var orderTotal = String.replace(order.totalGrossPrice, order.currencyCode);
+		var orderTotalStr = order.custom.SezzleOrderAmount || '0.00';
+		var orderTotal = orderTotalStr.replace(order.currencyCode, '');
 		var capturedAmountStr = order.custom.SezzleCapturedAmount || '0.00';
 		var capturedAmount = capturedAmountStr.replace(order.currencyCode, '');
 		var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
 		var releasedAmount = releasedAmountStr.replace(order.currencyCode, '');
-		var captureInputAmountInFloat = (orderTotal-releasedAmount)-capturedAmount;
+		var captureInputAmountInFloat = orderTotal-capturedAmount;
 		var captureInputAmount = dw.util.Decimal(captureInputAmountInFloat).round(2);
 	
 	
@@ -45,7 +46,7 @@
 			</tr>
 			<tr class="sezzlebm_gray">
 				<td class="infobox_title top">${Resource.msg('transaction.detail.authorizationamount', 'sezzlebm', null)}:</td>
-				<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, order.totalGrossPrice, order.currencyCode)}</td>
+				<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, order.custom.SezzleOrderAmount)}</td>
 			</tr>
 			<tr>
 				<td class="infobox_title top">${Resource.msg('transaction.capture.captureamount', 'sezzlebm', null)}:</td>

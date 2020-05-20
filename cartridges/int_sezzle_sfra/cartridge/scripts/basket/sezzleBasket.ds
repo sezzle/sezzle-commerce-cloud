@@ -265,7 +265,7 @@
 					returnObj['tokenize'] = {
 						'token' : requestObject.token,
 						'is_captured': doCapture,
-						'auth_uuid': authorizeResponse.uuid
+						'auth_uuid': authorizeResponse.response.uuid
 					}
 				}
 			} else {
@@ -295,9 +295,11 @@
 					returnObj['checkout'].checkout_url = checkoutResponse.response.order.checkout_url;
 				}
 				if (checkoutResponse.response.tokenize) {
-					returnObj['tokenize'].token = checkoutResponse.response.tokenize.token;
-					returnObj['tokenize'].token_expiration = checkoutResponse.response.tokenize.expiration;
-					returnObj['tokenize'].approval_url = checkoutResponse.response.tokenize.approval_url;
+					returnObj['tokenize'] = {
+						'token' : checkoutResponse.response.tokenize.token,
+						'token_expiration' : checkoutResponse.response.tokenize.expiration,
+						'approval_url' : checkoutResponse.response.tokenize.approval_url
+					}
 				}
 			}
 			return returnObj;
@@ -307,10 +309,12 @@
 			var apiResponse = sezzleAPI.getCustomerUUID(request.token);
 			if (!apiResponse.error) {
 				delete request['token'];
-				request.customer_uuid = apiResponse.response.customer.uuid;
+				//request.customer_uuid = apiResponse.response.customer.uuid;
+				request.customer_uuid = apiResponse.response.customer_uuid;
 				var apiResponse = sezzleAPI.authorizePayment(request);
+				
 				if (!apiResponse.error) {
-					return apiResponse.response;
+					return apiResponse;
 				}
 			}
 			return {
@@ -321,7 +325,7 @@
 		self.getCustomerToken = function (customerNo) {
 			var tokenizeRecord = dw.object.CustomObjectMgr.getCustomObject('SezzleTokenize', customerNo);
 			var currentTimestamp = new Date().toISOString();
-			if (tokenizeRecord && tokenizeRecord.custom.is_approved && tokenizeRecord.custom.expiration <= currentTimestamp) {
+			if (tokenizeRecord && tokenizeRecord.custom.is_approved) { //&& tokenizeRecord.custom.expiration <= currentTimestamp) {
 				return tokenizeRecord.custom.token;	
 			}
 			return '';

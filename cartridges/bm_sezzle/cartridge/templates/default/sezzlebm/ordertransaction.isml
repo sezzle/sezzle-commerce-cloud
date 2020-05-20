@@ -14,6 +14,7 @@
 	var subtotal =  sezzleHelper.getSubtotal(order);
 	var orderTotal = order.getTotalGrossPrice();	
 	var email = order.customerEmail || 'Unknown';
+	var authAmount = order.custom.SezzleOrderAmount;
 	var capturedAmount = order.custom.SezzleCapturedAmount;
 	var refundedAmount = order.custom.SezzleRefundedAmount;	
 	var releasedAmount = order.custom.SezzleReleasedAmount;	
@@ -82,6 +83,10 @@
     			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, orderTotal)}</td>
     		</tr>
         </isif>
+   		<tr>
+   			<td class="infobox_title top">${Resource.msg('transaction.detail.authamt', 'sezzlebm', null)}:</td>
+   			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, authAmount)}</td>
+   		</tr>
         <isif condition="${capturedAmount}"> 
     		<tr>
     			<td class="infobox_title top">${Resource.msg('transaction.detail.capturedamt', 'sezzlebm', null)}:</td>

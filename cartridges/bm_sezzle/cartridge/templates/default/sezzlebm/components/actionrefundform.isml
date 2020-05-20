@@ -38,7 +38,7 @@
 			</tr>
 			<tr class="sezzlebm_gray">
 				<td class="infobox_title top">${Resource.msg('transaction.refund.originalpayment', 'sezzlebm', null)}:</td>
-				<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, order.totalGrossPrice, order.currencyCode)}</td>
+				<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, order.custom.SezzleOrderAmount)}</td>
 			</tr>
 			<tr>
 				<td class="infobox_title top">${Resource.msg('transaction.refund.refundamount', 'sezzlebm', null)}:</td>

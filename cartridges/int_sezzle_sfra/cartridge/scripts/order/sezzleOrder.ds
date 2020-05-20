@@ -60,16 +60,11 @@
 		this.updateAttributes = function (order, response, paymentProcessor, paymentInstrument) {
 			
 			try {
-				paymentInstrument.paymentTransaction.transactionID = response.token;
-				paymentInstrument.paymentTransaction.amount = new Money(response.amount, order.currencyCode).divide(100);
-				paymentInstrument.paymentTransaction.setPaymentProcessor(paymentProcessor);
-				var paymentAction = data.getSezzlePaymentAction();
-				
 				order.custom.SezzleToken = response.token;
 				order.custom.SezzleExternalId = response.reference_id;
 				order.custom.SezzleStatus = 'AUTH';
-				order.custom.SezzlePaymentAction = String(paymentAction);
-				order.custom.SezzleOrderUUID = response.order_uuid;
+				order.custom.SezzlePaymentAction = String(data.getSezzlePaymentAction());
+				order.custom.SezzleOrderUUID = response.order_uuid != 'undefined' ? response.order_uuid : '';
 				order.custom.SezzleAuthUUID = response.auth_uuid != 'undefined' ? response.auth_uuid : '';
 				order.custom.SezzleOrderAmount = new Money(response.amount, order.currencyCode).divide(100);
 			} catch (e) {
