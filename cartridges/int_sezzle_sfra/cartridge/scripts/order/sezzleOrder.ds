@@ -62,7 +62,7 @@
 			try {
 				order.custom.SezzleToken = response.token;
 				order.custom.SezzleExternalId = response.reference_id;
-				order.custom.SezzleStatus = 'AUTH';
+				order.custom.SezzleStatus = 'IN_PROGRESS';
 				order.custom.SezzlePaymentAction = String(data.getSezzlePaymentAction());
 				order.custom.SezzleOrderUUID = response.order_uuid != 'undefined' ? response.order_uuid : '';
 				order.custom.SezzleAuthUUID = response.auth_uuid != 'undefined' ? response.auth_uuid : '';

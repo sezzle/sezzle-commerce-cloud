@@ -64,15 +64,8 @@ server.get('Redirect', function(req, res, next) {
 server.get('Tokenize', function(req, res, next) {
 	var isApproved = request.httpParameterMap.isApproved.booleanValue;
 	var customerNo = request.httpParameterMap.customerNo.stringValue;
-	var error = 'Unable to tokenize the account.';
 	if (isApproved) {
-		error = '';
-		Transaction.wrap(function () {
-			var tokenizeRecord = dw.object.CustomObjectMgr.createCustomObject('SezzleTokenize', customerNo);
-			tokenizeRecord.custom.token = session.privacy.sezzleToken;
-			tokenizeRecord.custom.is_approved = isApproved;
-			tokenizeRecord.custom.expiration = session.privacy.tokenExpiration;
-		});
+		sezzleHelper.storeTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
 	}
 	res.render('sezzle/sezzleredirect', {
 		SezzleRedirectUrl: URLUtils.url('Home-Show').toString()
@@ -88,6 +81,10 @@ server.get('Success', function(req, res, next) {
 	if (!basket) {
 		res.redirect(URLUtils.url('Home-Show'));
         return next();
+	}
+	var customerUUID = request.httpParameterMap["customer-uuid"].stringValue;
+	if (customerUUID != "") {
+		sezzleHelper.storeTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
 	}
 	// Creates a new order.
 	var reportingUrlsHelper = require('*/cartridge/scripts/reportingUrls');

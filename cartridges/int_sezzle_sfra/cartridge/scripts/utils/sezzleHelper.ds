@@ -60,6 +60,15 @@ function checkCart(cart) {
     }
 }
 
+function storeTokenizeRecord(customerNo, token, tokenExpiration) {
+	Transaction.wrap(function () {
+		var tokenizeRecord = dw.object.CustomObjectMgr.createCustomObject('SezzleTokenize', customerNo);
+		tokenizeRecord.custom.token = token;
+		tokenizeRecord.custom.is_approved = true;
+		tokenizeRecord.custom.expiration = tokenExpiration;
+	});
+}
+
 function postProcess(order, isCaptured){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 	try {
@@ -102,6 +111,7 @@ function isSezzleApplicable(){
 module.exports = {
 		Init: init,
 		CheckCart: checkCart,
+		StoreTokenizeRecord: storeTokenizeRecord,
 		PostProcess: postProcess,
 		IsSezzleApplicable: isSezzleApplicable
 }

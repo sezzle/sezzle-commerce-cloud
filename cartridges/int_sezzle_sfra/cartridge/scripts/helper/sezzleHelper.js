@@ -7,13 +7,10 @@ var logger = require('dw/system').Logger.getLogger('Sezzle', ''),
     Money = require('dw/value/Money');
 
 var sezzleHelper = {
-		SEZZLE_PAYMENT_STATUS_AUTH : 'AUTH',
+		SEZZLE_PAYMENT_STATUS_IN_PROGRESS : 'IN_PROGRESS',
 		SEZZLE_PAYMENT_STATUS_CAPTURE : 'CAPTURE',
-		SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE : 'PARTIAL_CAPTURE',
 		SEZZLE_PAYMENT_STATUS_REFUNDED : 'REFUNDED',
-		SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED : 'PARTIAL_REFUNDED',
 		SEZZLE_PAYMENT_STATUS_RELEASED : 'RELEASED',
-		SEZZLE_PAYMENT_STATUS_PARTIAL_RELEASED : 'PARTIAL_RELEASED'
 };
 
 
@@ -97,15 +94,12 @@ function updateOrderData(order, transactionId, methodName, amount, action) {
     		order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PAID);
     		order.setStatus(dw.order.Order.ORDER_STATUS_COMPLETED);
     	} else {
-    		order.custom.SezzleStatus = sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE;
     		order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PARTPAID);
     	}
     } else if (action == sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED) {
     	order.custom.SezzleRefundedAmount = finalRefundedAmount;
     	if (authAmount.equals(finalRefundedAmount)) {
     		order.custom.SezzleStatus = sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED;
-    	} else {
-    		order.custom.SezzleStatus = sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED;
     	}
     } else if (action == sezzleHelper.SEZZLE_PAYMENT_STATUS_RELEASED) {
     	order.custom.SezzleReleasedAmount = finalReleasedAmount;
@@ -115,10 +109,7 @@ function updateOrderData(order, transactionId, methodName, amount, action) {
     	
     	if (orderTotal.equals(finalReleasedAmount)) {
     		order.custom.SezzleStatus = sezzleHelper.SEZZLE_PAYMENT_STATUS_RELEASED;
-    	} 
-//    	else {
-//    		order.custom.SezzleStatus = sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_RELEASED;
-//    	}
+    	}
     }
 
 //    if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE) {
