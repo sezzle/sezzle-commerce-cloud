@@ -266,7 +266,6 @@ function orderTransaction() {
     var canRefund = false;
     var canRelease = false;
     
-    
 
     if (request.httpParameterMap.orderNo && !empty(request.httpParameterMap.orderNo.value)) {
         if (request.httpParameterMap.isCustomOrder && !empty(request.httpParameterMap.isCustomOrder.stringValue)) {
@@ -291,39 +290,66 @@ function orderTransaction() {
     
     var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
 	var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
+	
+	var refundedAmountStr = order.custom.SezzleRefundedAmount || '0.00';
+	var refundedAmountInFloat = parseFloat(refundedAmountStr.replace(order.currencyCode, ''));
+	
+	var capturedAmountStr = order.custom.SezzleCapturedAmount || '0.00';
+	var capturedAmountInFloat = parseFloat(capturedAmountStr.replace(order.currencyCode, ''));
+	
+	var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
+	var releasedAmountInFloat = parseFloat(releasedAmountStr.replace(order.currencyCode, ''));
+	
+	logger.debug(capturedAmountInFloat)
+	logger.debug(refundedAmountInFloat)
 
     if (!order) {
         render('sezzlebm/components/servererror');
         return;
     }
-    
-    if ((order.paymentStatus == dw.order.Order.PAYMENT_STATUS_NOTPAID 
-    	|| order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PARTPAID) 
-    	&& (order.status == dw.order.Order.ORDER_STATUS_NEW 
-    	|| order.status == dw.order.Order.ORDER_STATUS_OPEN)		
-    	&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH 
-    	|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE)
-    	&& authAmountInFloat > 0) {
-    	canCapture = true;
-    }
-    
-	if (order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PAID 
-		&& order.status == dw.order.Order.ORDER_STATUS_COMPLETED 
-		&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE
-		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE
-		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED)) {
+	
+	if (authAmountInFloat > capturedAmountInFloat) {
+		canCapture = true;
+	}
+	
+	if (capturedAmountInFloat > refundedAmountInFloat) {
 		canRefund = true;
 	}
 	
-	if ((order.paymentStatus == dw.order.Order.PAYMENT_STATUS_NOTPAID 
-    	|| order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PARTPAID)
-    	&& (order.status == dw.order.Order.ORDER_STATUS_NEW 
-    	|| order.status == dw.order.Order.ORDER_STATUS_OPEN) 
-    	&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH
-		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE)
-		&& authAmountInFloat > 0) {
-    	canRelease = true;
-    }
+	if (authAmountInFloat > capturedAmountInFloat) {
+		canRelease = true;
+	}
+    
+//    if ((order.paymentStatus == dw.order.Order.PAYMENT_STATUS_NOTPAID 
+//    	|| order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PARTPAID) 
+//    	&& (order.status == dw.order.Order.ORDER_STATUS_NEW 
+//    	|| order.status == dw.order.Order.ORDER_STATUS_OPEN)		
+//    	&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH 
+//    	|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE)
+//    	&& authAmountInFloat > 0) {
+//    	canCapture = true;
+//    }
+    
+//	if ((order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PAID
+//		|| order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PARTPAID)
+//		&& (order.status == dw.order.Order.ORDER_STATUS_COMPLETED 
+//		|| order.status == dw.order.Order.ORDER_STATUS_NEW)
+//		&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE
+//		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE
+//		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED)
+//		&& (capturedAmountInFloat > refundedAmountInFloat)) {
+//		canRefund = true;
+//	}
+	
+//	if ((order.paymentStatus == dw.order.Order.PAYMENT_STATUS_NOTPAID 
+//    	|| order.paymentStatus == dw.order.Order.PAYMENT_STATUS_PARTPAID)
+//    	&& (order.status == dw.order.Order.ORDER_STATUS_NEW 
+//    	|| order.status == dw.order.Order.ORDER_STATUS_OPEN) 
+//    	&& (order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_AUTH
+//		|| order.custom.SezzleStatus == sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE)
+//		&& authAmountInFloat > 0) {
+//    	canRelease = true;
+//    }
 	
 	
 

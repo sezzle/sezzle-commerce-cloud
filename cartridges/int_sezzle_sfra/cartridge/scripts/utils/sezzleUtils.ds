@@ -201,6 +201,17 @@
 			    return v.toString(16);
 			  });
 			}
+			
+		self.getFormattedDateTimestamp = function (timestampStr) {
+			timestampStr = timestampStr.split('.');
+			timestampStr = timestampStr[0];
+			timestampStr = timestampStr.replace('Z', ' ');
+			timestampStr = timestampStr.replace('T', ' ');
+			timestampStr = timestampStr.replace('-', '/');
+			timestampStr = timestampStr.replace('-', '/');
+			var timestamp = Date.parse(timestampStr);
+			return timestamp;
+		}
 		
 		self.getQueryString = function ( field, url ) {
 			var href = url;

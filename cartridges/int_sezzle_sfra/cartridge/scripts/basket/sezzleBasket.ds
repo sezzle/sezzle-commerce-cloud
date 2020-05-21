@@ -324,12 +324,18 @@
 		
 		self.getCustomerToken = function (customerNo) {
 			var tokenizeRecord = dw.object.CustomObjectMgr.getCustomObject('SezzleTokenize', customerNo);
-			var currentTimestamp = new Date().toISOString();
-			if (tokenizeRecord && tokenizeRecord.custom.is_approved) { //&& tokenizeRecord.custom.expiration <= currentTimestamp) {
+			var currentTimestamp = Date.now();
+			var tokenExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(tokenizeRecord.custom.expiration);
+			if (tokenizeRecord && tokenizeRecord.custom.is_approved && tokenExpirationTimestamp <= currentTimestamp) {
 				return tokenizeRecord.custom.token;	
 			}
+			self.deleteCustomerToken(tokenizeRecord);
 			return '';
 		};
+		
+		self.deleteCustomerToken = function (record) {
+			dw.object.CustomObjectMgr.remove(record);
+		}
 		
 		
 		/**

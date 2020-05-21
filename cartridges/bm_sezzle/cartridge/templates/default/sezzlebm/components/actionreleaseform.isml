@@ -4,8 +4,10 @@
 		var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
 		var orderTotal = orderTotalStr.replace(order.currencyCode, '');
 		var releasedAmount = releasedAmountStr.replace(order.currencyCode, '');
-		var releaseInputAmountInFloat = orderTotal;
-		var releaseInputAmount = orderTotal;
+		var capturedAmountStr = order.custom.SezzleCapturedAmount || '0.00';
+		var capturedAmount = capturedAmountStr.replace(order.currencyCode, '');
+		var releaseInputAmountInFloat = orderTotal - capturedAmount;
+		var releaseInputAmount = dw.util.Decimal(releaseInputAmountInFloat).round(2);
 	</isscript>
 	<form class="sezzle_action_form sezzlebm_content" action="${URLUtils.url('SezzleAdmin-Action')}">
 		
