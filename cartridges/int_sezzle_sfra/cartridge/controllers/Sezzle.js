@@ -65,7 +65,7 @@ server.get('Tokenize', function(req, res, next) {
 	var isApproved = request.httpParameterMap.isApproved.booleanValue;
 	var customerNo = request.httpParameterMap.customerNo.stringValue;
 	if (isApproved) {
-		sezzleHelper.storeTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
+		sezzleHelper.StoreTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
 	}
 	res.render('sezzle/sezzleredirect', {
 		SezzleRedirectUrl: URLUtils.url('Home-Show').toString()
@@ -83,8 +83,9 @@ server.get('Success', function(req, res, next) {
         return next();
 	}
 	var customerUUID = request.httpParameterMap["customer-uuid"].stringValue;
+	var customerNo = basket.getCustomer().profile.customerNo;
 	if (customerUUID != "") {
-		sezzleHelper.storeTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
+		sezzleHelper.StoreTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
 	}
 	// Creates a new order.
 	var reportingUrlsHelper = require('*/cartridge/scripts/reportingUrls');
