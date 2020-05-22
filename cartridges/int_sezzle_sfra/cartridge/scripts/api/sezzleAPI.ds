@@ -126,7 +126,7 @@
 		 * @param {dw.order.Order} order 
 		 * @returns status
 		 */
-		self.getOrder = function (order) {
+		self.getOrderByOrderUUID = function (orderUUID) {
 			try {
 				var authentication = self.authenticate();
 				var obj = {
@@ -134,8 +134,33 @@
 					'httpMethod': 'GET'
 				};
 				
-				var sezzleService = service.initService('sezzle.order');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID;
+				var sezzleService = service.initService('sezzle.getorderbyorderuuid');
+				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + orderUUID;
+				return sezzleService.call(obj).object;
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					error : false
+				};
+			}
+		};
+		
+		/**
+		 * Get order by auth UUID
+		 *
+		 * @param {dw.order.Order} order 
+		 * @returns status
+		 */
+		self.getOrderByAuthUUID = function (authUUID) {
+			try {
+				var authentication = self.authenticate();
+				var obj = {
+					'authToken' : authentication.response.token,
+					'httpMethod': 'GET'
+				};
+				
+				var sezzleService = service.initService('sezzle.getorderbyauthuuid');
+				sezzleService.URL = sezzleData.getV2URLPath() + 'authorization/' + authUUID;
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);

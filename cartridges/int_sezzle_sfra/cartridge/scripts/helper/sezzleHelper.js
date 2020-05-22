@@ -10,7 +10,7 @@ var sezzleHelper = {
 		SEZZLE_PAYMENT_STATUS_IN_PROGRESS : 'IN_PROGRESS',
 		SEZZLE_PAYMENT_STATUS_CAPTURE : 'CAPTURE',
 		SEZZLE_PAYMENT_STATUS_REFUNDED : 'REFUNDED',
-		SEZZLE_PAYMENT_STATUS_RELEASED : 'RELEASED',
+		SEZZLE_PAYMENT_STATUS_RELEASED : 'RELEASED', 
 };
 
 
@@ -133,6 +133,11 @@ function updateOrderData(order, transactionId, methodName, amount, action) {
 //        //order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
 //        order.custom.SezzleReleasedAmount = amount;
 //    }
+}
+
+sezzleHelper.updateSezzleOrderAmount = function (order, amount) {
+	amount = new Money(amount, order.currencyCode);
+	order.custom.SezzleOrderAmount = amount;
 }
 
 /**
