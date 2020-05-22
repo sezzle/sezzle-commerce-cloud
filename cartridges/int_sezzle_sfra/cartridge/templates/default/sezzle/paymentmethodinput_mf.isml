@@ -20,8 +20,10 @@
 </isif>
 <script type="text/javascript">
 
-  function getModal(modalNode, callback) {
+  // getModal : Getting Sezzle modal
+    function getModal(modalNode, callback) {
       var httpRequest = new XMLHttpRequest();
+
       httpRequest.onreadystatechange = function () {
         if (httpRequest.readyState === XMLHttpRequest.DONE) {
           if (httpRequest.status === 200) {
@@ -29,75 +31,48 @@
             modalNode.innerHTML = httpRequest.response;
             document.getElementsByTagName('html')[0].appendChild(modalNode);
             callback();
-          }
-          else {
+          } else {
             return console.warn("Can't load the modal because the link provided is not found");
           }
         }
       }.bind(this);
 
-
-      var url = 'https://media.sezzle.com/shopify-app/assets/sezzle-modal-1.0.8-en.html';
+      var url = 'https://media.sezzle.com/shopify-app/assets/sezzle-modal-2.0.0-en.html';
       httpRequest.open('GET', url, true);
       httpRequest.send();
+    }
 
-  }
-  function closeModalHandler () {
-    // Event listener for close in modal
-    Array.prototype.forEach.call(document.getElementsByClassName('close-sezzle-modal'), function (el) {
-      el.addEventListener('click', function () {
-        // Display the modal node
-        modalNode.style.display = 'none';
-        // Add hidden class hide the item
-        modalNode.getElementsByClassName('sezzle-modal')[0].className = 'sezzle-modal sezzle-checkout-modal-hidden';
+    // closeModalHandler : Close modal handler
+    function closeModalHandler() {
+      // Event listener for close in modal
+      Array.prototype.forEach.call($('.close-sezzle-modal'), function (el) {
+        el.addEventListener('click', function () {
+          modalNode.style.display = 'none';
+        });
+      }); // Event listener to prevent close in modal if click happens within sezzle-checkout-modal
+
+      var sezzleModal = $('.sezzle-modal')[0]; // backwards compatability check
+
+      if (!sezzleModal) sezzleModal = $('.sezzle-checkout-modal')[0];
+      sezzleModal.addEventListener('click', function (event) {
+        // stop propagating the event to the parent sezzle-checkout-modal-lightbox to prevent the closure of the modal
+        event.stopPropagation();
       });
-    });
+    }
 
-    // Event listener to prevent close in modal if click happens within sezzle-checkout-modal
-    var sezzleModal = document.getElementsByClassName('sezzle-modal')[0]
-    // backwards compatability check
-    if (!sezzleModal) sezzleModal = document.getElementsByClassName('sezzle-checkout-modal')[0]
-    sezzleModal.addEventListener('click', function (event) {
-      // stop propagating the event to the parent sezzle-checkout-modal-lightbox to prevent the closure of the modal
-      event.stopPropagation();
-    });
-  }
-  var modalNode = document.createElement('div');
-  if (!document.getElementsByClassName('sezzle-checkout-modal-lightbox').length) {
-    console.log("sezzle widget")
-    modalNode.className = 'sezzle-checkout-modal-lightbox close-sezzle-modal';
-    modalNode.style.display = 'none';
-    getModal(modalNode, closeModalHandler);
-  } else {
-    modalNode.innerHTML = document.getElementsByClassName('sezzle-checkout-modal-lightbox')[0];
-  }
+    var modalNode = document.createElement('div');
 
-Array.prototype.forEach.call(document.getElementsByClassName('sezzle-know-more'), function (el) {
-    el.addEventListener('click', function () {
-      // Display the modal node
-      modalNode.style.display = 'block';
-      // Add hidden class hide the item
-      modalNode.getElementsByClassName('sezzle-modal')[0].className = 'sezzle-checkout-modal';
-    });
-  });
-  
-  
-  Array.prototype.forEach.call(document.getElementsByClassName('close-sezzle-modal'), function (el) {
-    el.addEventListener('click', function () {
-      // Display the modal node
+    if (!$('.sezzle-checkout-modal-lightbox').length) {
+      modalNode.className = 'sezzle-checkout-modal-lightbox close-sezzle-modal';
       modalNode.style.display = 'none';
-      // Add hidden class hide the item
-      modalNode.getElementsByClassName('sezzle-modal')[0].className = 'sezzle-checkout-modal sezzle-checkout-modal-hidden';
+      getModal(modalNode, closeModalHandler);
+    } else {
+      modalNode.innerHTML = $('.sezzle-checkout-modal-lightbox')[0];
+    }
+
+    $("body").on("click", ".sezzle-know-more", function (a) {
+      modalNode.style.display = 'block';
     });
-  });
-  
-  let sezzleModal = document.getElementsByClassName('sezzle-modal')[0]
-  // backwards compatability check
-  if (!sezzleModal) sezzleModal = document.getElementsByClassName('sezzle-checkout-modal')[0]
-  sezzleModal.addEventListener('click', function (event) {
-    // stop propagating the event to the parent sezzle-checkout-modal-lightbox to prevent the closure of the modal
-    event.stopPropagation();
-  });
   
 
 

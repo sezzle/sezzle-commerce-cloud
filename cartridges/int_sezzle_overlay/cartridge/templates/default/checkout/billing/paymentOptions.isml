@@ -1,5 +1,5 @@
 <div class="form-nav billing-nav payment-information"
-     data-payment-method-id="<isif condition="${require('*/cartridge/scripts/utils/sezzleHelper').IsSezzleApplicable()}">Sezzle<iselse>CREDIT_CARD</isif>"
+     data-payment-method-id="<isif condition="${require('*/cartridge/scripts/utils/sezzleHelper').IsSezzleApplicable()}">SEZZLE<iselse>CREDIT_CARD</isif>"
      data-is-new-payment="${pdict.customer.registeredUser && pdict.customer.customerPaymentInstruments.length ? false : true}"
 >
 

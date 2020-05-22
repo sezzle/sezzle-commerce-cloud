@@ -712,6 +712,14 @@
             + checkoutStages[currentStage]
           );
         }
+        
+        function removePaymentMethod(form, methodName) {
+        	var splitForm = form.split('&');
+            var removeItem = 'dwfrm_billing_paymentMethod='+methodName;
+            splitForm.splice($.inArray(removeItem, splitForm), 1);
+            form = splitForm.join('&');
+            return form;
+        }
 
         //
         // Local member methods of the Checkout plugin
@@ -803,10 +811,9 @@
               });
 
               if (selectedPaymentMethod == 'Sezzle') {
-                var splitForm = paymentForm.split('&');
-                var removeItem = 'dwfrm_billing_paymentMethod=CREDIT_CARD';
-                splitForm.splice($.inArray(removeItem, splitForm), 1);
-                var paymentForm = splitForm.join('&');
+            	  paymentForm = removePaymentMethod(paymentForm, 'CREDIT_CARD');
+              } else {
+            	  paymentForm = removePaymentMethod(paymentForm, 'Sezzle');
               }
 
               if ($('.data-checkout-stage').data('customer-type') === 'registered') {
