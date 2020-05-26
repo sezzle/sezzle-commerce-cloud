@@ -95,7 +95,6 @@ if (!isSearchByOrderNo && !isSearchByTransaction) {
 			<td class="table_header e s" nowrap="nowrap">${Resource.msg('search.grid.email', 'sezzlebm', null)}</td>
 			<td class="table_header e s left" nowrap="nowrap">${Resource.msg('search.grid.total', 'sezzlebm', null)}</td>
 			<td class="table_header e s left" nowrap="nowrap">${Resource.msg('search.grid.sezzleamount', 'sezzlebm', null)}</td>
-			<td class="table_header e s left" nowrap="nowrap">${Resource.msg('search.grid.status', 'sezzlebm', null)}</td>
 			<td class="table_header e s left" nowrap="nowrap">${Resource.msg('search.grid.authexpiration', 'sezzlebm', null)}</td>
 			<td class="table_header e s left" nowrap="nowrap">${Resource.msg('search.grid.action', 'sezzlebm', null)}</td>
 		</tr>
@@ -118,7 +117,6 @@ if (!isSearchByOrderNo && !isSearchByTransaction) {
 				<td class="table_detail e s" nowrap="nowrap"><isprint value="${order.email}"/></td>
 				<td class="table_detail e s" nowrap="nowrap"><isprint value="${order.orderTotal}"/></td>
 				<td class="table_detail e s" nowrap="nowrap"><isprint value="${order.sezzleAmount}"/></td>
-				<td class="table_detail e s" nowrap="nowrap"><isprint value="${order.status}"/></td>
 				<td class="table_detail e s" nowrap="nowrap"><isprint value="${order.authExpiration}"/></td>
 				<td class="table_detail e s" nowrap="nowrap">
 					<a class="js_sezzle_show_detail" href="${URLUtils.url('SezzleAdmin-OrderTransaction', 'orderNo', order.orderNo, 'currencyCode', order.currencyCode)}" data-orderno="${order.orderNo}" data-iscustom='${order.isCustom}' data-currencycode="${order.currencyCode}" title="${Resource.msgf('ordertransaction.title', 'sezzlebm', null, order.orderNo)}">${Resource.msg('search.grid.changestatus', 'sezzlebm', null)}</a>

@@ -180,7 +180,7 @@
 			try {
 				var authentication = self.authenticate();
 				requestObj.authToken = authentication.response.token;
-				logger.debug(JSON.stringify(requestObj))
+				(JSON.stringify(requestObj))
 				var sezzleService = service.initService('sezzle.authorizepayment');
 				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/authorize';
 				delete requestObj['customer_uuid'];
@@ -304,7 +304,7 @@
 			try {
 				var authentication = self.authenticate();
 				checkoutObject.authToken = authentication.response.token
-				logger.debug(checkoutObject.authToken);
+				(checkoutObject.authToken);
 				var sezzleService = service.initService('sezzle.initiatecheckout');		
 				sezzleService.URL = sezzleData.getV2URLPath() + 'session';
 				return sezzleService.call(checkoutObject).object;

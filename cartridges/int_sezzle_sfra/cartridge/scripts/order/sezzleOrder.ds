@@ -62,7 +62,6 @@
 			try {
 				order.custom.SezzleToken = response.token;
 				order.custom.SezzleExternalId = response.reference_id;
-				order.custom.SezzleStatus = 'IN_PROGRESS';
 				order.custom.SezzlePaymentAction = String(data.getSezzlePaymentAction());
 				order.custom.SezzleOrderUUID = response.order_uuid != 'undefined' ? response.order_uuid : '';
 				order.custom.SezzleAuthUUID = response.auth_uuid != 'undefined' ? response.auth_uuid : '';
@@ -91,9 +90,6 @@
 				try {
 					var refundAmount = order.totalGrossPrice.multiply(100).getValue();
 					response = api.refund(order, refundAmount);
-					if (!response.error){
-						order.custom.SezzleStatus = 'REFUNDED';
-					}
 				} catch (e) {
 					logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 				}

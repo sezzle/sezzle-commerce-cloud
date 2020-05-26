@@ -114,10 +114,6 @@
 		<td class="infobox_item top">${order.getCreationDate()}</td>
 	</tr>
 	<tr>
-		<td class="infobox_title top">${Resource.msg('transaction.detail.paymentstatus', 'sezzlebm', null)}:</td>
-		<td class="infobox_item top">${order.custom.SezzleStatus}</td>
-	</tr>
-	<tr>
 		<td class="infobox_title top"></td>
 		<td class="infobox_item top">
 			<ul class="sezzlebm_transaction_actions">

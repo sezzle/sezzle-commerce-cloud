@@ -335,7 +335,7 @@
 		};
 		
 		self.deleteCustomerToken = function (record) {
-			logger.debug(338);
+			(338);
 			Transaction.wrap(function () {
 				dw.object.CustomObjectMgr.remove(record);
 			});

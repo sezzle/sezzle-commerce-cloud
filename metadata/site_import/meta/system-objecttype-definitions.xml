@@ -10,22 +10,6 @@
                 <externally-managed-flag>true</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
-            <attribute-definition attribute-id="SezzleOrderUUID">
-                <display-name xml:lang="x-default">Sezzle Order UUID</display-name>
-                <description xml:lang="x-default">Sezzle Order UUID</description>
-                <type>string</type>
-                <mandatory-flag>false</mandatory-flag>
-                <externally-managed-flag>true</externally-managed-flag>
-                <min-length>0</min-length>
-            </attribute-definition>
-            <attribute-definition attribute-id="SezzleOrderAmount">
-                <display-name xml:lang="x-default">Sezzle Order Amount</display-name>
-                <description xml:lang="x-default">Order Amount in Cents</description>
-                <type>string</type>
-                <mandatory-flag>false</mandatory-flag>
-                <externally-managed-flag>true</externally-managed-flag>
-                <min-length>0</min-length>
-            </attribute-definition>
             <attribute-definition attribute-id="SezzlePaymentAction">
                 <display-name xml:lang="x-default">Sezzle Payment Action</display-name>
                 <description xml:lang="x-default">Defines by what action order was placed</description>
@@ -84,8 +68,6 @@
                 <attribute attribute-id="SezzlePaymentAction"/>
                 <attribute attribute-id="SezzleToken"/>
                 <attribute attribute-id="SezzleStatus"/>
-                <attribute attribute-id="SezzleOrderUUID"/>
-                <attribute attribute-id="SezzleOrderAmount"/>
             </attribute-group>
         </group-definitions>
     </type-extension>

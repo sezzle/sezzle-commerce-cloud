@@ -86,7 +86,6 @@ function getOrders(orderNo, referenceID) {
             orderTotal: order.totalGrossPrice,
             currencyCode: order.getCurrencyCode(),
             sezzleAmount: order.custom.SezzleOrderAmount,
-            status: order.custom.SezzleStatus,
             authExpiration: sezzleAuthExpiration,
             dateCompare: orderDate.getTime(),
             isCustom: false
@@ -125,8 +124,6 @@ function renderJson(responseResult, responseData) {
     if (!empty(responseData)) {
     	data.ack = 'Success';
     }
-    //logger.debug(responseData);
-    logger.debug(responseResult);
     if (!empty(responseResult)) {
         data.result = responseResult;
     }
@@ -198,7 +195,7 @@ function orders() {
     
     if (request.httpParameterMap.transactionId.submitted) {
         var callApiResponse = sezzleApi.getOrder(request.httpParameterMap.transactionId.stringValue);
-        logger.debug(JSON.stringify(callApiResponse));
+        (JSON.stringify(callApiResponse));
         if (!callApiResponse.error) {
             referenceID = callApiResponse.response.reference_id;
         } 
@@ -305,24 +302,6 @@ function orderTransaction() {
 	var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
 	var releasedAmountInFloat = parseFloat(releasedAmountStr.replace(order.currencyCode, ''));
 	
-	logger.debug(capturedAmountInFloat)
-	logger.debug(refundedAmountInFloat)
-	
-	
-	
-//	if (sezzlePaymentAction == 'AUTH' && currentTimestamp < authExpiration) {
-//		if (authAmountInFloat > capturedAmountInFloat) {
-//			canCapture = true;
-//			canRelease = true;
-//		}
-//		
-//		if (capturedAmountInFloat > refundedAmountInFloat) {
-//			canRefund = true;
-//		}
-//	} else if (sezzlePaymentAction == 'CAPTURE' && capturedAmountInFloat > refundedAmountInFloat) {
-//		canRefund = true;
-//	}
-	
 	if (authAmountInFloat > capturedAmountInFloat) {
 		canCapture = true;
 		canRelease = true;
@@ -412,7 +391,7 @@ function action() {
         	Transaction.wrap(function () {
                 transactionResult = sezzleHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt, action);
             });
-        	logger.debug(JSON.stringify(callApiResponse));
+        	(JSON.stringify(callApiResponse));
         }
     } else {
         responseResult = 'Error';

@@ -77,7 +77,6 @@ function postProcess(order, isCaptured){
 				if (!isCaptured) {
 					sezzle.order.captureOrder(order);
 				}
-				order.custom.SezzleStatus = 'CAPTURE';
 				order.custom.SezzleCapturedAmount = order.totalGrossPrice.toString();
 				order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
 				order.setStatus(Order.ORDER_STATUS_COMPLETED);

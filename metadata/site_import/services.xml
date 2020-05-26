@@ -20,16 +20,6 @@
         <credential-id/>
     </service>
 
-    <service service-id="sezzle.getorder">
-        <service-type>HTTP</service-type>
-        <enabled>true</enabled>
-        <log-prefix>sezzle</log-prefix>
-        <comm-log-enabled>false</comm-log-enabled>
-        <mock-mode-enabled>false</mock-mode-enabled>
-        <profile-id>Sezzle</profile-id>
-        <credential-id/>
-    </service>
-
     <service service-id="sezzle.capture">
         <service-type>HTTP</service-type>
         <enabled>true</enabled>

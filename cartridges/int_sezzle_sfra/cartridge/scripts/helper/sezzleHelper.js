@@ -2,16 +2,8 @@
 
 /* global empty dw request session customer */
 
-//var sezzleApi = require('~/cartridge/scripts/sezzle/sezzleApi');
 var logger = require('dw/system').Logger.getLogger('Sezzle', ''),
     Money = require('dw/value/Money');
-
-var sezzleHelper = {
-		SEZZLE_PAYMENT_STATUS_IN_PROGRESS : 'IN_PROGRESS',
-		SEZZLE_PAYMENT_STATUS_CAPTURE : 'CAPTURE',
-		SEZZLE_PAYMENT_STATUS_REFUNDED : 'REFUNDED',
-		SEZZLE_PAYMENT_STATUS_RELEASED : 'RELEASED', 
-};
 
 
 
@@ -31,8 +23,7 @@ function updateCustomOrderData(orderNo, transactionId) {
     }
 
     var paymentStatus = transactionDetailsResult.responseData.paymentstatus;
-
-    //writeTransactionHistory(order.custom, transactionId);
+    
     order.custom.transactionId = transactionId;
     order.custom.paymentStatus = paymentStatus;
 }
@@ -45,32 +36,12 @@ function updateCustomOrderData(orderNo, transactionId) {
  * @param {string} methodName - Method name
  */
 function updateOrderData(order, transactionId, methodName, amount, action) {
-//    var order = dw.order.OrderMgr.getOrder(orderNo);
-//    var paymentInstrument = sezzleHelper.getSezzlePaymentInstrument(order);
-//    var paymentTransaction = paymentInstrument.getPaymentTransaction();
-//    var transactionDetailsResult = sezzleApi.getTransactionDetails(paymentTransaction.custom.transactionsHistory[0], order.getCurrencyCode());
-//
-//    if (transactionDetailsResult.error) {
-//        throw new Error('transactionDetailsResult.error');
-//    }
-//    var paymentStatus = transactionDetailsResult.responseData.paymentstatus;
-//
-//    if (empty(order)) {
-//        throw new Error();
-//    }
-//
-//    //writeTransactionHistory(paymentTransaction.custom, transactionId);
-//    paymentTransaction.setTransactionID(transactionId);
-//    paymentInstrument.custom.sezzlePaymentStatus = paymentStatus;
-    
-    //order.custom.SezzleStatus = sezzlePaymentStatus;
     var orderTotal = order.totalGrossPrice;
     var amount = dw.value.Money(amount, order.currencyCode);
     
     var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
 	var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
 	var authAmount = new Money(authAmountInFloat, order.currencyCode);
-	//var finalauthAmount = authAmount.add(amount);
     
     var capturedAmountStr = order.custom.SezzleCapturedAmount || '0.00';
 	var capturedAmountInFloat = parseFloat(capturedAmountStr.replace(order.currencyCode, ''));
@@ -90,7 +61,6 @@ function updateOrderData(order, transactionId, methodName, amount, action) {
     if (action == sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE) {
     	order.custom.SezzleCapturedAmount = finalCapturedAmount;
     	if (authAmount.equals(finalCapturedAmount)) {
-    		order.custom.SezzleStatus = sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE;
     		order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PAID);
     		order.setStatus(dw.order.Order.ORDER_STATUS_COMPLETED);
     	} else {
@@ -98,41 +68,12 @@ function updateOrderData(order, transactionId, methodName, amount, action) {
     	}
     } else if (action == sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED) {
     	order.custom.SezzleRefundedAmount = finalRefundedAmount;
-    	if (authAmount.equals(finalRefundedAmount)) {
-    		order.custom.SezzleStatus = sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED;
-    	}
     } else if (action == sezzleHelper.SEZZLE_PAYMENT_STATUS_RELEASED) {
     	order.custom.SezzleReleasedAmount = finalReleasedAmount;
     	
     	var updatedAuthAmount = orderTotal.getValue() - finalReleasedAmount.getValue();
     	order.custom.SezzleOrderAmount = new Money(updatedAuthAmount, order.currencyCode);
-    	
-    	if (orderTotal.equals(finalReleasedAmount)) {
-    		order.custom.SezzleStatus = sezzleHelper.SEZZLE_PAYMENT_STATUS_RELEASED;
-    	}
     }
-
-//    if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE) {
-//        order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PAID);
-//        order.setStatus(dw.order.Order.ORDER_STATUS_COMPLETED);
-//        order.custom.SezzleCapturedAmount = amount;
-//    } else if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_CAPTURE) {
-//        order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PARTPAID);
-//        //order.setStatus(dw.order.Order.ORDER_STATUS_COMPLETED);
-//        order.custom.SezzleCapturedAmount = amount;
-//    } else if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED) {
-//        //order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
-//        order.custom.SezzleRefundedAmount = amount;
-//    } else if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_REFUNDED) {
-//        //order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
-//        order.custom.SezzleRefundedAmount = amount;
-//    } else if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_RELEASED) {
-//        //order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
-//        order.custom.SezzleReleasedAmount = amount;
-//    } else if (sezzlePaymentStatus === sezzleHelper.SEZZLE_PAYMENT_STATUS_PARTIAL_RELEASED) {
-//        //order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
-//        order.custom.SezzleReleasedAmount = amount;
-//    }
 }
 
 sezzleHelper.updateSezzleOrderAmount = function (order, amount) {

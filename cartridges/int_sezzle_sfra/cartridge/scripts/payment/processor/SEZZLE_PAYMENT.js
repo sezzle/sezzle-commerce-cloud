@@ -62,7 +62,6 @@ function postProcess(order){
 				var resp = sezzleUtils.order.captureOrder(order);
 				if (resp){
 					if (resp.httpStatus == 200){
-						order.custom.SezzleStatus = 'CAPTURE';
 						order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
 					}
 					else{
