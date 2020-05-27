@@ -57,7 +57,6 @@ server.get('Redirect', function(req, res, next) {
 		session.privacy.sezzleToken = checkoutObject['tokenize']['token'] ? checkoutObject['tokenize']['token'] : '';
 		session.privacy.tokenExpiration = checkoutObject['tokenize']['token_expiration'] ? checkoutObject['tokenize']['token_expiration'] : '';
 	}
-	(JSON.stringify(checkoutObject));
 	return next();
 });
 

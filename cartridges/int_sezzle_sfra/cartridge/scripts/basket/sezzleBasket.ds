@@ -330,12 +330,11 @@
 			if (tokenizeRecord && tokenizeRecord.custom.is_approved && tokenExpirationTimestamp <= currentTimestamp) {
 				return tokenizeRecord.custom.token;	
 			}
-			self.deleteCustomerToken(tokenizeRecord);
+			self.deleteCustomerToken(tokenizeRecord); 
 			return '';
 		};
 		
 		self.deleteCustomerToken = function (record) {
-			(338);
 			Transaction.wrap(function () {
 				dw.object.CustomObjectMgr.remove(record);
 			});

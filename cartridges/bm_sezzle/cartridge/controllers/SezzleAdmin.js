@@ -195,7 +195,6 @@ function orders() {
     
     if (request.httpParameterMap.transactionId.submitted) {
         var callApiResponse = sezzleApi.getOrder(request.httpParameterMap.transactionId.stringValue);
-        (JSON.stringify(callApiResponse));
         if (!callApiResponse.error) {
             referenceID = callApiResponse.response.reference_id;
         } 
@@ -391,7 +390,6 @@ function action() {
         	Transaction.wrap(function () {
                 transactionResult = sezzleHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt, action);
             });
-        	(JSON.stringify(callApiResponse));
         }
     } else {
         responseResult = 'Error';
