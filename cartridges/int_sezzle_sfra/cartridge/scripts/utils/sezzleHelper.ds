@@ -12,7 +12,9 @@ var server = require('server');
 var BasketMgr = require('dw/order/BasketMgr');
 var ISML = require('dw/template/ISML');
 var sezzle = require('*/cartridge/scripts/sezzle.ds');
+var sezzleApi = require('*/cartridge/scripts/api/sezzleAPI.ds');
 var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
+var sezzleData = require('~/cartridge/scripts/data/sezzleData.ds');
  
  
 var Status = require('dw/system/Status');
@@ -69,19 +71,38 @@ function storeTokenizeRecord(customerNo, token, tokenExpiration) {
 	});
 }
 
-function postProcess(order, isCaptured){
+function postProcess(order, canAuthorize){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+	var paymentAction = sezzleData.getSezzlePaymentAction();
+	var doCapture = paymentAction == 'CAPTURE' ? true : false;
 	try {
-		if (sezzle.data.getSezzlePaymentAction() == 'CAPTURE') {
-			Transaction.wrap(function(){
-				if (!isCaptured) {
+		Transaction.wrap(function(){
+			if (canAuthorize) {
+				var authorizeResponse = sezzle.order.authorizePayment(order, doCapture);
+				if (!authorizeResponse.error) {
+					order.custom.SezzleAuthUUID = authorizeResponse.response.uuid;
+					if (!doCapture) {
+						order.custom.SezzleAuthExpiration = authorizeResponse.response.expiration;
+					}
+				}
+			}
+			if (doCapture) {
+				if (!canAuthorize) {
 					sezzle.order.captureOrder(order);
 				}
 				order.custom.SezzleCapturedAmount = order.totalGrossPrice.toString();
 				order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
 				order.setStatus(Order.ORDER_STATUS_COMPLETED);
-			});
-		}
+				
+			} 
+			if (order.custom.SezzleOrderUUID){
+				var sezzleOrder = sezzle.order.getOrderByOrderUUID(order.custom.SezzleOrderUUID);
+				if (!sezzleOrder.error) {
+					order.custom.SezzleAuthExpiration = sezzleOrder.response.authorization.expiration;
+				}
+				sezzle.order.updateOrder(order);
+			}
+		});
 	} catch (e) {
 		logger.error('Sezzle Capturing error. Details - {0}', e);
 		return false;

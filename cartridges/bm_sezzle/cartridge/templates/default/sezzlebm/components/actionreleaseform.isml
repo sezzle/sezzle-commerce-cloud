@@ -43,16 +43,6 @@
 				<td class="infobox_title top">${Resource.msg('transaction.release.releaseamount', 'sezzlebm', null)}:</td>
 				<td class="infobox_item top">${order.currencyCode} <input type="text" name="amt" value="${releaseInputAmount}" data-validation="required,float,greaterzero,max" /></td>
 			</tr>
-			<tr>
-				<td class="infobox_title top">
-                    ${Resource.msg('transaction.release.note', 'sezzlebm', null)}<br/>
-                    <i>${Resource.msg('transaction.optional', 'sezzlebm', null)}</i>
-                </td>
-				<td class="infobox_item top">
-					<textarea name="note" cols="50" rows="10" data-maxcount="255"></textarea>
-					<p><b class="js_textarea_count">0</b> ${Resource.msg('forms.charectersleft', 'sezzlebm', null)}</p>
-				</td>
-			</tr>
 		</table>
 	</form>
 </div>

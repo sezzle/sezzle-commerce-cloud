@@ -5,6 +5,8 @@
 var logger = require('dw/system').Logger.getLogger('Sezzle', ''),
     Money = require('dw/value/Money');
 
+var sezzleHelper = {};
+
 
 
 
@@ -35,7 +37,7 @@ function updateCustomOrderData(orderNo, transactionId) {
  * @param {string} transactionId - Transaction ID from new transaction
  * @param {string} methodName - Method name
  */
-function updateOrderData(order, transactionId, methodName, amount, action) {
+function updateOrderData(order, transactionId, methodName, amount) {
     var orderTotal = order.totalGrossPrice;
     var amount = dw.value.Money(amount, order.currencyCode);
     
@@ -58,7 +60,7 @@ function updateOrderData(order, transactionId, methodName, amount, action) {
 	var releasedAmount = new Money(releasedAmountInFloat, order.currencyCode);
 	var finalReleasedAmount = releasedAmount.add(amount);
     
-    if (action == sezzleHelper.SEZZLE_PAYMENT_STATUS_CAPTURE) {
+    if (methodName == 'DoCapture') {
     	order.custom.SezzleCapturedAmount = finalCapturedAmount;
     	if (authAmount.equals(finalCapturedAmount)) {
     		order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PAID);
@@ -66,9 +68,9 @@ function updateOrderData(order, transactionId, methodName, amount, action) {
     	} else {
     		order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PARTPAID);
     	}
-    } else if (action == sezzleHelper.SEZZLE_PAYMENT_STATUS_REFUNDED) {
+    } else if (methodName == 'DoRefund') {
     	order.custom.SezzleRefundedAmount = finalRefundedAmount;
-    } else if (action == sezzleHelper.SEZZLE_PAYMENT_STATUS_RELEASED) {
+    } else if (methodName == 'DoRelease') {
     	order.custom.SezzleReleasedAmount = finalReleasedAmount;
     	
     	var updatedAuthAmount = orderTotal.getValue() - finalReleasedAmount.getValue();
@@ -79,7 +81,7 @@ function updateOrderData(order, transactionId, methodName, amount, action) {
 sezzleHelper.updateSezzleOrderAmount = function (order, amount) {
 	amount = new Money(amount, order.currencyCode);
 	order.custom.SezzleOrderAmount = amount;
-}
+};
 
 /**
  * Return Sezzle order payment instrument
@@ -132,12 +134,12 @@ sezzleHelper.getSubtotal = function (order) {
  * @param {string} methodName - Used API method
  * @returns {boolean} true in case of success and false when error
  */
-sezzleHelper.updateOrderTransaction = function (order, isCustomOrder, transactionID, methodName, amount, action) {
+sezzleHelper.updateOrderTransaction = function (order, isCustomOrder, transactionID, methodName, amount) {
     try {
         if (isCustomOrder) {
             updateCustomOrderData(order.orderNo, transactionID);
         } else {
-            updateOrderData(order, transactionID, methodName, amount, action);
+            updateOrderData(order, transactionID, methodName, amount);
         }
     } catch (error) {
     	logger.error(error);

@@ -182,7 +182,6 @@
 				requestObj.authToken = authentication.response.token;
 				var sezzleService = service.initService('sezzle.authorizepayment');
 				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/authorize';
-				delete requestObj['customer_uuid'];
 				return sezzleService.call(requestObj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
@@ -285,6 +284,53 @@
 				sezzleService.URL = sezzleData.getV2URLPath() + 'authorization/' + order.custom.SezzleAuthUUID + '/release';	
 				return sezzleService.call(obj).object;
 				
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					error : false
+				};
+			}
+		};
+		
+		/**
+		 * Pre approve payment by customer UUID
+		 *
+		 * @param {dw.order.Order} order 
+		 * @returns status
+		 */
+		self.preApprovePayment = function (requestObj) {
+			try {
+				var authentication = self.authenticate();
+				requestObj.authToken = authentication.response.token;
+				var sezzleService = service.initService('sezzle.preapprovepayment');
+				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/preapprove';
+				return sezzleService.call(requestObj).object;
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+				return {
+					error : false
+				};
+			}
+		};
+		
+		/**
+		 * Update order reference id
+		 *
+		 * @param {dw.order.Order} order 
+		 * @returns status
+		 */
+		self.updateOrder = function (order) {
+			try {
+				var authentication = self.authenticate();
+				var obj = {
+					'authToken' : authentication.response.token,
+					'reference_id': order.orderNo,
+					'httpMethod': 'PATCH'
+				};
+				
+				var sezzleService = service.initService('sezzle.updateorder');
+				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID;
+				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {

@@ -80,6 +80,48 @@
 				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 			}
 		};
+		
+		this.authorizePayment = function (order, doCapture) {
+			try {
+				var requestObject = {
+					'reference_id': order.orderNo,
+					'payment_amount': {
+						'amount_in_cents': order.totalGrossPrice.multiply(100).getValue(),
+						'currency': order.getCurrencyCode()
+						},
+					'capture': doCapture,
+					'customer_uuid': session.privacy.customerUUID
+				}
+				var response = api.authorizePayment(requestObject);
+				return response;
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+				return {
+					'error': true	
+				};
+			}
+		};
+		
+		this.getOrderByOrderUUID = function (orderUUID) {
+			try {
+				var response = api.getOrderByOrderUUID(orderUUID);
+				return response;
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+				return {
+					'error': true	
+				};
+			}
+		};
+		
+		this.updateOrder = function (order) {
+			try {
+				var response = api.updateOrder(order);
+			} catch (e) {
+				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+			}
+		};
+		
 		/**
 		 * Refund captured orders and update their sezzle  status. Used in Sezzle job.
 		 * 

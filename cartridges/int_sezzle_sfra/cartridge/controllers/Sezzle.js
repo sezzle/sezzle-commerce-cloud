@@ -33,8 +33,8 @@ server.get('Redirect', function(req, res, next) {
 	var basket = BasketMgr.getCurrentBasket();
 	var checkoutObject = sezzle.basket.initiateCheckout(basket);
 	var redirectURL = checkoutObject['checkout']['checkout_url'];
-	if (checkoutObject.tokenize && checkoutObject.tokenize.auth_uuid) {
-		redirectURL = URLUtils.url('Sezzle-Success').toString() + "?order_reference_id="+checkoutObject['checkout']['reference_id']+"&isCaptured="+checkoutObject['tokenize']['is_captured'];
+	if (checkoutObject.tokenize && checkoutObject.tokenize.is_approved) {
+		redirectURL = URLUtils.url('Sezzle-Success').toString() + "?order_reference_id="+checkoutObject['checkout']['reference_id']+"&isApproved="+checkoutObject['tokenize']['is_approved'];
 	}
 	else if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
 		redirectURL = checkoutObject['tokenize']['approval_url'];
@@ -51,7 +51,8 @@ server.get('Redirect', function(req, res, next) {
 	session.privacy.orderUUID = checkoutObject['checkout']['order_uuid'];
 	
 	if (checkoutObject.tokenize) {
-		session.privacy.authUUID = checkoutObject['tokenize']['auth_uuid'] ? checkoutObject['tokenize']['auth_uuid'] : '';
+		session.privacy.customerUUID = checkoutObject['tokenize']['customer_uuid'] ? checkoutObject['tokenize']['customer_uuid'] : '';
+		//session.privacy.authUUID = checkoutObject['tokenize']['auth_uuid'] ? checkoutObject['tokenize']['auth_uuid'] : '';
 		session.privacy.approved = checkoutObject['tokenize']['approved'] ? checkoutObject['tokenize']['approved'] : '';
 		session.privacy.isCaptured = checkoutObject['tokenize']['is_captured'] ? checkoutObject['tokenize']['is_captured'] : '';
 		session.privacy.sezzleToken = checkoutObject['tokenize']['token'] ? checkoutObject['tokenize']['token'] : '';
@@ -83,7 +84,7 @@ server.get('Success', function(req, res, next) {
 	}
 	var customerUUID = request.httpParameterMap["customer-uuid"].stringValue;
 	var customerNo = basket.getCustomer().profile.customerNo;
-	if (customerUUID != "") {
+	if (customerUUID != null) {
 		sezzleHelper.StoreTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
 	}
 	// Creates a new order.
@@ -112,14 +113,16 @@ server.get('Success', function(req, res, next) {
     }
     logger.debug("Payment handled successfully");
     
-    var orderPlacementStatus = COHelpers.placeOrder(order);
+    var orderPlacementStatus = COHelpers.placeOrder(order, {status: 'success'});
 
     if (orderPlacementStatus.error) {
         return next(new Error('Could not place order'));
     }
     
-    var isCaptured = request.httpParameterMap.isCaptured.booleanValue;
-    var result = sezzleHelper.PostProcess(order, isCaptured);
+    logger.debug("Order placed successfully in Salesforce");
+    
+    var canAuthorize = request.httpParameterMap.isApproved.booleanValue;;
+    var result = sezzleHelper.PostProcess(order, canAuthorize);
     if (!result) {
     	res.json({
             error: true,
@@ -127,10 +130,8 @@ server.get('Success', function(req, res, next) {
         });
         return next();
     }
-    logger.debug("Order placed successfully in Salesforce");
     
     var passwordForm;
-    
     var config = {
             numberOfLineItems: '*'
         };

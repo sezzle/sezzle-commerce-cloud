@@ -244,33 +244,28 @@
 		self.initiateCheckout = function (basket) {
 			var referenceID = sezzleUtils.generateUUID();
 			var customerToken = self.getCustomerToken(basket.getCustomer().getProfile().customerNo);
-			var paymentAction = sezzleData.getSezzlePaymentAction();
-			var doCapture = paymentAction == 'CAPTURE' ? true : false;
 			var returnObj = {};
 			if (customerToken) {
 				var requestObject = {
 					'reference_id': sezzleUtils.generateUUID(),
 					'token': customerToken,
-					'payment_amount': {
-						'amount_in_cents': self.getTotal(basket),
-						'currency': basket.getCurrencyCode()
-						},
-					'capture': doCapture
+					'amount_in_cents': self.getTotal(basket),
+					'currency': basket.getCurrencyCode()
 				}
-				var authorizeResponse = self.authorizePayment(requestObject);
+				var preApprovalResponse = self.preApprovePayment(requestObject);
 				returnObj['checkout'] = {
-					'amount_in_cents': requestObject.payment_amount.amount_in_cents,
+					'amount_in_cents': requestObject.amount_in_cents,
 					'reference_id' : requestObject.reference_id
 				}
-				if (!authorizeResponse.error) {
+				if (!preApprovalResponse.error) {
 					returnObj['tokenize'] = {
 						'token' : requestObject.token,
-						'is_captured': doCapture,
-						'auth_uuid': authorizeResponse.response.uuid
+						'customer_uuid': preApprovalResponse.response.customer_uuid,
+						'is_approved': preApprovalResponse.response.approved
 					}
 				}
 			} else {
-				var successURL = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID+"&isCaptured=false";
+				var successURL = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID;
 				if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
 					successURL = self.getMerchant().user_tokenize_url+ "?isApproved=true&customerNo="+basket.getCustomer().profile.customerNo;
 				}
@@ -306,15 +301,15 @@
 			return returnObj;
 		};
 		
-		self.authorizePayment = function (request) {
+		self.preApprovePayment = function (request) {
 			var apiResponse = sezzleAPI.getCustomerUUID(request.token);
 			if (!apiResponse.error) {
 				delete request['token'];
-				//request.customer_uuid = apiResponse.response.customer.uuid;
-				request.customer_uuid = apiResponse.response.customer_uuid;
-				var apiResponse = sezzleAPI.authorizePayment(request);
+				request.customer_uuid = apiResponse.response.customer.uuid;
+				var apiResponse = sezzleAPI.preApprovePayment(request);
 				
 				if (!apiResponse.error) {
+					apiResponse.response.customer_uuid = request.customer_uuid;
 					return apiResponse;
 				}
 			}
@@ -325,12 +320,14 @@
 		
 		self.getCustomerToken = function (customerNo) {
 			var tokenizeRecord = dw.object.CustomObjectMgr.getCustomObject('SezzleTokenize', customerNo);
-			var currentTimestamp = Date.now();
-			var tokenExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(tokenizeRecord.custom.expiration);
-			if (tokenizeRecord && tokenizeRecord.custom.is_approved && tokenExpirationTimestamp <= currentTimestamp) {
-				return tokenizeRecord.custom.token;	
+			if (tokenizeRecord) {
+				var currentTimestamp = Date.now();
+				var tokenExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(tokenizeRecord.custom.expiration);
+				if (tokenizeRecord.custom.is_approved && currentTimestamp <= tokenExpirationTimestamp) {
+					return tokenizeRecord.custom.token;	
+				}
+				self.deleteCustomerToken(tokenizeRecord); 
 			}
-			self.deleteCustomerToken(tokenizeRecord); 
 			return '';
 		};
 		
