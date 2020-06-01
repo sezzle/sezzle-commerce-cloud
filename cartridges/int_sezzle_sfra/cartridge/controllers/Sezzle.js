@@ -83,8 +83,8 @@ server.get('Success', function(req, res, next) {
         return next();
 	}
 	var customerUUID = request.httpParameterMap["customer-uuid"].stringValue;
-	var customerNo = basket.getCustomer().profile.customerNo;
-	if (customerUUID != null) {
+	var customerNo = basket.getCustomerNo();
+	if (customerUUID != null && customerNo != null) {
 		sezzleHelper.StoreTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
 	}
 	// Creates a new order.

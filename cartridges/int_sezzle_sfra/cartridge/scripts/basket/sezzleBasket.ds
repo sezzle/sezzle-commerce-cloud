@@ -243,7 +243,7 @@
 		 */
 		self.initiateCheckout = function (basket) {
 			var referenceID = sezzleUtils.generateUUID();
-			var customerToken = self.getCustomerToken(basket.getCustomer().getProfile().customerNo);
+			var customerToken = self.getCustomerToken(basket.getCustomerNo());
 			var returnObj = {};
 			if (customerToken) {
 				var requestObject = {
@@ -267,7 +267,7 @@
 			} else {
 				var successURL = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID;
 				if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
-					successURL = self.getMerchant().user_tokenize_url+ "?isApproved=true&customerNo="+basket.getCustomer().profile.customerNo;
+					successURL = self.getMerchant().user_tokenize_url+ "?isApproved=true&customerNo="+basket.getCustomerNo();
 				}
 				var checkoutObject = {
 					'cancel_url' : {
@@ -348,10 +348,10 @@
 			var customer = {
 				"tokenize": sezzleData.getTokenizeStatus(),
 				"email": basket.getCustomerEmail(),
-				"first_name": basket.getCustomer().getProfile().getFirstName(),
-				"last_name": basket.getCustomer().getProfile().getLastName(),
-				"phone": basket.getCustomer().getProfile().getPhoneMobile(),
-				"dob": basket.getCustomer().getProfile().getBirthday(),
+				"first_name": basket.getCustomerNo() ? basket.getCustomer().getProfile().getFirstName() : basket.getBillingAddress().getFirstName(),
+				"last_name": basket.getCustomerNo() ? basket.getCustomer().getProfile().getLastName() : basket.getBillingAddress().getLastName(),
+				"phone": basket.getCustomerNo() ? basket.getCustomer().getProfile().getPhoneMobile() : basket.getBillingAddress().getPhone(),
+				"dob": basket.getCustomerNo() ? basket.getCustomer().getProfile().getBirthday() : '',
 				'billing_address' : self.getBillingAddress(basket),
 				'shipping_address': self.getShippingAddress(basket)
 			};

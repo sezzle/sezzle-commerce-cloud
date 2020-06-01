@@ -254,6 +254,7 @@ server.prepend('PlaceOrder',
     function (req, res, next) {
         var BasketMgr = require('dw/order/BasketMgr');
         var URLUtils = require('dw/web/URLUtils');
+        var sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
         var paymentMethod = '';
 
         var currentBasket = BasketMgr.getCurrentBasket(),
@@ -275,7 +276,22 @@ server.prepend('PlaceOrder',
                 redirectUrl: URLUtils.url('Cart-Show').toString()
             });
 
-            return;
+            return next();
+        }
+        
+        var customerNo = currentBasket.getCustomerNo();
+        if (customerNo == null && sezzleData.getTokenizeStatus()) {
+        	logger.debug('Guest user blocked as it is a tokenize checkout');
+        	res.json({
+                error: true,
+                cartError: false,
+                fieldErrors: [],
+                serverErrors: ['Sezzle does not allow tokenize checkout for guest user.'],
+                redirectUrl: URLUtils.url('Cart-Show').toString()
+            });
+        	
+            return next();
+        	
         }
 
         if (paymentMethod === 'Sezzle') {
