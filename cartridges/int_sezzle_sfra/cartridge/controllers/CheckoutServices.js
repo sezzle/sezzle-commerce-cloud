@@ -258,14 +258,20 @@ server.prepend('PlaceOrder',
         var paymentMethod = '';
 
         var currentBasket = BasketMgr.getCurrentBasket(),
-
             paymentInstruments = currentBasket.paymentInstruments;
+        if (paymentInstruments.length <= 0) {
+        	res.json({
+                error: true,
+                cartError: true,
+                fieldErrors: [],
+                serverErrors: ['Payment method not selected.'],
+                redirectUrl: URLUtils.url('Cart-Show').toString()
+            });
 
-        for (var i = 0; i < paymentInstruments.length; i++) {
-            var paymentInstrument = paymentInstruments[i];
-
-            paymentMethod = paymentInstrument.paymentMethod;
+            return next();
         }
+        
+        paymentMethod = paymentInstruments[paymentInstruments.length - 1].paymentMethod;
 
         if (!currentBasket) {
             res.json({
