@@ -123,19 +123,28 @@
 		};
 		
 		/**
-		 * Refund captured orders and update their sezzle  status. Used in Sezzle job.
+		 * Full refund captured orders. Used in Sezzle job.
 		 * 
 		 * @see pipeline "SezzleJob"
 		 */
 		this.refundOrders = function () {
 			OrderMgr.processOrders(function (order) {
 				try {
-					var refundAmount = order.totalGrossPrice.multiply(100).getValue();
-					response = api.refund(order, refundAmount);
+					var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
+			    	var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
+			    	var authAmountInCents = new Money(authAmountInFloat, order.currencyCode).multiply(100).getValue();
+					if ((order.custom.SezzleOrderAmount == order.custom.SezzleCapturedAmount)
+						&& authAmountInCents > 0) {
+						var response = api.refund(order, authAmountInCents);
+						if (!response.error) {
+							order.custom.SezzleRefundedAmount = order.totalGrossPrice.toString();	
+						}
+					}
 				} catch (e) {
 					logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 				}
-			}, 'status = {0} AND custom.SezzleStatus = {1}', Order.ORDER_STATUS_CANCELLED, 'CAPTURE');
+			}, 'status = {0} AND custom.SezzleRefundedAmount = null', 
+			Order.ORDER_STATUS_CANCELLED);
 		};
 	};
 	
