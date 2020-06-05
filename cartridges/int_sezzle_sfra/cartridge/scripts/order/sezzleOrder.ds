@@ -61,6 +61,7 @@
 			
 			try {
 				order.custom.SezzleToken = response.token;
+				order.custom.SezzleTokenExpiration = response.token_expiration;
 				order.custom.SezzleExternalId = response.reference_id;
 				order.custom.SezzlePaymentAction = String(data.getSezzlePaymentAction());
 				order.custom.SezzleOrderUUID = response.order_uuid != 'undefined' ? response.order_uuid : '';

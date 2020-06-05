@@ -97,7 +97,7 @@ function postProcess(order, canAuthorize){
 			} 
 			if (order.custom.SezzleOrderUUID){
 				var sezzleOrder = sezzle.order.getOrderByOrderUUID(order.custom.SezzleOrderUUID);
-				if (!sezzleOrder.error) {
+				if (!sezzleOrder.error && !doCapture) {
 					order.custom.SezzleAuthExpiration = sezzleOrder.response.authorization.expiration;
 				}
 				sezzle.order.updateOrder(order);

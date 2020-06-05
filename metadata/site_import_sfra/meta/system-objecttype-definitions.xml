@@ -91,6 +91,14 @@
                 <externally-managed-flag>true</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
+            <attribute-definition attribute-id="SezzleTokenExpiration">
+                <display-name xml:lang="x-default">Sezzle Token Expiration</display-name>
+                <description xml:lang="x-default">Sezzle Token Expiration</description>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>true</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
         </custom-attribute-definitions>
         <group-definitions>
             <attribute-group group-id="Sezzle">
@@ -98,6 +106,7 @@
                 <attribute attribute-id="SezzleExternalId"/>
                 <attribute attribute-id="SezzlePaymentAction"/>
                 <attribute attribute-id="SezzleToken"/>
+                <attribute attribute-id="SezzleTokenExpiration"/>
                 <attribute attribute-id="SezzleAuthExpiration"/>
                 <attribute attribute-id="SezzleOrderUUID"/>
                 <attribute attribute-id="SezzleAuthUUID"/>
