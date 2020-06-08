@@ -33,12 +33,6 @@ server.get('Redirect', function(req, res, next) {
 	var basket = BasketMgr.getCurrentBasket();
 	var checkoutObject = sezzle.basket.initiateCheckout(basket);
 	var redirectURL = checkoutObject['checkout']['checkout_url'];
-	if (checkoutObject.tokenize && checkoutObject.tokenize.is_approved) {
-		redirectURL = URLUtils.url('Sezzle-Success').toString() + "?order_reference_id="+checkoutObject['checkout']['reference_id']+"&isApproved="+checkoutObject['tokenize']['is_approved'];
-	}
-	else if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
-		redirectURL = checkoutObject['tokenize']['approval_url'];
-	}
 	
 	res.render('sezzle/sezzleredirect', {
 		SezzleRedirectUrl: redirectURL
@@ -51,25 +45,9 @@ server.get('Redirect', function(req, res, next) {
 	session.privacy.orderUUID = checkoutObject['checkout']['order_uuid'];
 	
 	if (checkoutObject.tokenize) {
-		session.privacy.customerUUID = checkoutObject['tokenize']['customer_uuid'] ? checkoutObject['tokenize']['customer_uuid'] : '';
-		//session.privacy.authUUID = checkoutObject['tokenize']['auth_uuid'] ? checkoutObject['tokenize']['auth_uuid'] : '';
-		session.privacy.approved = checkoutObject['tokenize']['approved'] ? checkoutObject['tokenize']['approved'] : '';
-		session.privacy.isCaptured = checkoutObject['tokenize']['is_captured'] ? checkoutObject['tokenize']['is_captured'] : '';
 		session.privacy.sezzleToken = checkoutObject['tokenize']['token'] ? checkoutObject['tokenize']['token'] : '';
 		session.privacy.tokenExpiration = checkoutObject['tokenize']['token_expiration'] ? checkoutObject['tokenize']['token_expiration'] : '';
 	}
-	return next();
-});
-
-server.get('Tokenize', function(req, res, next) {
-	var isApproved = request.httpParameterMap.isApproved.booleanValue;
-	var customerNo = request.httpParameterMap.customerNo.stringValue;
-	if (isApproved) {
-		sezzleHelper.StoreTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
-	}
-	res.render('sezzle/sezzleredirect', {
-		SezzleRedirectUrl: URLUtils.url('Home-Show').toString()
-    });
 	return next();
 });
 
@@ -121,8 +99,7 @@ server.get('Success', function(req, res, next) {
     
     logger.debug("Order placed successfully in Salesforce");
     
-    var canAuthorize = request.httpParameterMap.isApproved.booleanValue;;
-    var result = sezzleHelper.PostProcess(order, canAuthorize);
+    var result = sezzleHelper.PostProcess(order);
     if (!result) {
     	res.json({
             error: true,

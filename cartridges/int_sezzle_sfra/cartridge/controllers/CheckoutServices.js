@@ -284,21 +284,6 @@ server.prepend('PlaceOrder',
 
             return next();
         }
-        
-        var customerNo = currentBasket.getCustomerNo();
-        if (customerNo == null && sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
-        	logger.debug('Guest user blocked as it is only tokenize approval checkout');
-        	res.json({
-                error: true,
-                cartError: false,
-                fieldErrors: [],
-                serverErrors: ['Sezzle does not allow only tokenize approval checkout for guest user.'],
-                redirectUrl: URLUtils.url('Cart-Show').toString()
-            });
-        	
-            return next();
-        	
-        }
 
         if (paymentMethod === 'Sezzle') {
             logger.debug('Selected payment method : {0}',

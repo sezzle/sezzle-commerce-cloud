@@ -65,7 +65,6 @@
 				order.custom.SezzleExternalId = response.reference_id;
 				order.custom.SezzlePaymentAction = String(data.getSezzlePaymentAction());
 				order.custom.SezzleOrderUUID = response.order_uuid != 'undefined' ? response.order_uuid : '';
-				order.custom.SezzleAuthUUID = response.auth_uuid != 'undefined' ? response.auth_uuid : '';
 				order.custom.SezzleOrderAmount = new Money(response.amount, order.currencyCode).divide(100);
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
@@ -82,18 +81,9 @@
 			}
 		};
 		
-		this.authorizePayment = function (order, doCapture) {
+		this.createOrder = function (requestObject) {
 			try {
-				var requestObject = {
-					'reference_id': order.orderNo,
-					'payment_amount': {
-						'amount_in_cents': order.totalGrossPrice.multiply(100).getValue(),
-						'currency': order.getCurrencyCode()
-						},
-					'capture': doCapture,
-					'customer_uuid': session.privacy.customerUUID
-				}
-				var response = api.authorizePayment(requestObject);
+				var response = api.createOrderByCustomerUUID(requestObject);
 				return response;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);

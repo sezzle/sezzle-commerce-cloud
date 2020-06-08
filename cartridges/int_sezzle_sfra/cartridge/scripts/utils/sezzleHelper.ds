@@ -71,25 +71,13 @@ function storeTokenizeRecord(customerNo, token, tokenExpiration) {
 	});
 }
 
-function postProcess(order, canAuthorize){
+function postProcess(order){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-	var paymentAction = sezzleData.getSezzlePaymentAction();
-	var doCapture = paymentAction == 'CAPTURE' ? true : false;
+	var canCapture = sezzleData.getSezzlePaymentAction() == 'CAPTURE' ? true : false;
 	try {
 		Transaction.wrap(function(){
-			if (canAuthorize) {
-				var authorizeResponse = sezzle.order.authorizePayment(order, doCapture);
-				if (!authorizeResponse.error) {
-					order.custom.SezzleAuthUUID = authorizeResponse.response.uuid;
-					if (!doCapture) {
-						order.custom.SezzleAuthExpiration = authorizeResponse.response.expiration;
-					}
-				}
-			}
-			if (doCapture) {
-				if (!canAuthorize) {
-					sezzle.order.captureOrder(order);
-				}
+			if (canCapture) {
+				sezzle.order.captureOrder(order);
 				order.custom.SezzleCapturedAmount = order.totalGrossPrice.toString();
 				order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
 				order.setStatus(Order.ORDER_STATUS_COMPLETED);
@@ -97,7 +85,7 @@ function postProcess(order, canAuthorize){
 			} 
 			if (order.custom.SezzleOrderUUID){
 				var sezzleOrder = sezzle.order.getOrderByOrderUUID(order.custom.SezzleOrderUUID);
-				if (!sezzleOrder.error && !doCapture) {
+				if (!sezzleOrder.error && !canCapture) {
 					order.custom.SezzleAuthExpiration = sezzleOrder.response.authorization.expiration;
 				}
 				sezzle.order.updateOrder(order);

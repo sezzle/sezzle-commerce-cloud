@@ -16,6 +16,7 @@
 			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
 			sezzleAPI = require('*/cartridge/scripts/api/sezzleAPI.ds'),
+			sezzle = require('*/cartridge/scripts/sezzle.ds'),
 			Transaction = require('dw/system/Transaction');
 
 		self.utils = sezzleUtils;
@@ -121,7 +122,6 @@
 		self.getMerchant = function () {
 			var merchant = {
 				'user_confirmation_url' : web.URLUtils.https('Sezzle-Success').toString(),
-				'user_tokenize_url' : web.URLUtils.https('Sezzle-Tokenize').toString(),
 				'user_cancel_url' : web.URLUtils.https('Checkout-Begin').toString(),
 				'user_confirmation_url_action' : 'GET'
 			};
@@ -247,40 +247,39 @@
 			var returnObj = {};
 			if (customerToken) {
 				var requestObject = {
-					'reference_id': sezzleUtils.generateUUID(),
-					'token': customerToken,
-					'amount_in_cents': self.getTotal(basket),
-					'currency': basket.getCurrencyCode()
-				}
-				var preApprovalResponse = self.preApprovePayment(requestObject);
-				returnObj['checkout'] = {
-					'amount_in_cents': requestObject.amount_in_cents,
-					'reference_id' : requestObject.reference_id
-				}
-				if (!preApprovalResponse.error) {
-					returnObj['tokenize'] = {
-						'token' : requestObject.token,
-						'customer_uuid': preApprovalResponse.response.customer_uuid,
-						'is_approved': preApprovalResponse.response.approved
+					'intent': 'AUTH',
+					'reference_id': referenceID,
+					'payment_amount': {
+						'amount_in_cents': self.getTotal(basket),
+						'currency': basket.getCurrencyCode()
 					}
 				}
-			} else {
-				var successURL = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID;
-				if (sezzleData.getTokenizeStatus() && !sezzleData.getCreateCheckoutStatus()) {
-					successURL = self.getMerchant().user_tokenize_url+ "?isApproved=true&customerNo="+basket.getCustomerNo();
+				var apiResponse = sezzleAPI.getCustomerUUID(customerToken);
+				if (!apiResponse.error) {
+					requestObject.customer_uuid = apiResponse.response.customer.uuid;
+					var orderResponse = sezzle.order.createOrder(requestObject);
+					if (!orderResponse.error && orderResponse.response.approved) {
+						returnObj['tokenize'] = {
+							'token' : customerToken
+						}
+					}
 				}
+				returnObj['checkout'] = {
+					'amount_in_cents': requestObject.amount_in_cents,
+					'reference_id' : requestObject.reference_id,
+					'order_uuid' : orderResponse.response.uuid
+				}
+			} else {
 				var checkoutObject = {
 					'cancel_url' : {
 						'href' : self.getMerchant().user_cancel_url
 					},
 					'complete_url' : {
-						'href' : successURL
+						'href' : self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID
 					},
 					'customer' : self.getCustomer(basket)
 				};
-				if (sezzleData.getCreateCheckoutStatus()) {
-					checkoutObject.order = self.getOrder(basket, referenceID);
-				}
+				checkoutObject.order = self.getOrder(basket, referenceID);
 				var checkoutResponse = sezzleAPI.initiateCheckout(checkoutObject);
 				returnObj['checkout'] = {
 					'amount_in_cents': self.getTotal(basket),
@@ -299,23 +298,6 @@
 				}
 			}
 			return returnObj;
-		};
-		
-		self.preApprovePayment = function (request) {
-			var apiResponse = sezzleAPI.getCustomerUUID(request.token);
-			if (!apiResponse.error) {
-				delete request['token'];
-				request.customer_uuid = apiResponse.response.customer.uuid;
-				var apiResponse = sezzleAPI.preApprovePayment(request);
-				
-				if (!apiResponse.error) {
-					apiResponse.response.customer_uuid = request.customer_uuid;
-					return apiResponse;
-				}
-			}
-			return {
-				'error' : true
-			};
 		};
 		
 		self.getCustomerToken = function (customerNo) {

@@ -58,14 +58,6 @@
             return currentSite.getCustomPreferenceValue('SezzleTokenize');
         };
         /**
-         * Return Sezzle Checkout Status
-         *
-         * @returns {string} checkout status
-         */
-        this.getCreateCheckoutStatus = function () {
-            return currentSite.getCustomPreferenceValue('SezzleCheckout');
-        };
-        /**
          * Return Sezzle Payment Action preference
          *
          * @returns {string} Promo text

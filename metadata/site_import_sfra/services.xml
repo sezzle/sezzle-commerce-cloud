@@ -30,16 +30,6 @@
         <credential-id/>
     </service>
 
-    <service service-id="sezzle.getorderbyauthuuid">
-        <service-type>HTTP</service-type>
-        <enabled>true</enabled>
-        <log-prefix>sezzle</log-prefix>
-        <comm-log-enabled>false</comm-log-enabled>
-        <mock-mode-enabled>false</mock-mode-enabled>
-        <profile-id>Sezzle</profile-id>
-        <credential-id/>
-    </service>
-
     <service service-id="sezzle.capture">
         <service-type>HTTP</service-type>
         <enabled>true</enabled>
@@ -80,37 +70,7 @@
         <credential-id/>
     </service>
 
-    <service service-id="sezzle.authorizepayment">
-        <service-type>HTTP</service-type>
-        <enabled>true</enabled>
-        <log-prefix>sezzle</log-prefix>
-        <comm-log-enabled>false</comm-log-enabled>
-        <mock-mode-enabled>false</mock-mode-enabled>
-        <profile-id>Sezzle</profile-id>
-        <credential-id/>
-    </service>
-
-    <service service-id="sezzle.capturebyauthuuid">
-        <service-type>HTTP</service-type>
-        <enabled>true</enabled>
-        <log-prefix>sezzle</log-prefix>
-        <comm-log-enabled>false</comm-log-enabled>
-        <mock-mode-enabled>false</mock-mode-enabled>
-        <profile-id>Sezzle</profile-id>
-        <credential-id/>
-    </service>
-
-    <service service-id="sezzle.refundbyauthuuid">
-        <service-type>HTTP</service-type>
-        <enabled>true</enabled>
-        <log-prefix>sezzle</log-prefix>
-        <comm-log-enabled>false</comm-log-enabled>
-        <mock-mode-enabled>false</mock-mode-enabled>
-        <profile-id>Sezzle</profile-id>
-        <credential-id/>
-    </service>
-
-    <service service-id="sezzle.releasebyauthuuid">
+    <service service-id="sezzle.createorderbycustomeruuid">
         <service-type>HTTP</service-type>
         <enabled>true</enabled>
         <log-prefix>sezzle</log-prefix>
@@ -131,16 +91,6 @@
     </service>
 
     <service service-id="sezzle.updateorder">
-        <service-type>HTTP</service-type>
-        <enabled>true</enabled>
-        <log-prefix>sezzle</log-prefix>
-        <comm-log-enabled>false</comm-log-enabled>
-        <mock-mode-enabled>false</mock-mode-enabled>
-        <profile-id>Sezzle</profile-id>
-        <credential-id/>
-    </service>
-
-    <service service-id="sezzle.preapprovepayment">
         <service-type>HTTP</service-type>
         <enabled>true</enabled>
         <log-prefix>sezzle</log-prefix>

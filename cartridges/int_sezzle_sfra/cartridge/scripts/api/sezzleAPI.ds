@@ -171,17 +171,17 @@
 		};
 		
 		/**
-		 * Authorize payment by customer uuid
+		 * Create order by customer uuid
 		 *
 		 * @param {string} customerUUID 
 		 * @returns {Object}
 		 */
-		self.authorizePayment = function (requestObj) {
+		self.createOrderByCustomerUUID = function (requestObj) {
 			try {
 				var authentication = self.authenticate();
 				requestObj.authToken = authentication.response.token;
-				var sezzleService = service.initService('sezzle.authorizepayment');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/authorize';
+				var sezzleService = service.initService('sezzle.createorderbycustomeruuid');
+				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/order';
 				return sezzleService.call(requestObj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
@@ -284,27 +284,6 @@
 				sezzleService.URL = sezzleData.getV2URLPath() + 'authorization/' + order.custom.SezzleAuthUUID + '/release';	
 				return sezzleService.call(obj).object;
 				
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
-				return {
-					error : false
-				};
-			}
-		};
-		
-		/**
-		 * Pre approve payment by customer UUID
-		 *
-		 * @param {dw.order.Order} order 
-		 * @returns status
-		 */
-		self.preApprovePayment = function (requestObj) {
-			try {
-				var authentication = self.authenticate();
-				requestObj.authToken = authentication.response.token;
-				var sezzleService = service.initService('sezzle.preapprovepayment');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/preapprove';
-				return sezzleService.call(requestObj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
