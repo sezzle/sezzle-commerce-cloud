@@ -32,7 +32,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -61,7 +61,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -90,7 +90,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -115,7 +115,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -140,7 +140,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -165,7 +165,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -186,7 +186,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -212,7 +212,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -237,7 +237,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -262,7 +262,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -287,7 +287,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -313,7 +313,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};
@@ -334,7 +334,7 @@
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
 				return {
-					error : false
+					error : true
 				};
 			}
 		};

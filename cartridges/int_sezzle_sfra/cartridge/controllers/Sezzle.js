@@ -61,9 +61,9 @@ server.get('Success', function(req, res, next) {
         return next();
 	}
 	var customerUUID = request.httpParameterMap["customer-uuid"].stringValue;
-	var customerNo = basket.getCustomerNo();
-	if (customerUUID != null && customerNo != null) {
-		sezzleHelper.StoreTokenizeRecord(customerNo, session.privacy.sezzleToken, session.privacy.tokenExpiration);
+	var profile = basket.customer.profile;
+	if (customerUUID != null && profile != null) {
+		sezzleHelper.StoreTokenizeRecord(profile, session.privacy.sezzleToken, session.privacy.tokenExpiration);
 	}
 	// Creates a new order.
 	var reportingUrlsHelper = require('*/cartridge/scripts/reportingUrls');
