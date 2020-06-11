@@ -66,6 +66,13 @@
 				order.custom.SezzlePaymentAction = String(data.getSezzlePaymentAction());
 				order.custom.SezzleOrderUUID = response.order_uuid != 'undefined' ? response.order_uuid : '';
 				order.custom.SezzleOrderAmount = new Money(response.amount, order.currencyCode).divide(100);
+				if (response.order_links) {
+					order.custom.SezzleGetOrderLink = response.order_links.get_order;
+					order.custom.SezzleUpdateOrderLink = response.order_links.update_order;
+					order.custom.SezzleCapturePaymentLink = response.order_links.capture_payment;
+					order.custom.SezzleRefundPaymentLink = response.order_links.refund_payment;
+					order.custom.SezzleReleasePaymentLink = response.order_links.release_payment;
+				}
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
 			}

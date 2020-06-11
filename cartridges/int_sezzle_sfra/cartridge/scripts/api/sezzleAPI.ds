@@ -56,36 +56,8 @@
 				};
 				
 				var sezzleService = service.initService('sezzle.capture');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/capture';
-				return sezzleService.call(obj).object;
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
-				return {
-					error : true
-				};
-			}
-		};
-		
-		/**
-		 * Capture charge by auth UUID
-		 *
-		 * @param {dw.order.Order} order 
-		 * @returns status
-		 */
-		self.captureByAuthUUID = function (order, amount, isPartialCapture) {
-			try {
-				var authentication = self.authenticate();
-				var obj = {
-					'authToken' : authentication.response.token,
-					'capture_amount': {
-						    'amount_in_cents': amount,
-						    'currency': order.getCurrencyCode()
-					     },
-				    'partial_capture': isPartialCapture
-				};
-				
-				var sezzleService = service.initService('sezzle.capturebyauthuuid');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'authorization/' + order.custom.SezzleAuthUUID + '/capture';
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/capture';
+				sezzleService.URL = order.custom.SezzleCapturePaymentLink;
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
@@ -135,32 +107,8 @@
 				};
 				
 				var sezzleService = service.initService('sezzle.getorderbyorderuuid');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + orderUUID;
-				return sezzleService.call(obj).object;
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
-				return {
-					error : true
-				};
-			}
-		};
-		
-		/**
-		 * Get order by auth UUID
-		 *
-		 * @param {dw.order.Order} order 
-		 * @returns status
-		 */
-		self.getOrderByAuthUUID = function (authUUID) {
-			try {
-				var authentication = self.authenticate();
-				var obj = {
-					'authToken' : authentication.response.token,
-					'httpMethod': 'GET'
-				};
-				
-				var sezzleService = service.initService('sezzle.getorderbyauthuuid');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'authorization/' + authUUID;
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + orderUUID;
+				sezzleService.URL = order.custom.SezzleGetOrderLink;
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
@@ -181,7 +129,8 @@
 				var authentication = self.authenticate();
 				requestObj.authToken = authentication.response.token;
 				var sezzleService = service.initService('sezzle.createorderbycustomeruuid');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/order';
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/order';
+				sezzleService.URL = requestObj.link;
 				return sezzleService.call(requestObj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
@@ -206,32 +155,8 @@
 				}
 				
 				var sezzleService = service.initService('sezzle.refund');		
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/refund';	
-				return sezzleService.call(obj).object;
-				
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
-				return {
-					error : true
-				};
-			}
-		};
-		
-		/**
-		 * Refund payment by auth UUID
-		 *
-		 * @param {dw.order.Order} order 
-		 * @returns status		 */
-		self.refundByAuthUUID = function (order, amount) {
-			try {
-				var authentication = self.authenticate();
-				var obj = {
-					'authToken' : authentication.response.token,
-					'amount_in_cents': amount,
-					'currency': order.getCurrencyCode()
-				}
-				var sezzleService = service.initService('sezzle.refundbyauthuuid');		
-				sezzleService.URL = sezzleData.getV2URLPath() + 'authorization/' +  order.custom.SezzleAuthUUID + '/refund';	
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/refund';	
+				sezzleService.URL = order.custom.SezzleRefundPaymentLink;
 				return sezzleService.call(obj).object;
 				
 			} catch (e) {
@@ -256,32 +181,8 @@
 					'currency': order.getCurrencyCode()
 				}
 				var sezzleService = service.initService('sezzle.release');		
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/release';	
-				return sezzleService.call(obj).object;
-				
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
-				return {
-					error : true
-				};
-			}
-		};
-		
-		/**
-		 * Release payment by auth UUID
-		 *
-		 * @param {dw.order.Order} order 
-		 * @returns status		 */
-		self.releaseByAuthUUID = function (order, amount) {
-			try {
-				var authentication = self.authenticate();
-				var obj = {
-					'authToken' : authentication.response.token,
-					'amount_in_cents': amount,
-					'currency': order.getCurrencyCode()
-				}
-				var sezzleService = service.initService('sezzle.releasebyauthuuid');		
-				sezzleService.URL = sezzleData.getV2URLPath() + 'authorization/' + order.custom.SezzleAuthUUID + '/release';	
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/release';	
+				sezzleService.URL = order.custom.SezzleReleasePaymentLink;
 				return sezzleService.call(obj).object;
 				
 			} catch (e) {
@@ -308,7 +209,8 @@
 				};
 				
 				var sezzleService = service.initService('sezzle.updateorder');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID;
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID;
+				sezzleService.URL = order.custom.SezzleUpdateOrderLink;
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);

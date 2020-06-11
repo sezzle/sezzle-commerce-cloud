@@ -246,6 +246,7 @@
 			var customerToken = self.getCustomerToken(basket.customer.profile);
 			var returnObj = {};
 			if (customerToken) {
+				var createOrderLink = "";
 				var requestObject = {
 					'intent': 'AUTH',
 					'reference_id': referenceID,
@@ -257,18 +258,28 @@
 				var apiResponse = sezzleAPI.getCustomerUUID(customerToken);
 				if (!apiResponse.error) {
 					requestObject.customer_uuid = apiResponse.response.customer.uuid;
-					logger.debug(apiResponse.response.customer.uuid);
-					var orderResponse = sezzleOrder.createOrder(requestObject);
-					if (!orderResponse.error && orderResponse.response.approved) {
-						returnObj['tokenize'] = {
-							'token' : customerToken
+					var customerLinks = apiResponse.response.customer.links;
+					if (customerLinks) {
+						var link = customerLinks[k];
+						if (link.rel == 'order' && link.method == 'POST') {
+							createOrderLink = link.href;	
+						}
+					}
+					if (createOrderLink != "") {
+						requestObject.link = createOrderLink;
+						var orderResponse = sezzleOrder.createOrder(requestObject);
+						if (!orderResponse.error && orderResponse.response.approved) {
+							returnObj['tokenize'] = {
+								'token' : customerToken
+							}
 						}
 					}
 				}
 				returnObj['checkout'] = {
 					'amount_in_cents': requestObject.amount_in_cents,
 					'reference_id' : requestObject.reference_id,
-					'order_uuid' : orderResponse.response.uuid
+					'order_uuid' : orderResponse.response.uuid,
+					'order_links' : orderResponse.response.links
 				}
 			} else {
 				var checkoutObject = {
@@ -289,6 +300,7 @@
 				if (checkoutResponse.response.order) {
 					returnObj['checkout'].order_uuid = checkoutResponse.response.order.uuid;
 					returnObj['checkout'].checkout_url = checkoutResponse.response.order.checkout_url;
+					returnObj['checkout'].order_links = checkoutResponse.response.order.links;
 				}
 				if (checkoutResponse.response.tokenize) {
 					returnObj['tokenize'] = {

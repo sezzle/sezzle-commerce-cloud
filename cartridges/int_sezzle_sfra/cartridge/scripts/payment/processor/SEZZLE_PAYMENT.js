@@ -46,7 +46,14 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor){
 				'events' : [{'id': session.privacy.sezzleFirstEventID}],
 				'amount': session.privacy.sezzleOrderAmount,
 				'token': session.privacy.sezzleToken,
-				'token_expiration': session.privacy.tokenExpiration
+				'token_expiration': session.privacy.tokenExpiration,
+				'order_links' : {
+					'get_order' : session.privacy.getOrderLink,
+					'update_order' : session.privacy.updateOrderLink,
+					'capture_payment' : session.privacy.capturePaymentLink,
+					'refund_payment' : session.privacy.refundPaymentLink,
+					'release_payment' : session.privacy.releasePaymentLink
+				}
 		};
 		sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
 		
