@@ -1,4 +1,12 @@
+
+
 <div class="tab-pane sezzle-payment-content" id="sezzle-payment-content" role="tabpanel">
+	<isif condition="${!empty(session.privacy.sezzleErrorMessage)}">
+            <div class="sezzle-error" style="display:none"><isprint value="${session.privacy.sezzleErrorMessage}"/></div>
+    </isif>
+    <isscript>
+    	session.privacy.sezzleErrorMessage = "";
+    </isscript>
 	<fieldset class="payment-form-fields">
 
         <!--- payment method is sezzle pay --->
@@ -19,7 +27,9 @@
 <link href="${Resource.msg('sezzle.css', 'sezzle', null)}" type="text/css" rel="stylesheet" />
 </isif>
 <script type="text/javascript">
-
+	if ($('.sezzle-error').text()) {
+		alert($('.sezzle-error').text());
+	}
   // getModal : Getting Sezzle modal
     function getModal(modalNode, callback) {
       var httpRequest = new XMLHttpRequest();
@@ -73,6 +83,8 @@
     $("body").on("click", ".sezzle-know-more", function (a) {
       modalNode.style.display = 'block';
     });
+    
+    
   
 
 

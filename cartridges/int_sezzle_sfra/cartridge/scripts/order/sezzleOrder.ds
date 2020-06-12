@@ -80,44 +80,20 @@
 		
 		
 		this.captureOrder = function (order) {
-			try {
-				var captureAmount = order.totalGrossPrice.multiply(100).getValue();
-				response = api.capture(order, captureAmount, false);
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
-			}
+			var captureAmount = order.totalGrossPrice.multiply(100).getValue();
+			var response = api.capture(order, captureAmount, false);
 		};
 		
 		this.createOrder = function (requestObject) {
-			try {
-				var response = api.createOrderByCustomerUUID(requestObject);
-				return response;
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
-				return {
-					'error': true	
-				};
-			}
+			return response = api.createOrderByCustomerUUID(requestObject);
 		};
 		
 		this.getOrderByOrderUUID = function (orderUUID) {
-			try {
-				var response = api.getOrderByOrderUUID(orderUUID);
-				return response;
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
-				return {
-					'error': true	
-				};
-			}
+			return response = api.getOrderByOrderUUID(orderUUID);
 		};
 		
 		this.updateOrder = function (order) {
-			try {
-				var response = api.updateOrder(order);
-			} catch (e) {
-				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
-			}
+			var response = api.updateOrder(order);
 		};
 		
 		/**

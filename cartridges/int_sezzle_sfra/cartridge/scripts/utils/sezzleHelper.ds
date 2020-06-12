@@ -67,10 +67,6 @@ function storeTokenizeRecord(profile, token, tokenExpiration) {
 		profile.custom.SezzleToken = token;
 		profile.custom.SezzleTokenApproved = true;
 		profile.custom.SezzleTokenExpiration = tokenExpiration;
-		//var tokenizeRecord = dw.object.CustomObjectMgr.createCustomObject('SezzleTokenize', customerNo);
-		//tokenizeRecord.custom.token = token;
-		//tokenizeRecord.custom.is_approved = true;
-		//tokenizeRecord.custom.expiration = tokenExpiration;
 	});
 }
 

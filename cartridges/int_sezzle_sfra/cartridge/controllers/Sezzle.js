@@ -33,49 +33,59 @@ server.get('Redirect', function(req, res, next) {
 	var basket = BasketMgr.getCurrentBasket();
 	var checkoutObject = sezzle.basket.initiateCheckout(basket);
 	var redirectURL = checkoutObject['checkout']['checkout_url'];
+	var sezzleOrderUUID = checkoutObject['checkout']['order_uuid']
+	var error = false;
+	session.privacy.sezzleErrorMessage = "";
+	if (redirectURL == undefined && sezzleOrderUUID == undefined) {
+		error = true;
+		session.privacy.sezzleErrorMessage = "Something went wrong while redirecting. Please try again.";
+		redirectURL = URLUtils.url('Checkout-Begin').toString() + "?stage=payment";
+	}
 	
 	res.render('sezzle/sezzleredirect', {
 		SezzleRedirectUrl: redirectURL
     });
 	
 	
-	session.privacy.sezzled = true;
-	session.privacy.sezzleOrderAmount = checkoutObject['checkout']['amount_in_cents']
-	session.privacy.referenceId = checkoutObject['checkout']['reference_id']
-	session.privacy.orderUUID = checkoutObject['checkout']['order_uuid'];
-	var orderLinks = checkoutObject['checkout']['order_links'];
-	
-	if (orderLinks) {
-		for (var k in orderLinks) {
-			var link = orderLinks[k],
-				rel = link.rel,
-				method = link.method;
-			switch (rel) {
-				case 'self' :
-					if (method == 'GET') {
-						session.privacy.getOrderLink = link.href;
-					} else if (method == 'PATCH') {
-						session.privacy.updateOrderLink = link.href;
-					}
-					break;
-				case 'capture' :
-					session.privacy.capturePaymentLink = link.href;
-					break;
-				case 'refund' :
-					session.privacy.refundPaymentLink = link.href;
-					break;
-				case 'release' :
-					session.privacy.releasePaymentLink = link.href;
-					break;
-				default :
-					break;
+	if (!error) {
+		session.privacy.sezzled = true;
+		session.privacy.sezzleOrderAmount = checkoutObject['checkout']['amount_in_cents']
+		session.privacy.referenceId = checkoutObject['checkout']['reference_id']
+		session.privacy.orderUUID = sezzleOrderUUID;
+		var orderLinks = checkoutObject['checkout']['order_links'];
+		
+		if (orderLinks) {
+			for (var k in orderLinks) {
+				var link = orderLinks[k],
+					rel = link.rel,
+					method = link.method;
+				switch (rel) {
+					case 'self' :
+						if (method == 'GET') {
+							session.privacy.getOrderLink = link.href;
+						} else if (method == 'PATCH') {
+							session.privacy.updateOrderLink = link.href;
+						}
+						break;
+					case 'capture' :
+						session.privacy.capturePaymentLink = link.href;
+						break;
+					case 'refund' :
+						session.privacy.refundPaymentLink = link.href;
+						break;
+					case 'release' :
+						session.privacy.releasePaymentLink = link.href;
+						break;
+					default :
+						break;
+				}
 			}
 		}
-	}
-	
-	if (checkoutObject.tokenize) {
-		session.privacy.sezzleToken = checkoutObject['tokenize']['token'] ? checkoutObject['tokenize']['token'] : '';
-		session.privacy.tokenExpiration = checkoutObject['tokenize']['token_expiration'] ? checkoutObject['tokenize']['token_expiration'] : '';
+		
+		if (checkoutObject.tokenize) {
+			session.privacy.sezzleToken = checkoutObject['tokenize']['token'] ? checkoutObject['tokenize']['token'] : '';
+			session.privacy.tokenExpiration = checkoutObject['tokenize']['token_expiration'] ? checkoutObject['tokenize']['token_expiration'] : '';
+		}
 	}
 	return next();
 });
