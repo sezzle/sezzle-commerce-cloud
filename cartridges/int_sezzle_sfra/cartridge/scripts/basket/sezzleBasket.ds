@@ -25,11 +25,11 @@
 		 * Build shipping address object based on Basket
 		 *
 		 * @param {dw.order.Basket}  basket
-		 * @returns {Object} simple object with name and shipping address
+		 * @returns {Object} simple object with shipping address
 		 */
 		self.getShippingAddress = function (basket) {
 			var basketShippingAddress = basket.getDefaultShipment().getShippingAddress(),
-				shippingAddress = {
+			return  {
 					'name' : basketShippingAddress.getFullName(),
 					'street' : basketShippingAddress.getAddress1(),
 					'street2' : basketShippingAddress.getAddress2(),
@@ -39,22 +39,20 @@
 					'country_code' : basketShippingAddress.getCountryCode().getValue(),
 					'phone' : basketShippingAddress.getPhone()	
 				};
-
-			return shippingAddress;
 		};
 
 		/**
 		 * Build billing address object based on Basket
 		 *
 		 * @param {dw.order.Basket}  basket
-		 * @returns {Object} simple object with name and billing address
+		 * @returns {Object} simple object with billing address
 		 */
 		self.getBillingAddress = function (basket) {
 			var basketBillingAddress = basket.getBillingAddress();
 			if (empty(basketBillingAddress)){
 				return null;
 			}
-			var billingAddress = {
+			return {
 					'name' : basketBillingAddress.getFullName(),
 					'street' : basketBillingAddress.getAddress1(),
 					'street2' : basketBillingAddress.getAddress2(),
@@ -64,8 +62,6 @@
 					'country_code' : basketBillingAddress.getCountryCode().getValue(),
 					'phone' : basketBillingAddress.getPhone()	
 				};
-
-			return billingAddress;
 		};
 
 		/**
@@ -239,7 +235,7 @@
 		 * Build object with checkout data and fetch the checkout url
 		 *
 		 * @param {dw.order.Basket}  basket
-		 * @returns {string} checkout data object in JSON format
+		 * @returns {Object} checkout data object in JSON format
 		 */
 		self.initiateCheckout = function (basket) {
 			var referenceID = sezzleUtils.generateUUID();
@@ -323,6 +319,12 @@
 			return returnObj;
 		};
 		
+		/**
+		 * Get Customer Token Record from Profile
+		 *
+		 * @param {dw.customer.Profile}  profile
+		 * @returns {Object} customer token record object in JSON format
+		 */
 		self.getCustomerTokenRecord = function (profile) {
 			if (profile) {
 				var token = profile.custom.SezzleToken;
@@ -346,12 +348,16 @@
 			
 		};
 		
+		/**
+		 * Delete Customer Token Record from Profile
+		 *
+		 * @param {dw.customer.Profile}  profile
+		 */
 		self.deleteCustomerToken = function (profile) {
 			Transaction.wrap(function () {
 				profile.custom.SezzleToken = null;
 				profile.custom.SezzleTokenApproved = false;
 				profile.custom.SezzleTokenExpiration = null;
-				
 			});
 		};
 		

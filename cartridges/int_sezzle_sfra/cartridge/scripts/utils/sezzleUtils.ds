@@ -160,9 +160,23 @@
 			}
 		};
 
+		/**
+		 * Check addresses
+		 *
+		 * @param {dw.order.Basket}  basket
+		 * @param {Object} SezzleResponse charge object
+		 * @param {dw.system.Status} status basket
+		 */
 		self.checkAddresses	= function (basket, SezzleResponse, status) {
 		};
 
+		/**
+		 * Parse the response
+		 *
+		 * @param {dw.svc}  svc
+		 * @param {Object} client
+		 * @param {Object} response
+		 */
 		self.responseParser = function (svc, client) {
 			var response;
 			response = {
@@ -195,13 +209,24 @@
 			return response;
 		};
 		
+		/**
+		 * Generate UUID
+		 *
+		 * @returns {string} uuid
+		 */
 		self.generateUUID = function () {
-			  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-			    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-			    return v.toString(16);
-			  });
-			}
+		  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+		    return v.toString(16);
+		  });
+		};
 			
+		/**
+		 * Get formatted timestamp from string datetime
+		 *
+		 * @param {string}  timestampStr
+		 * @returns {Date} date
+		 */	
 		self.getFormattedDateTimestamp = function (timestampStr) {
 			timestampStr = timestampStr.split('.');
 			timestampStr = timestampStr[0];
@@ -211,8 +236,15 @@
 			timestampStr = timestampStr.replace('-', '/');
 			var timestamp = Date.parse(timestampStr);
 			return timestamp;
-		}
+		};
 		
+		/**
+		 * Get Query String from URL
+		 *
+		 * @param {string}  field
+		 * @param {string}  url
+		 * @returns {string} query string
+		 */
 		self.getQueryString = function ( field, url ) {
 			var href = url;
 			var reg = new RegExp( '[?&]' + field + '=([^&#]*)', 'i' );
@@ -220,6 +252,12 @@
 			return string ? string[1] : null;
 		};
 
+		/**
+		 * Check total basket range
+		 *
+		 * @param {dw.order.Basket}  basket
+		 * @returns {boolean} status
+		 */
 		self.checkBasketTotalRange = function(basket){
 			var basketTotal;
 			if (basket.totalGrossPrice.available){
@@ -236,7 +274,7 @@
 				return false;
 			}
 			return true;
-		}
+		};
 	};
 
 	module.exports = new Utils();

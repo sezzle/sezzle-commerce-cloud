@@ -20,6 +20,14 @@ var logger = require('dw/system').Logger.getLogger('Sezzle', '');
  * Export the publicly available controller methods
  */
 
+/**
+ * Authorize Payment
+ *
+ * @param {dw.order.Order.orderNo} orderNumber
+ * @param {dw.order.PaymentInstrument} PaymentInstrument payment instrument instance
+ * @param {dw.order.PaymentProcessor} PaymentProcessor payment processor instance
+ * @returns {Object} authorize response
+ */
 function authorize(orderNumber, paymentInstrument, paymentProcessor){
 	var order = OrderMgr.getOrder(orderNumber);
 
@@ -61,6 +69,12 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor){
 	return {authorized: true};
 }
 
+/**
+ * Post process order
+ *
+ * @param {dw.order.Order} order
+ * @returns {Object} processing response
+ */
 function postProcess(order){
 	var payment_action = sezzleUtils.data.getSezzlePaymentAction();
 	if (sezzleUtils.data.getSezzlePaymentAction() == 'CAPTURE'){
@@ -89,6 +103,12 @@ function postProcess(order){
 	return {error: false};
 }
 
+/**
+ * Handle creating of payment instrument
+ *
+ * @param {dw.order.Order} order
+ * @returns {Object} response
+ */
 function handle(){
 	var basket = BasketMgr.getCurrentBasket();
 	Transaction.wrap(function(){

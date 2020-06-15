@@ -1,6 +1,13 @@
 /**
- * This script used for init and configure Affirm services
+ * This script used for init and configure Sezzle services
  *
+ */
+ 
+/**
+ * Get Auth Header
+ * 
+ * @param {dw.system.Site} currentSite
+ * @returns {string} auth header
  */
 var getAuthHeader = function (currentSite) {
     var authString = currentSite.getCustomPreferenceValue('SezzlePublicKey')
@@ -8,6 +15,13 @@ var getAuthHeader = function (currentSite) {
     return 'Basic ' + require('dw/util/StringUtils').encodeBase64(authString);
 };
 
+/**
+ * Create Common Request
+ * 
+ * @param {dw.svc} svc
+ * @param {Object} args
+ * @returns {string} args object
+ */
 var commonCreateRequest = function (svc, args) {
     svc.setRequestMethod('POST');
     svc.addHeader('Content-Type', 'application/json');
@@ -22,6 +36,12 @@ var commonCreateRequest = function (svc, args) {
     }
 };
 
+/**
+ * Init services
+ * 
+ * @param {string} serviceName
+ * @returns {Service} called service
+ */
 function initService(serviceName) {
     var service = require('dw/svc/LocalServiceRegistry').createService(serviceName, {
     	createRequest: commonCreateRequest,
@@ -36,6 +56,12 @@ function initService(serviceName) {
     return service;
 };
 
+/**
+ * Prepare Log data
+ * 
+ * @param {string} data
+ * @returns {string} printable data
+ */
 function prepareLogData(data) {
 	if (data === null) {
         return 'Data of response or request is null';
@@ -46,6 +72,12 @@ function prepareLogData(data) {
 	}
 };
 
+/**
+ * Print values
+ * 
+ * @param {Object} obj
+ * @returns {string} printable data
+ */
 function printValues(obj) {
 	var result = '\n';
     for(var k in obj) {
@@ -59,6 +91,13 @@ function printValues(obj) {
     return result;
 };
 
+/**
+ * Filter sensitive data
+ * 
+ * @param {string} key
+ * @param {string} value
+ * @returns {string} value
+ */
 function filterSensitiveData(key, value) {
 	var identifiers = ["public_key","private_key","billing","shipping","token","authToken","merchant_uuid"];
 	if (identifiers.indexOf(key) !== -1) {

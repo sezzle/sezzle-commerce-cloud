@@ -33,7 +33,7 @@ function getCustomOrderInfo(orderNo) {
 }
 
 /**
- * Combine orders and SezzleNewTransactions Custom Objects into one array for pagination
+ * Get Sezzle orders into one array for pagination
  *
  * @param {string} orderNo - Order number used in "Search by order number" feature
  * @returns {dw.util.ArrayList} Combined array with all orders
@@ -185,7 +185,7 @@ function createNewTransactionCustomObject(transactionData, invNum) {
 }
 
 /**
- * Get orders list. Can be filtered by order ID or transaction ID
+ * Get orders list. Can be filtered by order ID or reference ID
  */
 function orders() {
     var orderNo;

@@ -2,6 +2,12 @@
 
 var Status = require('dw/system/Status');
 
+/**
+ * Print values
+ * 
+ * @param {Object} args
+ * @returns {dw.system.Status} refund status
+ */
 function execute(args) {
     try {
         require('*/cartridge/scripts/sezzle.ds').order.refundOrders();

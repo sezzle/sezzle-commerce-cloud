@@ -15,7 +15,7 @@
 		/**
 		 * Authenticate the merchant by public and private key
 		 *
-		 * @returns {Object} auth token object
+		 * @returns {Object} response object
 		 */
 		self.authenticate = function () {
 			try {
@@ -40,8 +40,10 @@
 		/**
 		 * Capture charge by order UUID
 		 *
-		 * @param {dw.order.Order} order 
-		 * @returns status
+		 * @param {dw.order.Order} order
+		 * @param {string} amount
+		 * @param {boolean} isPartialCapture
+		 * @returns {Object} response object
 		 */
 		self.capture = function (order, amount, isPartialCapture) {
 			try {
@@ -71,7 +73,7 @@
 		 * Get customer UUID by token
 		 *
 		 * @param {string} token 
-		 * @returns status
+		 * @returns {Object} response object
 		 */
 		self.getCustomerUUID = function (token) {
 			try {
@@ -95,8 +97,8 @@
 		/**
 		 * Get order by order UUID
 		 *
-		 * @param {dw.order.Order} order 
-		 * @returns status
+		 * @param {string} orderUUID 
+		 * @returns {Object} response object
 		 */
 		self.getOrderByOrderUUID = function (orderUUID) {
 			try {
@@ -121,8 +123,8 @@
 		/**
 		 * Create order by customer uuid
 		 *
-		 * @param {string} customerUUID 
-		 * @returns {Object}
+		 * @param {Object} requestObj 
+		 * @returns {Object} order response object
 		 */
 		self.createOrderByCustomerUUID = function (requestObj) {
 			try {
@@ -145,7 +147,9 @@
 		 * Refund payment by order UUID
 		 *
 		 * @param {dw.order.Order} order 
-		 * @returns status		 */
+		 * @param {string} amount
+		 * @returns {Object} response object	 
+		 */
 		self.refund = function (order, amount) {
 			try {
 				var authentication = self.authenticate();
@@ -172,7 +176,9 @@
 		 * Release payment by order UUID
 		 *
 		 * @param {dw.order.Order} order 
-		 * @returns status		 */
+		 * @param {string} amount
+		 * @returns {Object} response object		 
+		 */
 		self.release = function (order, amount) {
 			try {
 				var authentication = self.authenticate();
@@ -198,7 +204,7 @@
 		 * Update order reference id
 		 *
 		 * @param {dw.order.Order} order 
-		 * @returns status
+		 * @returns {Object} response object
 		 */
 		self.updateOrder = function (order) {
 			try {
@@ -222,10 +228,10 @@
 		};
 		
 		/**
-		 * Initiate a checkout - fetch the checkout url
+		 * Create Checkout Session
 		 *
-		 * @param {Object} - Checkout Object
-		 * @returns {Object} object with checkout url
+		 * @param {Object} checkoutObject
+		 * @returns {Object} response object
 		 */
 		self.createSession = function (checkoutObject) {
 			try {

@@ -28,6 +28,11 @@ var ShippingHelper = require('*/cartridge/scripts/checkout/shippingHelpers');
 
 // Static functions needed for Checkout Controller logic
 
+/**
+ * Loop through all shipments and make sure all not null
+ * @param {dw.order.LineItemCtnr} lineItemContainer - Current users's basket
+ * @returns {boolean} - allValid
+ */
 function ensureValidShipments(lineItemContainer) {
     var shipments = lineItemContainer.shipments,
         allValid = collections.every(
@@ -48,6 +53,13 @@ function ensureValidShipments(lineItemContainer) {
     return allValid;
 }
 
+/**
+ * Sets the gift message on a shipment
+ * @param {dw.order.Shipment} shipment - Any shipment for the current basket
+ * @param {boolean} isGift - is the shipment a gift
+ * @param {string} giftMessage - The gift message the user wants to attach to the shipment
+ * @returns {Object} object containing error information
+ */
 function setGift(shipment, isGift, giftMessage) {
     var result = {
         error: false,

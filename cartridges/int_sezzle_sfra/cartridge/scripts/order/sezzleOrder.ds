@@ -21,6 +21,11 @@
 			filepath = File.IMPEX + File.SEPARATOR + 'sezzle' + File.SEPARATOR,
 			filename = 'sezzle.dat';
 			
+		/**
+		 * Read date from file
+		 *
+		 * @returns {Date} Date instance
+		 */
 		function readDateFromFile(){
 			var file = new File(filepath + filename);
 			if (file.exists()){
@@ -34,6 +39,11 @@
 			return new Date(0);
 		}
 		
+		/**
+		 * Save date to file
+		 *
+		 * @param {Date} date
+		 */
 		function saveDateToFile(date){
 			var dir = new File(filepath);
 			if (!dir.exists()){
@@ -53,9 +63,9 @@
 		 * Updates PaymentInstrument and Order system objects
 		 * 
 		 * @param {dw.order.Order} Order demnadware order instance
-		 * @param {Object} Reponse auth response from Sezzle
+		 * @param {Object} Reponse response from Sezzle
 		 * @param {dw.order.PaymentProcessor} PaymentProcessor payment processor instance
-		 * @param {dw.order.PaymentInstrument} PaymentInstrument payment isntrument instance
+		 * @param {dw.order.PaymentInstrument} PaymentInstrument payment instrument instance
 		 */
 		this.updateAttributes = function (order, response, paymentProcessor, paymentInstrument) {
 			
@@ -78,20 +88,43 @@
 			}
 		};
 		
-		
+		/**
+		 * Capture payment
+		 *
+		 * @param {dw.order.Order} order
+		 * @returns {Object} capture response
+		 */
 		this.captureOrder = function (order) {
 			var captureAmount = order.totalGrossPrice.multiply(100).getValue();
 			var response = api.capture(order, captureAmount, false);
 		};
 		
+		/**
+		 * Create order by customer uuid
+		 *
+		 * @param {Object} requestObject
+		 * @returns {Object} order response
+		 */
 		this.createOrder = function (requestObject) {
 			return response = api.createOrderByCustomerUUID(requestObject);
 		};
 		
+		/**
+		 * Get order by order uuid
+		 *
+		 * @param {string} orderUUID
+		 * @returns {Object} order response
+		 */
 		this.getOrderByOrderUUID = function (orderUUID) {
 			return response = api.getOrderByOrderUUID(orderUUID);
 		};
 		
+		/**
+		 * Update order by order uuid
+		 *
+		 * @param {dw.order.Order} order
+		 * @returns {Object} order response
+		 */
 		this.updateOrder = function (order) {
 			var response = api.updateOrder(order);
 		};

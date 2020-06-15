@@ -28,6 +28,9 @@ var sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 
+/**
+ * Handle redirection to Sezzle
+ */
 server.get('Redirect', function(req, res, next) {
 	logger.debug("Sezzle Redirecting");
 	var basket = BasketMgr.getCurrentBasket();

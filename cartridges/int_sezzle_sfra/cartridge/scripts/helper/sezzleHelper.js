@@ -33,9 +33,10 @@ function updateCustomOrderData(orderNo, transactionId) {
 /**
  * Update transaction history of a Order
 
- * @param {string} orderNo - Order number
- * @param {string} transactionId - Transaction ID from new transaction
- * @param {string} methodName - Method name
+ * @param {dw.order.Order} order
+ * @param {string} transactionId
+ * @param {string} methodName
+ * @param {number} amount
  */
 function updateOrderData(order, transactionId, methodName, amount) {
     var orderTotal = order.totalGrossPrice;
@@ -78,6 +79,12 @@ function updateOrderData(order, transactionId, methodName, amount) {
     }
 }
 
+/**
+ * Update Sezzle Order Amount in Order Object
+
+ * @param {dw.order.Order} order
+ * @param {number} amount
+ */
 sezzleHelper.updateSezzleOrderAmount = function (order, amount) {
 	amount = new Money(amount, order.currencyCode);
 	order.custom.SezzleOrderAmount = amount;
@@ -87,7 +94,7 @@ sezzleHelper.updateSezzleOrderAmount = function (order, amount) {
  * Return Sezzle order payment instrument
  *
  * @param {dw.order.LineItemCtnr} basket - Basket
- * @returns {dw.order.OrderPaymentInstrument} payment instrument with id PAYPAL
+ * @returns {dw.order.OrderPaymentInstrument} payment instrument with id SEZZLE_PAYMENT
  */
 sezzleHelper.getSezzlePaymentInstrument = function (basket) {
     var paymentInstruments = basket.getPaymentInstruments();
@@ -106,6 +113,12 @@ sezzleHelper.getSezzlePaymentInstrument = function (basket) {
     return null;
 };
 
+/**
+ * Return Order Subtotal
+ *
+ * @param {dw.order.Order} basket - Basket
+ * @returns {money} order subtotal
+ */
 sezzleHelper.getSubtotal = function (order) {
 	var items = [],
 		productLineItems = order.getProductLineItems().iterator();
@@ -126,12 +139,13 @@ sezzleHelper.getSubtotal = function (order) {
 };
 
 /**
- * Update transactionID and transactions history for Sezzle payment instrument
+ * Update transactional data for Sezzle payment instrument
  *
- * @param {string} orderNo - order number
+ * @param {dw.order.Order} order - order 
  * @param {boolean} isCustomOrder -  Indicate if current order is Custom Object
  * @param {string} transactionID - Sezzle transaction ID
- * @param {string} methodName - Used API method
+ * @param {string} methodName - Used Action method
+ * * @param {number} amount - Amount passed
  * @returns {boolean} true in case of success and false when error
  */
 sezzleHelper.updateOrderTransaction = function (order, isCustomOrder, transactionID, methodName, amount) {

@@ -1,10 +1,5 @@
 'use strict';
 
-/**
- * Controller that renders the home page.
- *
- * @module controllers/Sezzle
- */
 var SezzlePaymentMethod = 'Sezzle';
 var Resource = require('dw/web/Resource');
 var URLUtils = require('dw/web/URLUtils');
@@ -28,6 +23,12 @@ var logger = require('dw/system').Logger.getLogger('Sezzle', '');
  * Export the publicly available controller methods
  */
 
+/**
+ * Check Cart
+ *
+ * @param {Object} cart
+ * @returns {Object} status response
+ */
 function checkCart(cart) {
 	var basket = 'object' in cart ? cart.object : cart;
 	
@@ -62,15 +63,27 @@ function checkCart(cart) {
     }
 }
 
+/**
+ * Store tokenize record to Customer profile
+ *
+ * @param {dw.customer.Profile} profile
+ * @param {string} token
+ * @param {string} tokenExpiration
+ */
 function storeTokenizeRecord(profile, token, tokenExpiration) {
 	Transaction.wrap(function () {
 		profile.custom.SezzleToken = token;
 		profile.custom.SezzleTokenApproved = true;
 		profile.custom.SezzleTokenExpiration = tokenExpiration;
-
 	});
 }
 
+/**
+ * Processing post order creation in Salesforce
+ *
+ * @param {dw.order.Order} order
+ * @returns {boolean} status
+ */
 function postProcess(order){
 	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 	var canCapture = sezzleData.getSezzlePaymentAction() == 'CAPTURE' ? true : false;
@@ -98,15 +111,22 @@ function postProcess(order){
 	return true;
 }
 
-
+/**
+ * Validate payments
+ *
+ * @param {dw.order.Basket} cart
+ * @param {dw.util.List} applicablePaymentMethods
+ * @returns {dw.util.List} applicablePaymentMethods
+ */
 function init(basket, applicablePaymentMethods) {
 	return sezzle.basket.validatePayments(basket, applicablePaymentMethods);
 }
 
 /**
  * Check if Sezzle payment method can be applicable for checkout 
+ *
+ * @returns {booelan} status
  */
-
 function isSezzleApplicable(){
 	var basket = BasketMgr.getCurrentBasket();
 	if (!basket.getGiftCertificateLineItems().empty || !sezzle.data.getSezzleOnlineStatus() || sezzle.data.getSezzlePaymentOnlineStatus() || !sezzle.utils.checkBasketTotalRange('object' in basket ? basket.object : basket)) {
