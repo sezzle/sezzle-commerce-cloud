@@ -242,7 +242,7 @@ function orderTransaction() {
     var canCapture = false;
     var canRefund = false;
     var canRelease = false;
-    var sezzleOrder = null;
+    var sezzleOrder = {};
     
 
     if (request.httpParameterMap.orderNo && !empty(request.httpParameterMap.orderNo.value)) {
@@ -268,7 +268,7 @@ function orderTransaction() {
 		sezzleOrder = sezzleApi.getOrderByOrderUUID(order.custom.SezzleOrderUUID);
 	}
 	
-	if (sezzleOrder.error) {
+	if (empty(sezzleOrder) || sezzleOrder == null || sezzleOrder.error) {
         render('sezzlebm/components/servererror');
         return;
     }
@@ -367,7 +367,7 @@ function action() {
         	callApiResponse = sezzleApi.release(order, amtInCents);
         }
         
-        if (!callApiResponse.error) {
+        if (callApiResponse != null && !callApiResponse.error) {
         	Transaction.wrap(function () {
                 transactionResult = sezzleHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt);
             });

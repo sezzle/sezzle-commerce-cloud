@@ -66,7 +66,7 @@
 				order.custom.SezzlePaymentAction = String(data.getSezzlePaymentAction());
 				order.custom.SezzleOrderUUID = response.order_uuid != 'undefined' ? response.order_uuid : '';
 				order.custom.SezzleOrderAmount = new Money(response.amount, order.currencyCode).divide(100);
-				if (response.order_links) {
+				if (!empty(response.order_links)) {
 					order.custom.SezzleGetOrderLink = response.order_links.get_order;
 					order.custom.SezzleUpdateOrderLink = response.order_links.update_order;
 					order.custom.SezzleCapturePaymentLink = response.order_links.capture_payment;
@@ -110,7 +110,7 @@
 					if ((order.custom.SezzleOrderAmount == order.custom.SezzleCapturedAmount)
 						&& authAmountInCents > 0) {
 						var response = api.refund(order, authAmountInCents);
-						if (!response.error) {
+						if (response != null && !response.error) {
 							order.custom.SezzleRefundedAmount = order.totalGrossPrice.toString();	
 						}
 					}

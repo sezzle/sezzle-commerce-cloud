@@ -17,8 +17,8 @@
 .sezzlebm_pagination .pagecursortxt {padding:0 2px}
 
 .sezzlebm_window_content .sezzlebm_content {padding:10px 10px 0 10px}
-.sezzlebm_window_content .sezzlebm_footer {display:none}
-.sezzlebm_window_content .sezzlebm_header {display:none}
+.sezzlebm_window_content .sezzlebm_footer {display:block} 
+.sezzlebm_window_content .sezzlebm_header {display:block}
 .sezzlebm_window_content .x-window-body {background:#fff}
 .sezzlebm_window_content table {width:inherit}
 

@@ -34,9 +34,14 @@ server.get('Redirect', function(req, res, next) {
 	var checkoutObject = sezzle.basket.initiateCheckout(basket);
 	var redirectURL = checkoutObject['checkout']['checkout_url'];
 	var sezzleOrderUUID = checkoutObject['checkout']['order_uuid']
+	var isCheckoutApproved = checkoutObject['checkout']['approved'];
 	var error = false;
 	session.privacy.sezzleErrorMessage = "";
-	if (redirectURL == undefined && sezzleOrderUUID == undefined) {
+	if (!isCheckoutApproved) {
+		error = true;
+		session.privacy.sezzleErrorMessage = "Sezzle has not approved your checkout. Please contact Sezzle Customer Support.";
+		redirectURL = URLUtils.url('Checkout-Begin').toString() + "?stage=payment";
+	} else if (redirectURL == undefined && sezzleOrderUUID == undefined) {
 		error = true;
 		session.privacy.sezzleErrorMessage = "Something went wrong while redirecting. Please try again.";
 		redirectURL = URLUtils.url('Checkout-Begin').toString() + "?stage=payment";

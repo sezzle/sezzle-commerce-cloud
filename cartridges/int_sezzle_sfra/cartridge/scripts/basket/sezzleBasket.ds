@@ -243,9 +243,9 @@
 		 */
 		self.initiateCheckout = function (basket) {
 			var referenceID = sezzleUtils.generateUUID();
-			var customerToken = self.getCustomerToken(basket.customer.profile);
+			var customerTokenRecord = self.getCustomerTokenRecord(basket.customer.profile);
 			var returnObj = {};
-			if (customerToken) {
+			if (customerTokenRecord.token != undefined && customerTokenRecord.token_expiration != undefined) {
 				var createOrderLink = "";
 				var requestObject = {
 					'intent': 'AUTH',
@@ -257,10 +257,11 @@
 				};
 				returnObj['checkout'] = {
 					'amount_in_cents': self.getTotal(basket),
-					'reference_id' : referenceID
+					'reference_id' : referenceID,
+					'approved' : false
 				};
-				var apiResponse = sezzleAPI.getCustomerUUID(customerToken);
-				if (!apiResponse.error) {
+				var apiResponse = sezzleAPI.getCustomerUUID(customerTokenRecord.token);
+				if (apiResponse != null && !apiResponse.error) {
 					requestObject.customer_uuid = apiResponse.response.customer.uuid;
 					var customerLinks = apiResponse.response.customer.links;
 					if (customerLinks) {
@@ -274,12 +275,14 @@
 					if (createOrderLink != "") { 
 						requestObject.link = createOrderLink;
 						var orderResponse = sezzleOrder.createOrder(requestObject);
-						if (orderResponse != null && !orderResponse.error && orderResponse.response.authorization.approved) {
+						if (orderResponse != null && !orderResponse.error) {
+							returnObj['checkout'].approved = orderResponse.response.authorization.approved;
 							returnObj['checkout'].checkout_url = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID;
 							returnObj['checkout'].order_uuid = orderResponse.response.uuid;
 							returnObj['checkout'].order_links = orderResponse.response.links;
 							returnObj['tokenize'] = {
-								'token' : customerToken
+								'token' : customerTokenRecord.token,
+								'token_expiration': customerTokenRecord.token_expiration
 							};
 						}
 					}
@@ -295,16 +298,18 @@
 					'customer' : self.getCustomer(basket)
 				};
 				checkoutObject.order = self.getOrder(basket, referenceID);
-				var checkoutResponse = sezzleAPI.initiateCheckout(checkoutObject);
+				var checkoutResponse = sezzleAPI.createSession(checkoutObject);
 				returnObj['checkout'] = {
 					'amount_in_cents': self.getTotal(basket),
-					'reference_id' : referenceID
+					'reference_id' : referenceID,
+					'approved' : false
 				}
-				if (!checkoutResponse.error) {
+				if (checkoutResponse != null && !checkoutResponse.error) {
 					if (checkoutResponse.response.order) {
 						returnObj['checkout'].order_uuid = checkoutResponse.response.order.uuid;
 						returnObj['checkout'].checkout_url = checkoutResponse.response.order.checkout_url;
 						returnObj['checkout'].order_links = checkoutResponse.response.order.links;
+						returnObj['checkout'].approved = true;
 					}
 					if (checkoutResponse.response.tokenize) {
 						returnObj['tokenize'] = {
@@ -318,7 +323,7 @@
 			return returnObj;
 		};
 		
-		self.getCustomerToken = function (profile) {
+		self.getCustomerTokenRecord = function (profile) {
 			if (profile) {
 				var token = profile.custom.SezzleToken;
 				var tokenExpiration = profile.custom.SezzleTokenExpiration;
@@ -327,22 +332,28 @@
 					var currentTimestamp = Date.now();
 					var tokenExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(tokenExpiration);
 					if (isTokenApproved && currentTimestamp <= tokenExpirationTimestamp) {
-						return token;	
+						return {
+							'token': token,
+							'is_approved': isTokenApproved,
+							'token_expiration': tokenExpiration
+						};	
 					}
 					self.deleteCustomerToken(profile); 
 				}	
 			}
-			return '';
+			return {};
+			
 			
 		};
 		
 		self.deleteCustomerToken = function (profile) {
 			Transaction.wrap(function () {
-				profile.custom.SezzleToken = '';
-				profile.custom.SezzleTokenApproved = '';
-				profile.custom.SezzleTokenExpiration = '';
+				profile.custom.SezzleToken = null;
+				profile.custom.SezzleTokenApproved = false;
+				profile.custom.SezzleTokenExpiration = null;
+				
 			});
-		}
+		};
 		
 		
 		/**

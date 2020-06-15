@@ -50,7 +50,7 @@
         <credential-id/>
     </service>
 
-    <service service-id="sezzle.initiatecheckout">
+    <service service-id="sezzle.createsession">
         <service-type>HTTP</service-type>
         <enabled>true</enabled>
         <log-prefix>sezzle</log-prefix>
