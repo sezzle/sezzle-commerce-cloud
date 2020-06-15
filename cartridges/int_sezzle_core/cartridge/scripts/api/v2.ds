@@ -6,7 +6,7 @@
 	 * @this {Api}
 	 * @returns Api instance
 	 */
-	var Api = function () {
+	var V2Api = function () {
 		var self = this,
 			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
@@ -58,8 +58,8 @@
 				};
 				
 				var sezzleService = service.initService('sezzle.capture');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/capture';
-				//sezzleService.URL = order.custom.SezzleCapturePaymentLink;
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/capture';
+				sezzleService.URL = order.custom.SezzleCapturePaymentLink;
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Api:capture. Error - {0}', e);
@@ -97,10 +97,10 @@
 		/**
 		 * Get order by order UUID
 		 *
-		 * @param {string} orderUUID 
+		 * @param {dw.order.Order} order 
 		 * @returns {Object} response object
 		 */
-		self.getOrderByOrderUUID = function (orderUUID) {
+		self.getOrderByOrderUUID = function (order) {
 			try {
 				var authentication = self.authenticate();
 				var obj = {
@@ -109,8 +109,8 @@
 				};
 				
 				var sezzleService = service.initService('sezzle.getorderbyorderuuid');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + orderUUID;
-				//sezzleService.URL = order.custom.SezzleGetOrderLink;
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + orderUUID;
+				sezzleService.URL = order.custom.SezzleGetOrderLink;
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Api:getOrderByOrderUUID. Error - {0}', e);
@@ -131,9 +131,8 @@
 				var authentication = self.authenticate();
 				requestObj.authToken = authentication.response.token;
 				var sezzleService = service.initService('sezzle.createorderbycustomeruuid');
-				logger.debug(JSON.stringify(requestObj));
-				sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/order';
-				//sezzleService.URL = requestObj.link;
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/order';
+				sezzleService.URL = requestObj.link;
 				return sezzleService.call(requestObj).object;
 			} catch (e) {
 				logger.debug('Api:createOrderByCustomerUUID. Error - {0}', e);
@@ -160,8 +159,8 @@
 				}
 				
 				var sezzleService = service.initService('sezzle.refund');		
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/refund';	
-				//sezzleService.URL = order.custom.SezzleRefundPaymentLink;
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/refund';	
+				sezzleService.URL = order.custom.SezzleRefundPaymentLink;
 				return sezzleService.call(obj).object;
 				
 			} catch (e) {
@@ -188,8 +187,8 @@
 					'currency': order.getCurrencyCode()
 				}
 				var sezzleService = service.initService('sezzle.release');		
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/release';	
-				//sezzleService.URL = order.custom.SezzleReleasePaymentLink;
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/release';	
+				sezzleService.URL = order.custom.SezzleReleasePaymentLink;
 				return sezzleService.call(obj).object;
 				
 			} catch (e) {
@@ -216,8 +215,8 @@
 				};
 				
 				var sezzleService = service.initService('sezzle.updateorder');
-				sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID;
-				//sezzleService.URL = order.custom.SezzleUpdateOrderLink;
+				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID;
+				sezzleService.URL = order.custom.SezzleUpdateOrderLink;
 				return sezzleService.call(obj).object;
 			} catch (e) {
 				logger.debug('Api:updateOrder. Error - {0}', e);
@@ -249,5 +248,5 @@
 		};
 	};
 	
-	module.exports = new Api();
+	module.exports = new V2Api();
 }());

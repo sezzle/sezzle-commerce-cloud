@@ -2,7 +2,7 @@
 
 var sezzleHelper = require('*/cartridge/scripts/helper/sezzleHelper');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-var sezzleApi = require('*/cartridge/scripts/api/sezzleAPI');
+var v2 = require('*/cartridge/scripts/api/v2');
 var Money = require('dw/value/Money');
 var sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils.ds');
 
@@ -194,7 +194,7 @@ function orders() {
     var orders; // eslint-disable-line no-shadow
     
     if (request.httpParameterMap.transactionId.submitted) {
-        var callApiResponse = sezzleApi.getOrder(request.httpParameterMap.transactionId.stringValue);
+        var callApiResponse = v2.getOrder(request.httpParameterMap.transactionId.stringValue);
         if (!callApiResponse.error) {
             referenceID = callApiResponse.response.reference_id;
         } 
@@ -242,7 +242,6 @@ function orderTransaction() {
     var canCapture = false;
     var canRefund = false;
     var canRelease = false;
-    var sezzleOrder = {};
     
 
     if (request.httpParameterMap.orderNo && !empty(request.httpParameterMap.orderNo.value)) {
@@ -260,15 +259,6 @@ function orderTransaction() {
     }
     
     if (!order) {
-        render('sezzlebm/components/servererror');
-        return;
-    }
-    
-	if (order.custom.SezzleOrderUUID != null) {
-		sezzleOrder = sezzleApi.getOrderByOrderUUID(order.custom.SezzleOrderUUID);
-	}
-	
-	if (empty(sezzleOrder) || sezzleOrder == null || sezzleOrder.error) {
         render('sezzlebm/components/servererror');
         return;
     }
@@ -359,12 +349,12 @@ function action() {
         
         if (methodName == 'DoCapture') {
         	var isPartialCapture = (amtInCents < authAmountInCents);
-        	callApiResponse = sezzleApi.capture(order, amtInCents, isPartialCapture);
+        	callApiResponse = v2.capture(order, amtInCents, isPartialCapture);
         	
         } else if (methodName == 'DoRefund') {
-        	callApiResponse = sezzleApi.refund(order, amtInCents);
+        	callApiResponse = v2.refund(order, amtInCents);
         } else if (methodName == 'DoRelease') {
-        	callApiResponse = sezzleApi.release(order, amtInCents);
+        	callApiResponse = v2.release(order, amtInCents);
         }
         
         if (callApiResponse != null && !callApiResponse.error) {

@@ -15,7 +15,7 @@
 			sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils.ds'),
 			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
-			sezzleAPI = require('*/cartridge/scripts/api/sezzleAPI.ds'),
+			v2 = require('*/cartridge/scripts/api/v2.ds'),
 			sezzleOrder = require('*/cartridge/scripts/order/sezzleOrder.ds'),
 			Transaction = require('dw/system/Transaction');
 
@@ -28,7 +28,7 @@
 		 * @returns {Object} simple object with shipping address
 		 */
 		self.getShippingAddress = function (basket) {
-			var basketShippingAddress = basket.getDefaultShipment().getShippingAddress(),
+			var basketShippingAddress = basket.getDefaultShipment().getShippingAddress();
 			return  {
 					'name' : basketShippingAddress.getFullName(),
 					'street' : basketShippingAddress.getAddress1(),
@@ -256,7 +256,7 @@
 					'reference_id' : referenceID,
 					'approved' : false
 				};
-				var apiResponse = sezzleAPI.getCustomerUUID(customerTokenRecord.token);
+				var apiResponse = v2.getCustomerUUID(customerTokenRecord.token);
 				if (apiResponse != null && !apiResponse.error) {
 					requestObject.customer_uuid = apiResponse.response.customer.uuid;
 					var customerLinks = apiResponse.response.customer.links;
@@ -294,7 +294,7 @@
 					'customer' : self.getCustomer(basket)
 				};
 				checkoutObject.order = self.getOrder(basket, referenceID);
-				var checkoutResponse = sezzleAPI.createSession(checkoutObject);
+				var checkoutResponse = v2.createSession(checkoutObject);
 				returnObj['checkout'] = {
 					'amount_in_cents': self.getTotal(basket),
 					'reference_id' : referenceID,

@@ -17,7 +17,7 @@
 			FileWriter = require('dw/io/FileWriter'),
 			data = require('~/cartridge/scripts/data/sezzleData.ds'),
 			basket = require('~/cartridge/scripts/basket/sezzleBasket.ds'),
-			api = require('~/cartridge/scripts/api/sezzleAPI.ds'),
+			api = require('~/cartridge/scripts/api/v2.ds'),
 			filepath = File.IMPEX + File.SEPARATOR + 'sezzle' + File.SEPARATOR,
 			filename = 'sezzle.dat';
 			
@@ -112,11 +112,11 @@
 		/**
 		 * Get order by order uuid
 		 *
-		 * @param {string} orderUUID
+		 * @param {dw.order.Order} order
 		 * @returns {Object} order response
 		 */
-		this.getOrderByOrderUUID = function (orderUUID) {
-			return response = api.getOrderByOrderUUID(orderUUID);
+		this.getOrderByOrderUUID = function (order) {
+			return response = api.getOrderByOrderUUID(order);
 		};
 		
 		/**
