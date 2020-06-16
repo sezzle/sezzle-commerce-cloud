@@ -193,7 +193,7 @@
     <type-extension type-id="SitePreferences">
         <custom-attribute-definitions>
             <attribute-definition attribute-id="SezzleMode">
-                <display-name xml:lang="x-default">Sezzle Mode</display-name>
+                <display-name xml:lang="x-default">Mode</display-name>
                 <type>enum-of-string</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
@@ -209,7 +209,7 @@
                 </value-definitions>
             </attribute-definition>
             <attribute-definition attribute-id="SezzleOnline">
-                <display-name xml:lang="x-default">Sezzle Enabled</display-name>
+                <display-name xml:lang="x-default">Enabled</display-name>
                 <description xml:lang="x-default">Turn on/off Sezzle integration</description>
                 <type>boolean</type>
                 <mandatory-flag>false</mandatory-flag>
@@ -217,7 +217,7 @@
                 <default-value>true</default-value>
             </attribute-definition>
             <attribute-definition attribute-id="SezzlePaymentAction">
-                <display-name xml:lang="x-default">Sezzle Payment Action</display-name>
+                <display-name xml:lang="x-default">Payment Action</display-name>
                 <type>enum-of-string</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
@@ -233,14 +233,14 @@
                 </value-definitions>
             </attribute-definition>
             <attribute-definition attribute-id="SezzleMerchantUUID">
-                <display-name xml:lang="x-default">Sezzle Merchant UUID</display-name>
+                <display-name xml:lang="x-default">Merchant UUID</display-name>
                 <type>string</type>
                 <mandatory-flag>true</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
             <attribute-definition attribute-id="SezzleAllowWidgetInPDP">
-                <display-name xml:lang="x-default">Sezzle Allow Widget In PDP</display-name>
+                <display-name xml:lang="x-default">Allow Widget In PDP</display-name>
                 <description xml:lang="x-default">Turn on/off Sezzle Widget in PDP</description>
                 <type>boolean</type>
                 <mandatory-flag>false</mandatory-flag>
@@ -248,7 +248,7 @@
                 <default-value>true</default-value>
             </attribute-definition>
             <attribute-definition attribute-id="SezzleAllowWidgetInCartPage">
-                <display-name xml:lang="x-default">Sezzle Allow Widget In Cart Page</display-name>
+                <display-name xml:lang="x-default">Allow Widget In Cart Page</display-name>
                 <description xml:lang="x-default">Turn on/off Sezzle Widget in Cart Page</description>
                 <type>boolean</type>
                 <mandatory-flag>false</mandatory-flag>
@@ -256,14 +256,14 @@
                 <default-value>true</default-value>
             </attribute-definition>
             <attribute-definition attribute-id="SezzlePrivateKey">
-                <display-name xml:lang="x-default">Sezzle Private Key</display-name>
+                <display-name xml:lang="x-default">Private Key</display-name>
                 <type>string</type>
                 <mandatory-flag>true</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
             <attribute-definition attribute-id="SezzlePublicKey">
-                <display-name xml:lang="x-default">Sezzle Public Key</display-name>
+                <display-name xml:lang="x-default">Public Key</display-name>
                 <type>string</type>
                 <mandatory-flag>true</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
