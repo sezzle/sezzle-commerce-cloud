@@ -235,9 +235,25 @@
             <attribute-definition attribute-id="SezzleMerchantUUID">
                 <display-name xml:lang="x-default">Sezzle Merchant UUID</display-name>
                 <type>string</type>
-                <mandatory-flag>false</mandatory-flag>
+                <mandatory-flag>true</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="SezzleAllowWidgetInPDP">
+                <display-name xml:lang="x-default">Sezzle Allow Widget In PDP</display-name>
+                <description xml:lang="x-default">Turn on/off Sezzle Widget in PDP</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>true</default-value>
+            </attribute-definition>
+            <attribute-definition attribute-id="SezzleAllowWidgetInCartPage">
+                <display-name xml:lang="x-default">Sezzle Allow Widget In Cart Page</display-name>
+                <description xml:lang="x-default">Turn on/off Sezzle Widget in Cart Page</description>
+                <type>boolean</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <default-value>true</default-value>
             </attribute-definition>
             <attribute-definition attribute-id="SezzlePrivateKey">
                 <display-name xml:lang="x-default">Sezzle Private Key</display-name>
@@ -279,6 +295,8 @@
                 <attribute attribute-id="SezzlePrivateKey"/>
                 <attribute attribute-id="SezzlePaymentAction"/>
                 <attribute attribute-id="SezzleTokenize"/>
+                <attribute attribute-id="SezzleAllowWidgetInPDP"/>
+                <attribute attribute-id="SezzleAllowWidgetInCartPage"/>
                 <attribute attribute-id="StoreFrontPath"/>
             </attribute-group>
         </group-definitions>

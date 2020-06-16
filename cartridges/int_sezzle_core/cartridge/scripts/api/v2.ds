@@ -11,7 +11,7 @@
 			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
 			service = require('*/cartridge/scripts/init/initSezzleServices.ds'),
-			sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper.ds');
+			sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils.ds');
 		
 		/**
 		 * Authenticate the merchant by public and private key
@@ -20,8 +20,8 @@
 		 */
 		self.authenticate = function () {
 			try {
-				if (sezzleHelper.GetAuthToken()) {
-					return sezzleHelper.getAuthToken();	
+				if (sezzleUtils.getAuthToken() != "") {
+					return sezzleUtils.getAuthToken();	
 				}
 				var sezzleService = service.initService('sezzle.authenticate');
 				var public_key = sezzleData.getPublicKey();
@@ -33,10 +33,7 @@
 					'private_key' : private_key
 				});
 				var response = resp.object.response;
-				sezzleHelper.setAuthToken(response);
-				session.privacy.sezzleAuthToken = response.token;
-				session.privacy.sezzleAuthTokenExpiration = response.expiration_date;
-				session.privacy.sezzleMerchantUUID = response.merchant_uuid;
+				sezzleUtils.setAuthToken(response);
 				return response.token;
 			} catch (e) {
 				logger.debug('Api:authenticate. Error - {0}', e);

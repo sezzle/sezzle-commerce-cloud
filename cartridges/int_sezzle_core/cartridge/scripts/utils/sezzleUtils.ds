@@ -275,6 +275,33 @@
 			}
 			return true;
 		};
+		
+		/**
+		 * Validate and get auth token 
+		 *
+		 * @returns {string} token
+		 */
+		self.getAuthToken = function(){
+			if (session.privacy.sezzleAuthToken == "" || sezzleData.getMerchantUUID() != session.privacy.sezzleMerchantUUID) {
+				return "";	
+			} else if (session.privacy.sezzleAuthTokenExpiration != "") {
+				var authExpirationTimestamp = self.getFormattedDateTimestamp(session.privacy.sezzleAuthTokenExpiration);
+				var currentTimestamp = Date.now();
+				if (currentTimestamp > authExpirationTimestamp) {
+					return "";
+				}
+			}
+			return session.privacy.sezzleAuthToken;
+		};
+		
+		/**
+		 * Set auth token for future use 
+		 */
+		self.setAuthToken = function(object){
+			session.privacy.sezzleAuthToken = object.token;
+			session.privacy.sezzleAuthTokenExpiration = object.expiration_date;
+			session.privacy.sezzleMerchantUUID = object.merchant_uuid;
+		};
 	};
 
 	module.exports = new Utils();

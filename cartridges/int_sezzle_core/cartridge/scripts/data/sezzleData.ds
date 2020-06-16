@@ -50,6 +50,30 @@
                     false;
         };
         /**
+         * Return Sezzle Merchant UUID
+         *
+         * @returns {string} merchant uuid
+         */
+        this.getMerchantUUID = function () {
+            return currentSite.getCustomPreferenceValue('SezzleMerchantUUID');
+        };
+        /**
+         * Return Sezzle Widget is allowed in PDP or not
+         *
+         * @returns {boolean} status
+         */
+        this.isWidgetScriptAllowedInPDP = function () {
+            return currentSite.getCustomPreferenceValue('SezzleAllowWidgetInPDP');
+        };
+        /**
+         * Return Sezzle Widget is allowed in Cart Page or not
+         *
+         * @returns {boolean} status
+         */
+        this.isWidgetScriptAllowedInCart = function () {
+            return currentSite.getCustomPreferenceValue('SezzleAllowWidgetInCartPage');
+        };
+        /**
          * Return Sezzle Tokenize Status
          *
          * @returns {string} tokenize status

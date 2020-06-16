@@ -10,6 +10,7 @@ var sezzle = require('*/cartridge/scripts/sezzle.ds');
 var v2 = require('*/cartridge/scripts/api/v2.ds');
 var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
 var sezzleData = require('~/cartridge/scripts/data/sezzleData.ds');
+var sezzleUtils = require('~/cartridge/scripts/utils/sezzleUtils.ds');
  
  
 var Status = require('dw/system/Status');
@@ -76,28 +77,32 @@ function storeTokenizeRecord(order, tokenizeObject) {
 			var token = tokenizeObject.token;
 			var tokenDetails = sezzle.order.getTokenDetails(token);
 			if (tokenDetails != null && !tokenDetails.error) {
-				var profile = order.getCustomer().getProfile();
 				Transaction.wrap(function () {
-					profile.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
-					profile.custom.SezzleCustomerTokenizeStatus = true;
-					profile.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
-					var customerLinks = tokenDetails.response.customer.links;
-					if (customerLinks) {
-						for (var k in customerLinks) {
-							var link = customerLinks[k];
-							if (link.rel == 'order' && link.method == 'POST') {
-								profile.custom.SezzleCustomerCreateOrderLink = link.href;	
+					if (tokenizeObject.is_customer_tokenized) {
+						var profile = order.getCustomer().getProfile();
+						profile.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
+						profile.custom.SezzleCustomerTokenizeStatus = true;
+						profile.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
+						var customerLinks = tokenDetails.response.customer.links;
+						if (customerLinks) {
+							for (var k in customerLinks) {
+								var link = customerLinks[k];
+								if (link.rel == 'order' && link.method == 'POST') {
+									profile.custom.SezzleCustomerCreateOrderLink = link.href;	
+								}
 							}
 						}
+						
+						order.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
+						order.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
 					}
-					
-					order.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
-					order.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
 				});
 			}
 		} else if (tokenizeObject.customer_uuid != '' && tokenizeObject.customer_uuid_expiration != '') {
-			order.custom.SezzleCustomerUUID = tokenizeObject.customer_uuid;
-			order.custom.SezzleCustomerUUIDExpiration = tokenizeObject.customer_uuid_expiration != '';
+			Transaction.wrap(function () {
+				order.custom.SezzleCustomerUUID = tokenizeObject.customer_uuid;
+				order.custom.SezzleCustomerUUIDExpiration = tokenizeObject.customer_uuid_expiration;
+			});
 		}
 	}
 }

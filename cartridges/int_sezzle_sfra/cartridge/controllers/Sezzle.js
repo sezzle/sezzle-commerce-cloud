@@ -144,16 +144,15 @@ server.get('Success', function(req, res, next) {
     logger.debug("Order placed successfully in Salesforce");
 
 	var customerUUID = request.httpParameterMap["customer-uuid"].stringValue;
-	if (customerUUID != null) {
-		var tokenizeObject = {
-				'token': session.privacy.token,
-				'token_expiration': session.privacy.tokenExpiration,
-				'customer_uuid': session.privacy.customerUUID,
-				'customer_uuid_expiration': session.privacy.customerUUIDExpiration
-		}
-		sezzleHelper.StoreTokenizeRecord(order, tokenizeObject);
-		logger.debug("Tokenize record successfully stored in Order and Profile");
+	var tokenizeObject = {
+			'token': session.privacy.token,
+			'token_expiration': session.privacy.tokenExpiration,
+			'customer_uuid': session.privacy.customerUUID,
+			'customer_uuid_expiration': session.privacy.customerUUIDExpiration,
+			'is_customer_tokenized': customerUUID != null ? true : false
 	}
+	sezzleHelper.StoreTokenizeRecord(order, tokenizeObject);
+	logger.debug("Tokenize record successfully stored in Order and Profile");
 	
     
     var result = sezzleHelper.PostProcess(order);

@@ -262,7 +262,7 @@
 					var orderResponse = sezzleOrder.createOrder(requestObject);
 					if (orderResponse != null && !orderResponse.error) {
 						returnObj['checkout'].approved = orderResponse.response.authorization.approved;
-						returnObj['checkout'].checkout_url = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID + "?customer-uuid="+customerTokenRecord.customer_uuid;
+						returnObj['checkout'].checkout_url = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID;
 						returnObj['checkout'].order_uuid = orderResponse.response.uuid;
 						returnObj['checkout'].order_links = orderResponse.response.links;
 						returnObj['tokenize'] = {
@@ -332,8 +332,6 @@
 				}	
 			}
 			return {};
-			
-			
 		};
 		
 		/**

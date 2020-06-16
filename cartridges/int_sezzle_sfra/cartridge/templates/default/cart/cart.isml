@@ -2,13 +2,14 @@
 <isdecorate template="common/layout/page">
     <isscript>
         var assets = require('*/cartridge/scripts/assets.js');
-        assets.addJs('/js/sezzleWidgetCore.js');
         assets.addCss('/css/cart.css');
-        assets.addJs('/js/widgetRenderer.js');
         var sezzleData = require('*/cartridge/scripts/data/sezzleData');
     </isscript>
-	<isif condition="${sezzleData.getMerchantID() && sezzleData.isWidgetScriptAllowedInCart()}">
-    	<script src='https://widget.sezzle.com/v1/javascript/price-widget?uuid=${sezzleData.getMerchantID()}'></script>
+	<isif condition="${sezzleData.getMerchantUUID() && sezzleData.isWidgetScriptAllowedInCart()}">
+    	<isscript>
+	        assets.addJs('/js/sezzleWidgetCore.js');
+	        assets.addJs('/js/widgetRenderer.js');
+	    </isscript>
     </isif>
     <isif condition="${pdict.reportingURLs && pdict.reportingURLs.length}">
         <isinclude template="reporting/reportingUrls" />
@@ -78,7 +79,10 @@
                         <isinclude template="cart/cartShippingMethodSelection" />
                     </div>
                     <isinclude template="cart/cartTotals" />
+                    
+                    <!-- Sezzle Widget -->
                     <div id="sezzle-widget"></div>
+                    
                     <div class="row">
                         <div class="col-12 checkout-continue">
                             <isinclude template="cart/checkoutButtons" />
