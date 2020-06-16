@@ -5,7 +5,7 @@
 var logger = require('dw/system').Logger.getLogger('Sezzle', ''),
     Money = require('dw/value/Money');
 
-var sezzleHelper = {};
+var sezzleBMHelper = {};
 
 
 
@@ -85,7 +85,7 @@ function updateOrderData(order, transactionId, methodName, amount) {
  * @param {dw.order.Order} order
  * @param {number} amount
  */
-sezzleHelper.updateSezzleOrderAmount = function (order, amount) {
+sezzleBMHelper.updateSezzleOrderAmount = function (order, amount) {
 	amount = new Money(amount, order.currencyCode);
 	order.custom.SezzleOrderAmount = amount;
 };
@@ -96,7 +96,7 @@ sezzleHelper.updateSezzleOrderAmount = function (order, amount) {
  * @param {dw.order.LineItemCtnr} basket - Basket
  * @returns {dw.order.OrderPaymentInstrument} payment instrument with id SEZZLE_PAYMENT
  */
-sezzleHelper.getSezzlePaymentInstrument = function (basket) {
+sezzleBMHelper.getSezzlePaymentInstrument = function (basket) {
     var paymentInstruments = basket.getPaymentInstruments();
     var iterator = paymentInstruments.iterator();
     var paymentInstrument = null;
@@ -119,7 +119,7 @@ sezzleHelper.getSezzlePaymentInstrument = function (basket) {
  * @param {dw.order.Order} basket - Basket
  * @returns {money} order subtotal
  */
-sezzleHelper.getSubtotal = function (order) {
+sezzleBMHelper.getSubtotal = function (order) {
 	var items = [],
 		productLineItems = order.getProductLineItems().iterator();
 
@@ -148,7 +148,7 @@ sezzleHelper.getSubtotal = function (order) {
  * * @param {number} amount - Amount passed
  * @returns {boolean} true in case of success and false when error
  */
-sezzleHelper.updateOrderTransaction = function (order, isCustomOrder, transactionID, methodName, amount) {
+sezzleBMHelper.updateOrderTransaction = function (order, isCustomOrder, transactionID, methodName, amount) {
     try {
         if (isCustomOrder) {
             updateCustomOrderData(order.orderNo, transactionID);
@@ -163,4 +163,4 @@ sezzleHelper.updateOrderTransaction = function (order, isCustomOrder, transactio
     return true;
 };
 
-module.exports = sezzleHelper;
+module.exports = sezzleBMHelper;

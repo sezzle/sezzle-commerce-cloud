@@ -10,7 +10,8 @@
 		var self = this,
 			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
-			service = require('*/cartridge/scripts/init/initSezzleServices.ds');
+			service = require('*/cartridge/scripts/init/initSezzleServices.ds'),
+			sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper.ds');
 		
 		/**
 		 * Authenticate the merchant by public and private key
@@ -19,6 +20,9 @@
 		 */
 		self.authenticate = function () {
 			try {
+				if (sezzleHelper.GetAuthToken()) {
+					return sezzleHelper.getAuthToken();	
+				}
 				var sezzleService = service.initService('sezzle.authenticate');
 				var public_key = sezzleData.getPublicKey();
 				var private_key = sezzleData.getPrivateKey();
@@ -28,7 +32,12 @@
 					'public_key' : public_key,
 					'private_key' : private_key
 				});
-				return resp.object;
+				var response = resp.object.response;
+				sezzleHelper.setAuthToken(response);
+				session.privacy.sezzleAuthToken = response.token;
+				session.privacy.sezzleAuthTokenExpiration = response.expiration_date;
+				session.privacy.sezzleMerchantUUID = response.merchant_uuid;
+				return response.token;
 			} catch (e) {
 				logger.debug('Api:authenticate. Error - {0}', e);
 				return {
@@ -47,9 +56,8 @@
 		 */
 		self.capture = function (order, amount, isPartialCapture) {
 			try {
-				var authentication = self.authenticate();
 				var obj = {
-					'authToken' : authentication.response.token,
+					'authToken' : self.authenticate(),
 					'capture_amount': {
 								'amount_in_cents': amount,
 								'currency': order.getCurrencyCode()
@@ -77,9 +85,8 @@
 		 */
 		self.getCustomerUUID = function (token) {
 			try {
-				var authentication = self.authenticate();
 				var obj = {
-					'authToken' : authentication.response.token,
+					'authToken' : self.authenticate(),
 					'httpMethod': 'GET'
 				};
 				
@@ -104,7 +111,7 @@
 			try {
 				var authentication = self.authenticate();
 				var obj = {
-					'authToken' : authentication.response.token,
+					'authToken' : self.authenticate(),
 					'httpMethod': 'GET'
 				};
 				
@@ -128,8 +135,7 @@
 		 */
 		self.createOrderByCustomerUUID = function (requestObj) {
 			try {
-				var authentication = self.authenticate();
-				requestObj.authToken = authentication.response.token;
+				requestObj.authToken = self.authenticate();
 				var sezzleService = service.initService('sezzle.createorderbycustomeruuid');
 				//sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/order';
 				sezzleService.URL = requestObj.link;
@@ -151,9 +157,8 @@
 		 */
 		self.refund = function (order, amount) {
 			try {
-				var authentication = self.authenticate();
 				var obj = {
-					'authToken' : authentication.response.token,
+					'authToken' : self.authenticate(),
 					'amount_in_cents': amount,
 					'currency': order.getCurrencyCode()
 				}
@@ -180,9 +185,8 @@
 		 */
 		self.release = function (order, amount) {
 			try {
-				var authentication = self.authenticate();
 				var obj = {
-					'authToken' : authentication.response.token,
+					'authToken' : self.authenticate(),
 					'amount_in_cents': amount,
 					'currency': order.getCurrencyCode()
 				}
@@ -207,9 +211,8 @@
 		 */
 		self.updateOrder = function (order) {
 			try {
-				var authentication = self.authenticate();
 				var obj = {
-					'authToken' : authentication.response.token,
+					'authToken' : self.authenticate(),
 					'reference_id': order.orderNo,
 					'httpMethod': 'PATCH'
 				};
@@ -234,8 +237,7 @@
 		 */
 		self.createSession = function (checkoutObject) {
 			try {
-				var authentication = self.authenticate();
-				checkoutObject.authToken = authentication.response.token;
+				checkoutObject.authToken = self.authenticate();
 				var sezzleService = service.initService('sezzle.createsession');		
 				sezzleService.URL = sezzleData.getV2URLPath() + 'session';
 				return sezzleService.call(checkoutObject).object;

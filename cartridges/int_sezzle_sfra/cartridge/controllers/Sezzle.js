@@ -91,8 +91,10 @@ server.get('Redirect', function(req, res, next) {
 		}
 		
 		if (checkoutObject.tokenize) {
-			session.privacy.sezzleToken = checkoutObject['tokenize']['token'] ? checkoutObject['tokenize']['token'] : '';
+			session.privacy.token = checkoutObject['tokenize']['token'] ? checkoutObject['tokenize']['token'] : '';
 			session.privacy.tokenExpiration = checkoutObject['tokenize']['token_expiration'] ? checkoutObject['tokenize']['token_expiration'] : '';
+			session.privacy.customerUUID = checkoutObject['tokenize']['customer_uuid'] ? checkoutObject['tokenize']['customer_uuid'] : '';
+			session.privacy.customerUUIDExpiration = checkoutObject['tokenize']['customer_uuid_expiration'] ? checkoutObject['tokenize']['customer_uuid_expiration'] : '';
 		}
 	}
 	return next();
@@ -106,11 +108,6 @@ server.get('Success', function(req, res, next) {
 	if (!basket) {
 		res.redirect(URLUtils.url('Home-Show'));
         return next();
-	}
-	var customerUUID = request.httpParameterMap["customer-uuid"].stringValue;
-	var profile = basket.customer.profile;
-	if (customerUUID != null && profile != null) {
-		sezzleHelper.StoreTokenizeRecord(profile, session.privacy.sezzleToken, session.privacy.tokenExpiration);
 	}
 	// Creates a new order.
 	var reportingUrlsHelper = require('*/cartridge/scripts/reportingUrls');
@@ -145,6 +142,19 @@ server.get('Success', function(req, res, next) {
     }
     
     logger.debug("Order placed successfully in Salesforce");
+
+	var customerUUID = request.httpParameterMap["customer-uuid"].stringValue;
+	if (customerUUID != null) {
+		var tokenizeObject = {
+				'token': session.privacy.token,
+				'token_expiration': session.privacy.tokenExpiration,
+				'customer_uuid': session.privacy.customerUUID,
+				'customer_uuid_expiration': session.privacy.customerUUIDExpiration
+		}
+		sezzleHelper.StoreTokenizeRecord(order, tokenizeObject);
+		logger.debug("Tokenize record successfully stored in Order and Profile");
+	}
+	
     
     var result = sezzleHelper.PostProcess(order);
     if (!result) {

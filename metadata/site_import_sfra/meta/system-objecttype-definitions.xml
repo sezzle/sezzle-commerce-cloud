@@ -2,22 +2,29 @@
 <metadata xmlns="http://www.demandware.com/xml/impex/metadata/2006-10-31">
     <type-extension type-id="Profile">
         <custom-attribute-definitions>
-            <attribute-definition attribute-id="SezzleToken">
-                <display-name xml:lang="x-default">Sezzle Token</display-name>
+            <attribute-definition attribute-id="SezzleCustomerUUID">
+                <display-name xml:lang="x-default">Sezzle Customer UUID</display-name>
                 <type>string</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
-            <attribute-definition attribute-id="SezzleTokenApproved">
-                <display-name xml:lang="x-default">Sezzle Token Approved</display-name>
+            <attribute-definition attribute-id="SezzleCustomerTokenizeStatus">
+                <display-name xml:lang="x-default">Sezzle Customer Tokenize Status</display-name>
                 <type>boolean</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
-            <attribute-definition attribute-id="SezzleTokenExpiration">
-                <display-name xml:lang="x-default">Sezzle Token Expiration</display-name>
+            <attribute-definition attribute-id="SezzleCustomerUUIDExpiration">
+                <display-name xml:lang="x-default">Sezzle Customer UUID Expiration</display-name>
+                <type>string</type>
+                <mandatory-flag>false</mandatory-flag>
+                <externally-managed-flag>false</externally-managed-flag>
+                <min-length>0</min-length>
+            </attribute-definition>
+            <attribute-definition attribute-id="SezzleCustomerCreateOrderLink">
+                <display-name xml:lang="x-default">Sezzle Customer Create Order Link</display-name>
                 <type>string</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>false</externally-managed-flag>
@@ -27,9 +34,9 @@
         <group-definitions>
             <attribute-group group-id="Sezzle">
                 <display-name xml:lang="x-default">Sezzle</display-name>
-                <attribute attribute-id="SezzleToken"/>
-                <attribute attribute-id="SezzleTokenApproved"/>
-                <attribute attribute-id="SezzleTokenExpiration"/>
+                <attribute attribute-id="SezzleCustomerUUID"/>
+                <attribute attribute-id="SezzleCustomerTokenizeStatus"/>
+                <attribute attribute-id="SezzleCustomerUUIDExpiration"/>
             </attribute-group>
         </group-definitions>
     </type-extension>
@@ -108,17 +115,17 @@
                     </value-definition>
                 </value-definitions>
             </attribute-definition>
-            <attribute-definition attribute-id="SezzleToken">
-                <display-name xml:lang="x-default">Sezzle Token</display-name>
-                <description xml:lang="x-default">Sezzle Tokenized token</description>
+            <attribute-definition attribute-id="SezzleCustomerUUID">
+                <display-name xml:lang="x-default">Sezzle Customer UUID</display-name>
+                <description xml:lang="x-default">Sezzle Customer UUID</description>
                 <type>string</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>true</externally-managed-flag>
                 <min-length>0</min-length>
             </attribute-definition>
-            <attribute-definition attribute-id="SezzleTokenExpiration">
-                <display-name xml:lang="x-default">Sezzle Token Expiration</display-name>
-                <description xml:lang="x-default">Sezzle Token Expiration</description>
+            <attribute-definition attribute-id="SezzleCustomerUUIDExpiration">
+                <display-name xml:lang="x-default">Sezzle Customer UUID Expiration</display-name>
+                <description xml:lang="x-default">Sezzle Customer UUID Expiration</description>
                 <type>string</type>
                 <mandatory-flag>false</mandatory-flag>
                 <externally-managed-flag>true</externally-managed-flag>
@@ -170,8 +177,8 @@
                 <display-name xml:lang="x-default">Sezzle</display-name>
                 <attribute attribute-id="SezzleExternalId"/>
                 <attribute attribute-id="SezzlePaymentAction"/>
-                <attribute attribute-id="SezzleToken"/>
-                <attribute attribute-id="SezzleTokenExpiration"/>
+                <attribute attribute-id="SezzleCustomerUUID"/>
+                <attribute attribute-id="SezzleCustomerUUIDExpiration"/>
                 <attribute attribute-id="SezzleAuthExpiration"/>
                 <attribute attribute-id="SezzleOrderUUID"/>
                 <attribute attribute-id="SezzleOrderAmount"/>

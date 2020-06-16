@@ -17,7 +17,7 @@
 			FileWriter = require('dw/io/FileWriter'),
 			data = require('~/cartridge/scripts/data/sezzleData.ds'),
 			basket = require('~/cartridge/scripts/basket/sezzleBasket.ds'),
-			api = require('~/cartridge/scripts/api/v2.ds'),
+			v2 = require('~/cartridge/scripts/api/v2.ds'),
 			filepath = File.IMPEX + File.SEPARATOR + 'sezzle' + File.SEPARATOR,
 			filename = 'sezzle.dat';
 			
@@ -70,8 +70,6 @@
 		this.updateAttributes = function (order, response, paymentProcessor, paymentInstrument) {
 			
 			try {
-				order.custom.SezzleToken = response.token;
-				order.custom.SezzleTokenExpiration = response.token_expiration;
 				order.custom.SezzleExternalId = response.reference_id;
 				order.custom.SezzlePaymentAction = String(data.getSezzlePaymentAction());
 				order.custom.SezzleOrderUUID = response.order_uuid != 'undefined' ? response.order_uuid : '';
@@ -96,7 +94,17 @@
 		 */
 		this.captureOrder = function (order) {
 			var captureAmount = order.totalGrossPrice.multiply(100).getValue();
-			var response = api.capture(order, captureAmount, false);
+			var response = v2.capture(order, captureAmount, false);
+		};
+		
+		/**
+		 * Get Token Details
+		 *
+		 * @param {string} token
+		 * @returns {Object} token details response
+		 */
+		this.getTokenDetails = function (token) {
+			return v2.getCustomerUUID(token);
 		};
 		
 		/**
@@ -106,7 +114,7 @@
 		 * @returns {Object} order response
 		 */
 		this.createOrder = function (requestObject) {
-			return response = api.createOrderByCustomerUUID(requestObject);
+			return response = v2.createOrderByCustomerUUID(requestObject);
 		};
 		
 		/**
@@ -116,7 +124,7 @@
 		 * @returns {Object} order response
 		 */
 		this.getOrderByOrderUUID = function (order) {
-			return response = api.getOrderByOrderUUID(order);
+			return response = v2.getOrderByOrderUUID(order);
 		};
 		
 		/**
@@ -126,7 +134,7 @@
 		 * @returns {Object} order response
 		 */
 		this.updateOrder = function (order) {
-			var response = api.updateOrder(order);
+			var response = v2.updateOrder(order);
 		};
 		
 		/**
@@ -142,7 +150,7 @@
 			    	var authAmountInCents = new Money(authAmountInFloat, order.currencyCode).multiply(100).getValue();
 					if ((order.custom.SezzleOrderAmount == order.custom.SezzleCapturedAmount)
 						&& authAmountInCents > 0) {
-						var response = api.refund(order, authAmountInCents);
+						var response = v2.refund(order, authAmountInCents);
 						if (response != null && !response.error) {
 							order.custom.SezzleRefundedAmount = order.totalGrossPrice.toString();	
 						}

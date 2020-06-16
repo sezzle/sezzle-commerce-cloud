@@ -4,7 +4,7 @@
 <isinclude template="sezzlebm/util/modules">
 
 <isscript>
-<!-- var sezzleHelper = require('*/cartridge/scripts/helper/sezzleHelper'); -->
+<!-- var sezzleBMHelper = require('*/cartridge/scripts/helper/sezzleHelper'); -->
 
 var isSearchByOrderNo = pdict.CurrentHttpParameterMap.orderNo.submitted;
 var isSearchByTransaction = pdict.CurrentHttpParameterMap.transactionId.submitted;

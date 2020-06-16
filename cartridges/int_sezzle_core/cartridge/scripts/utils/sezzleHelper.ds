@@ -65,18 +65,41 @@ function checkCart(cart) {
 }
 
 /**
- * Store tokenize record to Customer profile
+ * Store tokenize record to Customer profile and Order
  *
- * @param {dw.customer.Profile} profile
- * @param {string} token
- * @param {string} tokenExpiration
+ * @param {dw.order.Order} order
+ * @param {Object} tokenizeObject
  */
-function storeTokenizeRecord(profile, token, tokenExpiration) {
-	Transaction.wrap(function () {
-		profile.custom.SezzleToken = token;
-		profile.custom.SezzleTokenApproved = true;
-		profile.custom.SezzleTokenExpiration = tokenExpiration;
-	});
+function storeTokenizeRecord(order, tokenizeObject) {
+	if (!empty(tokenizeObject)) {
+		if (tokenizeObject.token != '') {
+			var token = tokenizeObject.token;
+			var tokenDetails = sezzle.order.getTokenDetails(token);
+			if (tokenDetails != null && !tokenDetails.error) {
+				var profile = order.getCustomer().getProfile();
+				Transaction.wrap(function () {
+					profile.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
+					profile.custom.SezzleCustomerTokenizeStatus = true;
+					profile.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
+					var customerLinks = tokenDetails.response.customer.links;
+					if (customerLinks) {
+						for (var k in customerLinks) {
+							var link = customerLinks[k];
+							if (link.rel == 'order' && link.method == 'POST') {
+								profile.custom.SezzleCustomerCreateOrderLink = link.href;	
+							}
+						}
+					}
+					
+					order.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
+					order.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
+				});
+			}
+		} else if (tokenizeObject.customer_uuid != '' && tokenizeObject.customer_uuid_expiration != '') {
+			order.custom.SezzleCustomerUUID = tokenizeObject.customer_uuid;
+			order.custom.SezzleCustomerUUIDExpiration = tokenizeObject.customer_uuid_expiration != '';
+		}
+	}
 }
 
 /**

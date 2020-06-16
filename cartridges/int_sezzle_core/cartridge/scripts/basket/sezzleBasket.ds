@@ -241,9 +241,10 @@
 			var referenceID = sezzleUtils.generateUUID();
 			var customerTokenRecord = self.getCustomerTokenRecord(basket.customer.profile);
 			var returnObj = {};
-			if (customerTokenRecord.token != undefined && customerTokenRecord.token_expiration != undefined) {
-				var createOrderLink = "";
+			if (customerTokenRecord.customer_uuid != undefined && customerTokenRecord.customer_uuid_expiration != undefined) {
+				var createOrderLinkByCustomerUUID = basket.customer.profile.custom.SezzleCustomerCreateOrderLink;
 				var requestObject = {
+					'customer_uuid': customerTokenRecord.customer_uuid,
 					'intent': 'AUTH',
 					'reference_id': referenceID,
 					'order_amount': {
@@ -256,31 +257,18 @@
 					'reference_id' : referenceID,
 					'approved' : false
 				};
-				var apiResponse = v2.getCustomerUUID(customerTokenRecord.token);
-				if (apiResponse != null && !apiResponse.error) {
-					requestObject.customer_uuid = apiResponse.response.customer.uuid;
-					var customerLinks = apiResponse.response.customer.links;
-					if (customerLinks) {
-						for (var k in customerLinks) {
-							var link = customerLinks[k];
-							if (link.rel == 'order' && link.method == 'POST') {
-								createOrderLink = link.href;	
-							}
-						}
-					}
-					if (createOrderLink != "") { 
-						requestObject.link = createOrderLink;
-						var orderResponse = sezzleOrder.createOrder(requestObject);
-						if (orderResponse != null && !orderResponse.error) {
-							returnObj['checkout'].approved = orderResponse.response.authorization.approved;
-							returnObj['checkout'].checkout_url = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID;
-							returnObj['checkout'].order_uuid = orderResponse.response.uuid;
-							returnObj['checkout'].order_links = orderResponse.response.links;
-							returnObj['tokenize'] = {
-								'token' : customerTokenRecord.token,
-								'token_expiration': customerTokenRecord.token_expiration
-							};
-						}
+				if (createOrderLinkByCustomerUUID != "") { 
+					requestObject.link = createOrderLinkByCustomerUUID;
+					var orderResponse = sezzleOrder.createOrder(requestObject);
+					if (orderResponse != null && !orderResponse.error) {
+						returnObj['checkout'].approved = orderResponse.response.authorization.approved;
+						returnObj['checkout'].checkout_url = self.getMerchant().user_confirmation_url + "?order_reference_id="+referenceID + "?customer-uuid="+customerTokenRecord.customer_uuid;
+						returnObj['checkout'].order_uuid = orderResponse.response.uuid;
+						returnObj['checkout'].order_links = orderResponse.response.links;
+						returnObj['tokenize'] = {
+							'customer_uuid' : customerTokenRecord.customer_uuid,
+							'customer_uuid_expiration': customerTokenRecord.customer_uuid_expiration
+						};
 					}
 				}
 			} else {
@@ -327,17 +315,17 @@
 		 */
 		self.getCustomerTokenRecord = function (profile) {
 			if (profile) {
-				var token = profile.custom.SezzleToken;
-				var tokenExpiration = profile.custom.SezzleTokenExpiration;
-				var isTokenApproved = profile.custom.SezzleTokenApproved;
-				if (token && tokenExpiration && isTokenApproved) {
+				var customerUUID = profile.custom.SezzleCustomerUUID;
+				var customerUUIDExpiration = profile.custom.SezzleCustomerUUIDExpiration;
+				var isCustomerTokenized = profile.custom.SezzleCustomerTokenizeStatus;
+				if (customerUUID && customerUUIDExpiration && isCustomerTokenized) {
 					var currentTimestamp = Date.now();
-					var tokenExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(tokenExpiration);
-					if (isTokenApproved && currentTimestamp <= tokenExpirationTimestamp) {
+					var customerUUIDExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(customerUUIDExpiration);
+					if (isCustomerTokenized && currentTimestamp <= customerUUIDExpirationTimestamp) {
 						return {
-							'token': token,
-							'is_approved': isTokenApproved,
-							'token_expiration': tokenExpiration
+							'customer_uuid': customerUUID,
+							'is_tokenized': isCustomerTokenized,
+							'customer_uuid_expiration': customerUUIDExpiration
 						};	
 					}
 					self.deleteCustomerToken(profile); 
@@ -355,9 +343,10 @@
 		 */
 		self.deleteCustomerToken = function (profile) {
 			Transaction.wrap(function () {
-				profile.custom.SezzleToken = null;
-				profile.custom.SezzleTokenApproved = false;
-				profile.custom.SezzleTokenExpiration = null;
+				profile.custom.SezzleCustomerUUID = null;
+				profile.custom.SezzleCustomerTokenizeStatus = false;
+				profile.custom.SezzleCustomerUUIDExpiration = null;
+				profile.custom.SezzleCustomerCreateOrderLink = null;
 			});
 		};
 		

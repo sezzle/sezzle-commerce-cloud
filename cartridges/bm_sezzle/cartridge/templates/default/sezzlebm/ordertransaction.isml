@@ -4,14 +4,14 @@
 <isinclude template="sezzlebm/util/modules">
 
 <isscript>
-    var sezzleHelper = require('*/cartridge/scripts/helper/sezzleHelper');
+    var sezzleBMHelper = require('*/cartridge/scripts/helper/sezzleBMHelper');
 	var order = pdict.Order;
 	var canCapture = pdict.CanCapture;
 	var canRefund = pdict.CanRefund;
 	var canRelease = pdict.CanRelease;
 	var shippingAmount = order.getShippingTotalPrice();
 	var taxAmount = order.getTotalTax();
-	var subtotal =  sezzleHelper.getSubtotal(order);
+	var subtotal =  sezzleBMHelper.getSubtotal(order);
 	var orderTotal = order.getTotalGrossPrice();	
 	var email = order.customerEmail || 'Unknown';
 	var authAmount = order.custom.SezzleOrderAmount;

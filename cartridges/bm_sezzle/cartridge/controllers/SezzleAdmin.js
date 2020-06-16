@@ -1,6 +1,6 @@
 /* global dw request response empty */
 
-var sezzleHelper = require('*/cartridge/scripts/helper/sezzleHelper');
+var sezzleBMHelper = require('*/cartridge/scripts/helper/sezzleBMHelper');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 var v2 = require('*/cartridge/scripts/api/v2');
 var Money = require('dw/value/Money');
@@ -65,7 +65,7 @@ function getOrders(orderNo, referenceID) {
             break;
         }
         order = systemOrders.next();
-        paymentInstrument = new Date(sezzleHelper.getSezzlePaymentInstrument(order));
+        paymentInstrument = new Date(sezzleBMHelper.getSezzlePaymentInstrument(order));
         if (paymentInstrument === null) {
             continue; // eslint-disable-line no-continue
         }
@@ -274,7 +274,7 @@ function orderTransaction() {
 		var authExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(order.custom.SezzleAuthExpiration);
 		if (currentTimestamp > authExpirationTimestamp) {
 			Transaction.wrap(function () {
-				sezzleHelper.updateSezzleOrderAmount(order, capturedAmountInFloat);
+				sezzleBMHelper.updateSezzleOrderAmount(order, capturedAmountInFloat);
 			});
 		}
 	}
@@ -359,7 +359,7 @@ function action() {
         
         if (callApiResponse != null && !callApiResponse.error) {
         	Transaction.wrap(function () {
-                transactionResult = sezzleHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt);
+                transactionResult = sezzleBMHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt);
             });
         }
     } else {

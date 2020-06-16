@@ -38,7 +38,7 @@ function redirect() {
             {
                 SezzleRedirectUrl: checkoutObject.redirect_url
             });
-        session.privacy.sezzleToken = sezzle.utils.getQueryString('id',
+        session.privacy.SezzleCustomerUUID = sezzle.utils.getQueryString('id',
             checkoutObject.redirect_url);
         session.privacy.sezzled = true;
         session.privacy.sezzleAmount = checkoutObject.amount_in_cents;

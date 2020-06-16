@@ -52,7 +52,7 @@
                     </value-definition>
                 </value-definitions>
             </attribute-definition>
-            <attribute-definition attribute-id="SezzleToken">
+            <attribute-definition attribute-id="SezzleCustomerUUID">
                 <display-name xml:lang="x-default">Sezzle Checkout Token</display-name>
                 <description xml:lang="x-default">Sezzle Checkout token</description>
                 <type>string</type>
@@ -66,7 +66,7 @@
                 <display-name xml:lang="x-default">Sezzle</display-name>
                 <attribute attribute-id="SezzleExternalId"/>
                 <attribute attribute-id="SezzlePaymentAction"/>
-                <attribute attribute-id="SezzleToken"/>
+                <attribute attribute-id="SezzleCustomerUUID"/>
                 <attribute attribute-id="SezzleStatus"/>
             </attribute-group>
         </group-definitions>
