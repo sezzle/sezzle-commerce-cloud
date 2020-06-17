@@ -159,15 +159,7 @@ server.get('Success', function(req, res, next) {
 			'customer_uuid_expiration': session.privacy.customerUUIDExpiration,
 			'is_customer_tokenized': customerUUID != null ? true : false
 	}
-	var response = sezzleHelper.StoreTokenizeRecord(order, tokenizeObject);
-	if (!response) {
-    	res.json({
-            error: true,
-            errorMessage: Resource.msg('error.technical', 'checkout', null)
-        });
-        return next();
-    }
-	logger.debug("Tokenize record successfully stored in Order and Profile");
+	sezzleHelper.StoreTokenizeRecord(order, tokenizeObject);
     
     var result = sezzleHelper.PostProcess(order);
     if (!result) {
