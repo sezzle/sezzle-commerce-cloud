@@ -63,6 +63,8 @@ function storeTokenizeRecord(order, tokenizeObject) {
 	try {
 		if (empty(tokenizeObject)) {
 			throw new Error("{tokenizeObject} is empty");	
+		} else if (!tokenizeObject.is_customer_tokenized) {
+			throw new Error("Customer not tokenized by Sezzle. Bypassing storing");
 		}
 	
 		if (tokenizeObject.token != '') {
@@ -73,9 +75,6 @@ function storeTokenizeRecord(order, tokenizeObject) {
 			}
 			
 			Transaction.wrap(function () {
-				if (!tokenizeObject.is_customer_tokenized) {
-					throw new Error("Customer not tokenized by Sezzle. Bypassing storing");
-				}
 				var profile = order.getCustomer().getProfile();
 				profile.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
 				profile.custom.SezzleCustomerTokenizeStatus = true;
