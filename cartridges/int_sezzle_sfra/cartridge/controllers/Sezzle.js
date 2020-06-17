@@ -39,15 +39,22 @@ server.get('Redirect', function(req, res, next) {
 	var sezzleOrderUUID = checkoutObject['checkout']['order_uuid']
 	var isCheckoutApproved = checkoutObject['checkout']['approved'];
 	var error = false;
+	var erMsg = "";
 	session.privacy.sezzleErrorMessage = "";
 	if (!isCheckoutApproved) {
 		error = true;
-		session.privacy.sezzleErrorMessage = "Sezzle has not approved your checkout. Please contact Sezzle Customer Support.";
+		erMsg = "Sezzle has not approved your checkout. Please contact Sezzle Customer Support.";
+		session.privacy.sezzleErrorMessage = erMsg;
 		redirectURL = URLUtils.url('Checkout-Begin').toString() + "?stage=payment";
 	} else if (redirectURL == undefined && sezzleOrderUUID == undefined) {
 		error = true;
-		session.privacy.sezzleErrorMessage = "Something went wrong while redirecting. Please try again.";
+		erMsg = "Something went wrong while redirecting. Please try again.";
+		session.privacy.sezzleErrorMessage = erMsg;
 		redirectURL = URLUtils.url('Checkout-Begin').toString() + "?stage=payment";
+	}
+	
+	if (erMsg != "") {
+		logger.debug("Redirection - {0}", erMsg);
 	}
 	
 	res.render('sezzle/sezzleredirect', {
@@ -88,6 +95,7 @@ server.get('Redirect', function(req, res, next) {
 						break;
 				}
 			}
+			logger.debug("Order Links has been successfully gathered into session");
 		}
 		
 		if (checkoutObject.tokenize) {
@@ -95,6 +103,7 @@ server.get('Redirect', function(req, res, next) {
 			session.privacy.tokenExpiration = checkoutObject['tokenize']['token_expiration'] || '';
 			session.privacy.customerUUID = checkoutObject['tokenize']['customer_uuid'] || '';
 			session.privacy.customerUUIDExpiration = checkoutObject['tokenize']['customer_uuid_expiration'] || '';
+			logger.debug("Tokenize records has been successfully gathered into session");
 		}
 	}
 	return next();
@@ -150,9 +159,15 @@ server.get('Success', function(req, res, next) {
 			'customer_uuid_expiration': session.privacy.customerUUIDExpiration,
 			'is_customer_tokenized': customerUUID != null ? true : false
 	}
-	sezzleHelper.StoreTokenizeRecord(order, tokenizeObject);
+	var response = sezzleHelper.StoreTokenizeRecord(order, tokenizeObject);
+	if (!response) {
+    	res.json({
+            error: true,
+            errorMessage: Resource.msg('error.technical', 'checkout', null)
+        });
+        return next();
+    }
 	logger.debug("Tokenize record successfully stored in Order and Profile");
-	
     
     var result = sezzleHelper.PostProcess(order);
     if (!result) {
@@ -162,6 +177,7 @@ server.get('Success', function(req, res, next) {
         });
         return next();
     }
+    logger.debug("Post process successfully completed");
     
     var passwordForm;
     var config = {

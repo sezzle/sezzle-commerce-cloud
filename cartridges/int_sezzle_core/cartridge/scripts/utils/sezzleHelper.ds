@@ -58,40 +58,55 @@ function checkCart(cart) {
  *
  * @param {dw.order.Order} order
  * @param {Object} tokenizeObject
+ * @returns {boolean} status
  */
 function storeTokenizeRecord(order, tokenizeObject) {
-	if (!empty(tokenizeObject)) {
+	try {
+		if (empty(tokenizeObject)) {
+			throw new Error("{tokenizeObject} is empty");	
+		}
+	
 		if (tokenizeObject.token != '') {
 			var token = tokenizeObject.token;
 			var tokenDetails = sezzle.order.getTokenDetails(token);
-			if (tokenDetails != null && !tokenDetails.error) {
-				Transaction.wrap(function () {
-					if (tokenizeObject.is_customer_tokenized) {
-						var profile = order.getCustomer().getProfile();
-						profile.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
-						profile.custom.SezzleCustomerTokenizeStatus = true;
-						profile.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
-						var customerLinks = tokenDetails.response.customer.links;
-						if (customerLinks) {
-							for (var k in customerLinks) {
-								var link = customerLinks[k];
-								if (link.rel == 'order' && link.method == 'POST') {
-									profile.custom.SezzleCustomerCreateOrderLink = link.href;	
-								}
-							}
-						}
-						
-						order.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
-						order.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
-					}
-				});
+			if (tokenDetails == null || tokenDetails.error) {
+				throw new Error("Unable to get tokenize details from Sezzle");
 			}
+			
+			Transaction.wrap(function () {
+				if (!tokenizeObject.is_customer_tokenized) {
+					throw new Error("Customer not tokenized by Sezzle. Bypassing storing");
+				}
+				var profile = order.getCustomer().getProfile();
+				profile.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
+				profile.custom.SezzleCustomerTokenizeStatus = true;
+				profile.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
+				var customerLinks = tokenDetails.response.customer.links;
+				if (customerLinks) {
+					for (var k in customerLinks) {
+						var link = customerLinks[k];
+						if (link.rel == 'order' && link.method == 'POST') {
+							profile.custom.SezzleCustomerCreateOrderLink = link.href;	
+						}
+					}
+				}
+				
+				order.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
+				order.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
+				
+			});
+			
+			return true;
 		} else if (tokenizeObject.customer_uuid != '' && tokenizeObject.customer_uuid_expiration != '') {
 			Transaction.wrap(function () {
 				order.custom.SezzleCustomerUUID = tokenizeObject.customer_uuid;
 				order.custom.SezzleCustomerUUIDExpiration = tokenizeObject.customer_uuid_expiration;
 			});
+			return true;
 		}
+	} catch (e) {
+		logger.debug("sezzleHelper.storeTokenizeRecord.- {0}", e);
+		return false;	
 	}
 }
 
@@ -102,7 +117,6 @@ function storeTokenizeRecord(order, tokenizeObject) {
  * @returns {boolean} status
  */
 function postProcess(order){
-	var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 	var canCapture = sezzleData.getSezzlePaymentAction() == 'CAPTURE' ? true : false;
 	try {
 		Transaction.wrap(function(){
@@ -111,7 +125,7 @@ function postProcess(order){
 				order.custom.SezzleCapturedAmount = order.totalGrossPrice.toString();
 				order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
 				order.setStatus(Order.ORDER_STATUS_COMPLETED);
-				
+				logger.debug("Payment has been captured successfully by Sezzle");
 			} 
 			if (order.custom.SezzleOrderUUID){
 				var sezzleOrder = sezzle.order.getOrderByOrderUUID(order);
@@ -119,13 +133,14 @@ function postProcess(order){
 					order.custom.SezzleAuthExpiration = sezzleOrder.response.authorization.expiration;
 				}
 				sezzle.order.updateOrder(order);
+				logger.debug("SFCC Order No has been successfully updated in the corresponding Sezzle order");
 			}
 		});
+		return true;
 	} catch (e) {
-		logger.error('Sezzle Capturing error. Details - {0}', e);
+		logger.debug("sezzleHelper.postProcess.- {0}", e);
 		return false;
 	}
-	return true;
 }
 
 /**

@@ -262,6 +262,8 @@ function orderTransaction() {
         render('sezzlebm/components/servererror');
         return;
     }
+    
+    logger.debug("SezzleAdmin.orderTransaction - Order validated");
 	
 	
 	var sezzlePaymentAction = order.custom.SezzlePaymentAction;
@@ -325,45 +327,53 @@ function action() {
     }
     
     
-
-    if (!params.helperAction.submitted) {
-        var methodName = params.methodName.stringValue;
-        var methodData = params;
-        var orderNo = params.orderNo.stringValue;
-        var transactionResult = false;
-
-        if (orderNo) {
-        	order = dw.order.OrderMgr.getOrder(orderNo);
-        } else {
-            errorMsg.put('l_longmessage0', 'Order No missing')
-            renderJson('Error', errorMsg);
-            return;
-        }
-        
-        
-        
-        var amtInCents = dw.value.Money(params.amt, order.currencyCode).multiply(100).getValue();
-        var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
-    	var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
-    	var authAmountInCents = new Money(authAmountInFloat, order.currencyCode).multiply(100).getValue();
-        
-        if (methodName == 'DoCapture') {
-        	var isPartialCapture = (amtInCents < authAmountInCents);
-        	callApiResponse = v2.capture(order, amtInCents, isPartialCapture);
-        	
-        } else if (methodName == 'DoRefund') {
-        	callApiResponse = v2.refund(order, amtInCents);
-        } else if (methodName == 'DoRelease') {
-        	callApiResponse = v2.release(order, amtInCents);
-        }
-        
-        if (callApiResponse != null && !callApiResponse.error) {
+    try {
+	    if (!params.helperAction.submitted) {
+	        var methodName = params.methodName.stringValue;
+	        var methodData = params;
+	        var orderNo = params.orderNo.stringValue;
+	        var transactionResult = false;
+	
+	        if (orderNo) {
+	        	order = dw.order.OrderMgr.getOrder(orderNo);
+	        } else {
+	            errorMsg.put('l_longmessage0', 'Order No missing')
+	            renderJson('Error', errorMsg);
+	            return;
+	        }
+	        
+	        
+	        
+	        var amtInCents = dw.value.Money(params.amt, order.currencyCode).multiply(100).getValue();
+	        var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
+	    	var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
+	    	var authAmountInCents = new Money(authAmountInFloat, order.currencyCode).multiply(100).getValue();
+	        
+	        if (methodName == 'DoCapture') {
+	        	var isPartialCapture = (amtInCents < authAmountInCents);
+	        	callApiResponse = v2.capture(order, amtInCents, isPartialCapture);
+	        	
+	        } else if (methodName == 'DoRefund') {
+	        	callApiResponse = v2.refund(order, amtInCents);
+	        } else if (methodName == 'DoRelease') {
+	        	callApiResponse = v2.release(order, amtInCents);
+	        }
+	        
+	        if (callApiResponse == null || callApiResponse.error) {
+	        	throw new Error("SezzleAdmin.API Call failed - {0}", methodName);
+	        }
+	        
+        	logger.debug("SezzleAdmin.API Call successfull - {0}", methodName);
         	Transaction.wrap(function () {
                 transactionResult = sezzleBMHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt);
             });
-        }
-    } else {
-        responseResult = 'Error';
+	    } else {
+	    	logger.debug("SezzleAdmin.Failed to get post data from form");
+	        responseResult = 'Error';
+	    }
+    } catch (e) {
+    	logger.debug("SezzleAdmin.action.- {0}", e);
+    	responseResult = 'Error';
     }
     renderJson(responseResult, callApiResponse);
 }

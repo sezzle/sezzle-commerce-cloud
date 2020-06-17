@@ -241,6 +241,7 @@
 			var customerTokenRecord = self.getCustomerTokenRecord(basket.customer.profile);
 			var returnObj = {};
 			if (customerTokenRecord.customer_uuid != undefined && customerTokenRecord.customer_uuid_expiration != undefined) {
+				logger.debug("Tokenized Checkout");
 				var createOrderLinkByCustomerUUID = basket.customer.profile.custom.SezzleCustomerCreateOrderLink;
 				var requestObject = {
 					'customer_uuid': customerTokenRecord.customer_uuid,
@@ -271,6 +272,7 @@
 					}
 				}
 			} else {
+				logger.debug("Typical Checkout");
 				var checkoutObject = {
 					'cancel_url' : {
 						'href' : self.getMerchant().user_cancel_url
@@ -321,13 +323,15 @@
 					var currentTimestamp = Date.now();
 					var customerUUIDExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(customerUUIDExpiration);
 					if (isCustomerTokenized && currentTimestamp <= customerUUIDExpirationTimestamp) {
+						logger.debug("Found customer token and moving forward");
 						return {
 							'customer_uuid': customerUUID,
 							'is_tokenized': isCustomerTokenized,
 							'customer_uuid_expiration': customerUUIDExpiration
 						};	
 					}
-					self.deleteCustomerToken(profile); 
+					self.deleteCustomerToken(profile);
+					logger.debug("Customer token has been expired and hence deleted the record from Profile");
 				}	
 			}
 			return {};

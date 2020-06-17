@@ -19,7 +19,7 @@ server.prepend(
     server.middleware.https,
     csrfProtection.validateAjaxRequest,
     function (req, res, next) {
-        logger.debug('****Checkout Start****');
+        logger.debug('****Checkout Started****');
         var data = res.getViewData();
         var BasketMgr = require('dw/order/BasketMgr'),
             currentBasket = BasketMgr.getCurrentBasket();

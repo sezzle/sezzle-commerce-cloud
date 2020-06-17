@@ -36,7 +36,7 @@
 				sezzleUtils.setAuthToken(response);
 				return response.token;
 			} catch (e) {
-				logger.debug('Api:authenticate. Error - {0}', e);
+				logger.debug('Api:authenticate. - {0}', e);
 				return {
 					error : true
 				};
@@ -63,11 +63,10 @@
 				};
 				
 				var sezzleService = service.initService('sezzle.capture');
-				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/capture';
 				sezzleService.URL = order.custom.SezzleCapturePaymentLink;
 				return sezzleService.call(obj).object;
 			} catch (e) {
-				logger.debug('Api:capture. Error - {0}', e);
+				logger.debug('Api:capture. - {0}', e);
 				return {
 					error : true
 				};
@@ -91,7 +90,7 @@
 				sezzleService.URL = sezzleData.getV2URLPath() + 'token/' + token + '/session';
 				return sezzleService.call(obj).object;
 			} catch (e) {
-				logger.debug('Api:getCustomerUUID. Error - {0}', e);
+				logger.debug('Api:getCustomerUUID. - {0}', e);
 				return {
 					error : true
 				};
@@ -113,11 +112,10 @@
 				};
 				
 				var sezzleService = service.initService('sezzle.getorderbyorderuuid');
-				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + orderUUID;
 				sezzleService.URL = order.custom.SezzleGetOrderLink;
 				return sezzleService.call(obj).object;
 			} catch (e) {
-				logger.debug('Api:getOrderByOrderUUID. Error - {0}', e);
+				logger.debug('Api:getOrderByOrderUUID. - {0}', e);
 				return {
 					error : true
 				};
@@ -134,11 +132,10 @@
 			try {
 				requestObj.authToken = self.authenticate();
 				var sezzleService = service.initService('sezzle.createorderbycustomeruuid');
-				//sezzleService.URL = sezzleData.getV2URLPath() + 'customer/' + requestObj.customer_uuid + '/order';
 				sezzleService.URL = requestObj.link;
 				return sezzleService.call(requestObj).object;
 			} catch (e) {
-				logger.debug('Api:createOrderByCustomerUUID. Error - {0}', e);
+				logger.debug('Api:createOrderByCustomerUUID. - {0}', e);
 				return {
 					error : true
 				};
@@ -160,13 +157,12 @@
 					'currency': order.getCurrencyCode()
 				}
 				
-				var sezzleService = service.initService('sezzle.refund');		
-				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/refund';	
+				var sezzleService = service.initService('sezzle.refund');
 				sezzleService.URL = order.custom.SezzleRefundPaymentLink;
 				return sezzleService.call(obj).object;
 				
 			} catch (e) {
-				logger.debug('Api:refund. Error - {0}', e);
+				logger.debug('Api:refund. - {0}', e);
 				return {
 					error : true
 				};
@@ -187,13 +183,12 @@
 					'amount_in_cents': amount,
 					'currency': order.getCurrencyCode()
 				}
-				var sezzleService = service.initService('sezzle.release');		
-				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID + '/release';	
+				var sezzleService = service.initService('sezzle.release');	
 				sezzleService.URL = order.custom.SezzleReleasePaymentLink;
 				return sezzleService.call(obj).object;
 				
 			} catch (e) {
-				logger.debug('Api:release. Error - {0}', e);
+				logger.debug('Api:release. - {0}', e);
 				return {
 					error : true
 				};
@@ -215,11 +210,10 @@
 				};
 				
 				var sezzleService = service.initService('sezzle.updateorder');
-				//sezzleService.URL = sezzleData.getV2URLPath() + 'order/' + order.custom.SezzleOrderUUID;
 				sezzleService.URL = order.custom.SezzleUpdateOrderLink;
 				return sezzleService.call(obj).object;
 			} catch (e) {
-				logger.debug('Api:updateOrder. Error - {0}', e);
+				logger.debug('Api:updateOrder. - {0}', e);
 				return {
 					error : true
 				};
@@ -239,7 +233,7 @@
 				sezzleService.URL = sezzleData.getV2URLPath() + 'session';
 				return sezzleService.call(checkoutObject).object;
 			} catch (e) {
-				logger.debug('Api:createSession. Error - {0}', e);
+				logger.debug('Api:createSession. - {0}', e);
 				return {
 					error : true
 				};

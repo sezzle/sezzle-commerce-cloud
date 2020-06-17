@@ -156,7 +156,7 @@ sezzleBMHelper.updateOrderTransaction = function (order, isCustomOrder, transact
             updateOrderData(order, transactionID, methodName, amount);
         }
     } catch (error) {
-    	logger.error(error);
+    	logger.debug("sezzleBMHelper.updateOrderTransaction.- {0}", error);
         return false;
     }
 

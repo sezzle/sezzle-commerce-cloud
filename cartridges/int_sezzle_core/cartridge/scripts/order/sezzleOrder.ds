@@ -80,8 +80,9 @@
 					order.custom.SezzleRefundPaymentLink = response.order_links.refund_payment;
 					order.custom.SezzleReleasePaymentLink = response.order_links.release_payment;
 				}
+				logger.debug('Sezzle attributes has been updated in the Order object');
 			} catch (e) {
-				logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+				logger.debug('sezzleOrder.updateAttributes.- {0}', e);
 			}
 		};
 		
@@ -142,8 +143,8 @@
 		 * @see pipeline "SezzleJob"
 		 */
 		this.refundOrders = function () {
-			OrderMgr.processOrders(function (order) {
-				try {
+			try {
+				OrderMgr.processOrders(function (order) {
 					var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
 			    	var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
 			    	var authAmountInCents = new Money(authAmountInFloat, order.currencyCode).multiply(100).getValue();
@@ -154,11 +155,12 @@
 							order.custom.SezzleRefundedAmount = order.totalGrossPrice.toString();	
 						}
 					}
-				} catch (e) {
-					logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
-				}
-			}, 'status = {0} AND custom.SezzleRefundedAmount = null', 
-			Order.ORDER_STATUS_CANCELLED);
+				}, 'status = {0} AND custom.SezzleRefundedAmount = null', 
+				Order.ORDER_STATUS_CANCELLED);
+				logger.debug("Payment has been successfully refunded by Sezzle");
+			} catch (e) {
+				logger.debug('sezzleOrder.refundOrders.- {0}', e);
+			}
 		};
 	};
 	
