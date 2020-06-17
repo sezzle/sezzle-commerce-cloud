@@ -63,11 +63,12 @@ function storeTokenizeRecord(order, tokenizeObject) {
 	try {
 		if (empty(tokenizeObject)) {
 			throw new Error("{tokenizeObject} is empty");	
-		} else if (!tokenizeObject.is_customer_tokenized) {
-			throw new Error("Customer not tokenized by Sezzle. Bypassing storing");
 		}
 	
 		if (tokenizeObject.token != '') {
+			if (!tokenizeObject.is_customer_tokenized) {
+				throw new Error("Customer not tokenized by Sezzle. Bypassing storing");
+			}
 			var token = tokenizeObject.token;
 			var tokenDetails = sezzle.order.getTokenDetails(token);
 			if (tokenDetails == null || tokenDetails.error) {
@@ -76,15 +77,17 @@ function storeTokenizeRecord(order, tokenizeObject) {
 			
 			Transaction.wrap(function () {
 				var profile = order.getCustomer().getProfile();
-				profile.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
-				profile.custom.SezzleCustomerTokenizeStatus = true;
-				profile.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
-				var customerLinks = tokenDetails.response.customer.links;
-				if (customerLinks) {
-					for (var k in customerLinks) {
-						var link = customerLinks[k];
-						if (link.rel == 'order' && link.method == 'POST') {
-							profile.custom.SezzleCustomerCreateOrderLink = link.href;	
+				if (profile != null) {
+					profile.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
+					profile.custom.SezzleCustomerTokenizeStatus = true;
+					profile.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
+					var customerLinks = tokenDetails.response.customer.links;
+					if (customerLinks) {
+						for (var k in customerLinks) {
+							var link = customerLinks[k];
+							if (link.rel == 'order' && link.method == 'POST') {
+								profile.custom.SezzleCustomerCreateOrderLink = link.href;	
+							}
 						}
 					}
 				}

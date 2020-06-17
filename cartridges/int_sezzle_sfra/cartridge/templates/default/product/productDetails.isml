@@ -4,9 +4,7 @@
     <isscript>
         var assets = require('*/cartridge/scripts/assets');
         assets.addJs('/js/productDetail.js');
-        assets.addJs('/js/sezzleWidgetCore.js');
         assets.addCss('/css/product/detail.css');
-        assets.addJs('/js/widgetRenderer.js');
         var sezzleData = require('*/cartridge/scripts/data/sezzleData');
     </isscript>
     
