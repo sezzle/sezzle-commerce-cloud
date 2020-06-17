@@ -524,7 +524,7 @@ function handlePayments(order, orderNumber) {
                     }
 
                     if (authorizationResult.error) {
-                        Transaction.wrap(function () { OrderMgr.failOrder(order); });
+                        Transaction.wrap(function () { OrderMgr.failOrder(order, true); });
                         result.error = true;
                         break;
                     }

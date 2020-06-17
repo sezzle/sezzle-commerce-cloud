@@ -8,7 +8,7 @@
             <step step-id="SezzleRefund" type="ExecuteScriptModule" enforce-restart="false">
                 <description/>
                 <parameters>
-                    <parameter name="ExecuteScriptModule.Module">int_sezzle_sfra/cartridge/scripts/jobs/refund.ds</parameter>
+                    <parameter name="ExecuteScriptModule.Module">int_sezzle_core/cartridge/scripts/jobs/refund.ds</parameter>
                     <parameter name="ExecuteScriptModule.FunctionName">execute</parameter>
                     <parameter name="ExecuteScriptModule.Transactional">true</parameter>
                 </parameters>

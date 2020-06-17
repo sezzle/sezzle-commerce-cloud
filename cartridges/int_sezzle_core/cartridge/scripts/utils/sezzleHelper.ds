@@ -60,7 +60,6 @@ function checkCart(cart) {
  * @param {Object} tokenizeObject
  */
 function storeTokenizeRecord(order, tokenizeObject) {
-	var status = false;
 	try {
 		if (empty(tokenizeObject)) {
 			throw new Error("{tokenizeObject} is empty");	
@@ -95,22 +94,16 @@ function storeTokenizeRecord(order, tokenizeObject) {
 				order.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
 				
 			});
-			status = true;
+			logger.debug("Tokenize record successfully stored in Order and Profile");
 		} else if (tokenizeObject.customer_uuid != '' && tokenizeObject.customer_uuid_expiration != '') {
 			Transaction.wrap(function () {
 				order.custom.SezzleCustomerUUID = tokenizeObject.customer_uuid;
 				order.custom.SezzleCustomerUUIDExpiration = tokenizeObject.customer_uuid_expiration;
 			});
-			status = true;
+			logger.debug("Tokenize record successfully stored in Order and Profile");
 		}
 	} catch (e) {
-		status = false;
 		logger.debug("sezzleHelper.storeTokenizeRecord.- {0}", e);
-	}
-	
-	if (status) {
-		logger.debug("Tokenize record successfully stored in Order and Profile");	
-	} else {
 		logger.debug("Tokenize record not stored in Order and Profile");
 	}
 }
