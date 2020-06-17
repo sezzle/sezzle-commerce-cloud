@@ -91,10 +91,10 @@ server.get('Redirect', function(req, res, next) {
 		}
 		
 		if (checkoutObject.tokenize) {
-			session.privacy.token = checkoutObject['tokenize']['token'] ? checkoutObject['tokenize']['token'] : '';
-			session.privacy.tokenExpiration = checkoutObject['tokenize']['token_expiration'] ? checkoutObject['tokenize']['token_expiration'] : '';
-			session.privacy.customerUUID = checkoutObject['tokenize']['customer_uuid'] ? checkoutObject['tokenize']['customer_uuid'] : '';
-			session.privacy.customerUUIDExpiration = checkoutObject['tokenize']['customer_uuid_expiration'] ? checkoutObject['tokenize']['customer_uuid_expiration'] : '';
+			session.privacy.token = checkoutObject['tokenize']['token'] || '';
+			session.privacy.tokenExpiration = checkoutObject['tokenize']['token_expiration'] || '';
+			session.privacy.customerUUID = checkoutObject['tokenize']['customer_uuid'] || '';
+			session.privacy.customerUUIDExpiration = checkoutObject['tokenize']['customer_uuid_expiration'] || '';
 		}
 	}
 	return next();
@@ -110,7 +110,6 @@ server.get('Success', function(req, res, next) {
         return next();
 	}
 	// Creates a new order.
-	var reportingUrlsHelper = require('*/cartridge/scripts/reportingUrls');
 	var currentBasket = BasketMgr.getCurrentBasket();
 	var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
 	logger.debug("Cart successfully checked and moving forward {0}",sezzleCheck.status.error);

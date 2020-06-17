@@ -8,13 +8,8 @@
 			values = require('dw/value'),
 			web = require('dw/web'),
 			system = require('dw/system'),
-			dwutil = require('dw/util'),
 			sezzleData = require('~/cartridge/scripts/data/sezzleData'),
-			Calendar = require('dw/util/Calendar'),
-			BasketMgr = require('dw/order/BasketMgr'),
-			Money = require('dw/value/Money'),
-			PromotionMgr = require('dw/campaign/PromotionMgr'),
-			Promotion = require('dw/campaign/Promotion');
+			Money = require('dw/value/Money');
 
 		/**
 		 * Calculate non-gift certificate amount

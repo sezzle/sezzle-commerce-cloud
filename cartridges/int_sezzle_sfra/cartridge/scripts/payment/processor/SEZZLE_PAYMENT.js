@@ -7,11 +7,9 @@
  */
 
 var BasketMgr = require('dw/order/BasketMgr');
-var PaymentMgr = require('dw/order/PaymentMgr');
 var Transaction = require('dw/system/Transaction');
 var sezzleUtils = require('*/cartridge/scripts/sezzle');
 var OrderMgr = require('dw/order/OrderMgr');
-var Resource = require('dw/web/Resource');
 var Order = require('dw/order/Order');
 var Money = require('dw/value/Money');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
@@ -68,40 +66,6 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor){
 }
 
 /**
- * Post process order
- *
- * @param {dw.order.Order} order
- * @returns {Object} processing response
- */
-function postProcess(order){
-	var payment_action = sezzleUtils.data.getSezzlePaymentAction();
-	if (sezzleUtils.data.getSezzlePaymentAction() == 'CAPTURE'){
-		try {
-			Transaction.wrap(function(){
-				var resp = sezzleUtils.order.captureOrder(order);
-				if (resp){
-					if (resp.httpStatus == 200){
-						order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-					}
-					else{
-						logger.debug('Sezzle Capturing error');
-						return {error: true};
-					}
-				}
-				else{
-					logger.debug('Sezzle Capturing error. Details');
-					return {error: true};
-				}
-			});
-		} catch (e) {
-			logger.debug('Sezzle Capturing error. Details - {0}', e);
-			return {error: true};
-		}
-	}
-	return {error: false};
-}
-
-/**
  * Handle creating of payment instrument
  *
  * @param {dw.order.Order} order
@@ -121,4 +85,3 @@ function handle(){
 
 exports.Handle = handle;
 exports.Authorize = authorize;
-exports.PostProcess = postProcess;

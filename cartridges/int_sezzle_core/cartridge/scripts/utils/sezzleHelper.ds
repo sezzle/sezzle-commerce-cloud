@@ -1,25 +1,13 @@
 'use strict';
 
 var SezzlePaymentMethod = 'Sezzle';
-var Resource = require('dw/web/Resource');
-var URLUtils = require('dw/web/URLUtils');
-var server = require('server');
 var BasketMgr = require('dw/order/BasketMgr');
-var ISML = require('dw/template/ISML');
 var sezzle = require('*/cartridge/scripts/sezzle.ds');
 var v2 = require('*/cartridge/scripts/api/v2.ds');
-var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
-var sezzleData = require('~/cartridge/scripts/data/sezzleData.ds');
-var sezzleUtils = require('~/cartridge/scripts/utils/sezzleUtils.ds');
- 
- 
-var Status = require('dw/system/Status');
+var sezzleData = require('~/cartridge/scripts/data/sezzleData.ds'); 
 var Transaction = require('dw/system/Transaction');
-var PaymentMgr = require('dw/order/PaymentMgr');
 var Order = require('dw/order/Order');
-var parametersMap = request.httpParameterMap;
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
-var Money = require('dw/value/Money');
 
 /*
  * Export the publicly available controller methods

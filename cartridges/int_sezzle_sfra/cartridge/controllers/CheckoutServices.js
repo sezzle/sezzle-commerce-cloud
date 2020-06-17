@@ -257,8 +257,22 @@ server.prepend('PlaceOrder',
         var sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
         var paymentMethod = '';
 
-        var currentBasket = BasketMgr.getCurrentBasket(),
-            paymentInstruments = currentBasket.paymentInstruments;
+        var currentBasket = BasketMgr.getCurrentBasket();
+        
+        if (!currentBasket) {
+            res.json({
+                error: true,
+                cartError: true,
+                fieldErrors: [],
+                serverErrors: [],
+                redirectUrl: URLUtils.url('Cart-Show').toString()
+            });
+
+            return next();
+        }
+        
+        var paymentInstruments = currentBasket.paymentInstruments;
+        
         if (paymentInstruments.length <= 0) {
         	res.json({
                 error: true,
@@ -273,17 +287,7 @@ server.prepend('PlaceOrder',
         
         paymentMethod = paymentInstruments[paymentInstruments.length - 1].paymentMethod;
 
-        if (!currentBasket) {
-            res.json({
-                error: true,
-                cartError: true,
-                fieldErrors: [],
-                serverErrors: [],
-                redirectUrl: URLUtils.url('Cart-Show').toString()
-            });
-
-            return next();
-        }
+        
 
         if (paymentMethod === 'Sezzle') {
             logger.debug('Selected payment method : {0}',
