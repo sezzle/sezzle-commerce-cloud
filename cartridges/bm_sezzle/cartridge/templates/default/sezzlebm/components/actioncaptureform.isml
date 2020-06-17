@@ -1,0 +1,66 @@
+<div id="sezzle_capture_form" class="sezzle_hide">
+
+	<isscript>
+	
+		var orderTotalStr = order.custom.SezzleOrderAmount || '0.00';
+		var orderTotal = orderTotalStr.replace(order.currencyCode, '');
+		var capturedAmountStr = order.custom.SezzleCapturedAmount || '0.00';
+		var capturedAmount = capturedAmountStr.replace(order.currencyCode, '');
+		var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
+		var releasedAmount = releasedAmountStr.replace(order.currencyCode, '');
+		var captureInputAmountInFloat = orderTotal-capturedAmount;
+		var captureInputAmount = dw.util.Decimal(captureInputAmountInFloat).round(2);
+	
+	
+	</isscript>
+	<form class="sezzle_action_form sezzlebm_content" action="${URLUtils.url('SezzleAdmin-Action')}">
+		
+		<input type="hidden" name="methodName" value="DoCapture" />
+		<input type="hidden" name="authorizationId" value="${order.custom.SezzleExternalId}" />
+		<input type="hidden" name="currencyCode" value="${order.currencyCode}" />
+		<input type="hidden" name="invNum" value="" />
+		<input type="hidden" name="maxAmount" value="captureInputAmount" />
+		<input type="hidden" name="orderNo" value="${order.orderNo}" />
+		<input type="hidden" name="isCustomOrder" value="${pdict.isCustomOrder}" />
+		
+		<h2>${Resource.msg('transaction.capture.title', 'sezzlebm', null)}</h2>
+		
+		<div class="sezzle_error_msg_box sezzle_error_msg_box_amt_required"><p>${Resource.msg('forms.error.amt.required', 'sezzlebm', null)}</p></div>
+		<div class="sezzle_error_msg_box sezzle_error_msg_box_amt_greaterzero"><p>${Resource.msg('forms.error.amt.greaterzero', 'sezzlebm', null)}</p></div>
+		<div class="sezzle_error_msg_box sezzle_error_msg_box_amt_float"><p>${Resource.msg('forms.error.amt.float', 'sezzlebm', null)}</p></div>
+		<div class="sezzle_error_msg_box sezzle_error_msg_box_amt_maxvalue"><p>${Resource.msg('forms.error.amt.maxvalue', 'sezzlebm', null)} <span></span> ${order.currencyCode}</p></div>
+		
+		<table class="sezzlebm_transaction_detail_table infobox w e s n">
+			
+			<tr>
+				<td class="infobox_title top">${Resource.msg('transaction.detail.referenceid', 'sezzlebm', null)}:</td>
+				<td class="infobox_item top">${order.custom.SezzleExternalId}</td>
+			</tr>
+			<tr class="sezzlebm_gray">
+				<td class="infobox_title top">${Resource.msg('transaction.detail.name', 'sezzlebm', null)}:</td>
+				<td class="infobox_item top">${Resource.msgf('transaction.detail.customerformat', 'sezzlebm', null, order.customerName, null)}</td>
+			</tr>
+			<tr>
+				<td class="infobox_title top">${Resource.msg('transaction.detail.email', 'sezzlebm', null)}:</td>
+				<td class="infobox_item top">${email}</td>
+			</tr>
+			<tr class="sezzlebm_gray">
+				<td class="infobox_title top">${Resource.msg('transaction.detail.authorizationamount', 'sezzlebm', null)}:</td>
+				<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, order.custom.SezzleOrderAmount)}</td>
+			</tr>
+			<tr>
+				<td class="infobox_title top">${Resource.msg('transaction.capture.captureamount', 'sezzlebm', null)}:</td>
+				<td class="infobox_item top">${order.currencyCode} <input class="js_sezzle_max_capture_input" type="text" name="amt" value="${captureInputAmount}" data-validation="required,float,greaterzero" max="${captureInputAmount}" /></td>
+			</tr>
+			<tr class="sezzlebm_gray">
+				<td colspan="2">
+					<p>
+                        <b>${Resource.msg('transaction.capture.notetomerchant.label', 'sezzlebm', null)}</b>
+                        ${Resource.msgf('transaction.capture.notetomerchant1', 'sezzlebm', null, Resource.msgf('transaction.detail.customerformat', 'sezzlebm', null, order.customerName, null), Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, order.totalGrossPrice, order.currencyCode))}
+                    </p>
+				    <p>${Resource.msg('transaction.capture.notetomerchant2', 'sezzlebm', null)}</p>
+                </td>
+			</tr>
+		</table>
+	</form>
+</div>

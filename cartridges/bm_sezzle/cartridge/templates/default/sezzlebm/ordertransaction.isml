@@ -1,0 +1,159 @@
+<isdecorate template="sezzlebm/util/pt_sezzle">
+
+<isinclude template="inc/Modules">
+<isinclude template="sezzlebm/util/modules">
+
+<isscript>
+    var sezzleBMHelper = require('*/cartridge/scripts/helper/sezzleBMHelper');
+	var order = pdict.Order;
+	var canCapture = pdict.CanCapture;
+	var canRefund = pdict.CanRefund;
+	var canRelease = pdict.CanRelease;
+	var shippingAmount = order.getShippingTotalPrice();
+	var taxAmount = order.getTotalTax();
+	var subtotal =  sezzleBMHelper.getSubtotal(order);
+	var orderTotal = order.getTotalGrossPrice();	
+	var email = order.customerEmail || 'Unknown';
+	var authAmount = order.custom.SezzleOrderAmount;
+	var capturedAmount = order.custom.SezzleCapturedAmount;
+	var refundedAmount = order.custom.SezzleRefundedAmount;	
+	var releasedAmount = order.custom.SezzleReleasedAmount;	
+	var shippingAddress = order.getDefaultShipment().getShippingAddress();
+</isscript>
+
+<div class="js_sezzlebm_order_detail" data-orderNo="${order.orderNo}" data-iscustom="${pdict.isCustomOrder ? true : false}" data-currencycode="${order.currencyCode}"></div>
+
+<div class="sezzlebm_header">
+	<isset name="ordersUrl" value="${URLUtils.url('SiteNavigationBar-ShowMenuitemOverview', 'CurrentMenuItemId', 'orders')}" scope="page">
+	<isset name="transactionsUrl" value="${URLUtils.url('SezzleAdmin-Orders')}" scope="page">
+	<isbreadcrumb
+		name1="Ordering" url1="${ordersUrl}"
+		name2="Sezzle Transactions" url2="${transactionsUrl}"
+		name3="${Resource.msgf('ordertransaction.breadcrumb', 'sezzlebm', null, order.orderNo)}">
+	
+	<table>
+		<tr><td width="100%" class="table_title w e s n">${Resource.msgf('ordertransaction.title', 'sezzlebm', null, order.orderNo)}</td></tr>
+		<tr><td class="w e s"></td></tr>
+		<iscomment><tr><td class="table_title_description e w s"><p>${Resource.msg('ordertransaction.description', 'sezzlebm', null)}</p></td></tr></iscomment>
+	</table>
+</div>
+
+
+<h2>${Resource.msgf('transaction.detail.title', 'sezzlebm', null, order.custom.SezzleExternalId)}</h2>
+
+<table class="sezzlebm_transaction_detail_table infobox w e s n">
+	<tr>
+		<td class="infobox_title top">${Resource.msg('transaction.detail.customername', 'sezzlebm', null)}:</td>
+		<td class="infobox_item top">
+			${Resource.msgf('transaction.detail.customerformatwithstatus', 'sezzlebm', null, order.getCustomerName())}
+		</td>
+	</tr>
+	<tr class="sezzlebm_gray">
+		<td class="infobox_title top">${Resource.msg('transaction.detail.customeremail', 'sezzlebm', null)}:</td>
+		<td class="infobox_item top">${email}</td>
+	</tr>
+</table>
+
+<table class="sezzlebm_transaction_detail_table infobox w e s n">
+	<tr>
+		<td class="infobox_title top">${Resource.msg('transaction.detail.subtotal', 'sezzlebm', null)}:</td>
+		<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, subtotal)}</td>
+	</tr>
+    <isif condition="${taxAmount !== undefined}">
+    	<tr class="sezzlebm_gray">
+    		<td class="infobox_title top">${Resource.msg('transaction.detail.salestax', 'sezzlebm', null)}:</td>
+    		<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, taxAmount)}</td>
+    	</tr>
+    </isif>
+	<iscomment>
+		<tr>
+			<td class="infobox_title top">${Resource.msg('transaction.detail.taxamt', 'sezzlebm', null)}:</td>
+			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, taxAmount)}</td>
+		</tr>
+	</iscomment>
+        <isif condition="${shippingAmount !== undefined}">
+    		<tr>
+    			<td class="infobox_title top">${Resource.msg('transaction.detail.shippingamt', 'sezzlebm', null)}:</td>
+    			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, shippingAmount)}</td>
+    		</tr>
+        </isif>
+        <isif condition="${orderTotal !== undefined}">
+    		<tr class="sezzlebm_gray">
+    			<td class="infobox_title top">${Resource.msg('transaction.detail.ordertotal', 'sezzlebm', null)}:</td>
+    			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, orderTotal)}</td>
+    		</tr>
+        </isif>
+   		<tr>
+   			<td class="infobox_title top">${Resource.msg('transaction.detail.authamt', 'sezzlebm', null)}:</td>
+   			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, authAmount)}</td>
+   		</tr>
+        <isif condition="${capturedAmount}"> 
+    		<tr>
+    			<td class="infobox_title top">${Resource.msg('transaction.detail.capturedamt', 'sezzlebm', null)}:</td>
+    			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, capturedAmount)}</td>
+    		</tr>
+        </isif>
+        <isif condition="${refundedAmount}">
+    		<tr>
+    			<td class="infobox_title top">${Resource.msg('transaction.detail.refundedamt', 'sezzlebm', null)}:</td>
+    			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, refundedAmount)}</td>
+    		</tr>
+        </isif>
+        <isif condition="${releasedAmount}">
+    		<tr>
+    			<td class="infobox_title top">${Resource.msg('transaction.detail.releasedamt', 'sezzlebm', null)}:</td>
+    			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, releasedAmount)}</td>
+    		</tr>
+        </isif>
+</table>
+
+<table class="sezzlebm_transaction_detail_table infobox w e s n">
+    
+	<tr class="sezzlebm_gray">
+		<td class="infobox_title top">${Resource.msg('transaction.detail.ordertime', 'sezzlebm', null)}:</td>
+		<td class="infobox_item top">${order.getCreationDate()}</td>
+	</tr>
+	<tr>
+		<td class="infobox_title top"></td>
+		<td class="infobox_item top">
+			<ul class="sezzlebm_transaction_actions">
+				
+				
+				<isif condition="${canCapture}">
+					<li>
+						<span class="js_sezzle_action" data-action="capture" data-title="${Resource.msg('transaction.capture.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.capture', 'sezzlebm', null)}</span>
+					</li>
+				</isif>
+				<isif condition="${canRefund}">
+					<li>
+						<span class="js_sezzle_action" data-action="refund" data-title="${Resource.msg('transaction.refund.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.refund', 'sezzlebm', null)}</span>
+					</li>
+				</isif>
+				<isif condition="${canRelease}">
+					<li>
+						<span class="js_sezzle_action" data-action="release" data-title="${Resource.msg('transaction.release.title', 'sezzlebm', null)}">${Resource.msg('transaction.actions.release', 'sezzlebm', null)}</span>
+					</li>
+				</isif>
+			</ul>
+		</td>
+	</tr>
+</table>
+
+
+<table class="sezzlebm_transaction_detail_table infobox w e s n">
+	<tr class="sezzlebm_gray">
+		<td class="infobox_title top">${Resource.msg('transaction.detail.shipaddress', 'sezzlebm', null)}:</td>
+		<td class="infobox_item top" colspan="3">
+			<isprint value="${Resource.msgf('transaction.detail.shipaddressformat', 'sezzlebm', null, shippingAddress.getFullName(), shippingAddress.getAddress1(), (empty(shippingAddress.getAddress2()) ? '' : shippingAddress.getAddress2()), shippingAddress.getCity(), shippingAddress.getStateCode(), shippingAddress.getPostalCode(), shippingAddress.getCountryCode(), shippingAddress.getPhone())}" encoding="jshtml"/>
+		</td>
+	</tr>
+</table>
+
+        
+<div class="sezzlebm_footer">
+	<a class="button" href="${transactionsUrl}">&lt;&lt; ${Resource.msg('ordertransaction.backtolist', 'sezzlebm', null)}</a>
+</div>
+<isinclude template="sezzlebm/components/actioncaptureform"/>
+<isinclude template="sezzlebm/components/actionrefundform"/>
+<isinclude template="sezzlebm/components/actionreleaseform"/>
+</isdecorate>

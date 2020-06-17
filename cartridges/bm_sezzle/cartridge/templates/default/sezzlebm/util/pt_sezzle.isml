@@ -1,0 +1,49 @@
+<isif condition="${pdict.CurrentHttpParameterMap.format.stringValue == 'ajax'}">
+
+	<isdecorate template="sezzlebm/util/pt_empty">
+	
+		<div class="sezzlebm_content sezzlebm_content_ajax">
+			<isreplace/>
+		</div>
+		
+	</isdecorate>
+	
+<iselse>
+
+	<isdecorate template="application/MenuFrame">
+	
+		<link rel="stylesheet" href="${URLUtils.staticURL('/sezzlebm/css/bm.css')}" />
+		<link rel="stylesheet" href="${URLUtils.staticURL('/jscript/ext/resources/css/ext-all.css')}" />
+		
+		<script type="text/javascript" src="${URLUtils.staticURL('/jscript/ext/adapter/ext/ext-base.js')}"></script>
+		<script type="text/javascript" src="${URLUtils.staticURL('/jscript/ext/ext-all.js')}"></script>
+		
+		<script type="text/javascript" src="${URLUtils.staticURL('/sezzlebm/js/sezzleAdmin.js')}"></script>
+
+		<script type="text/javascript">
+			sezzleAdmin.init({
+				urls: {
+					orderTransaction: "${URLUtils.url('SezzleAdmin-OrderTransaction')}",
+					action: "${URLUtils.url('SezzleAdmin-Action')}"
+				},
+				resources: {
+					submit: "${Resource.msg('forms.submit', 'sezzlebm', null)}",
+					cancel: "${Resource.msg('forms.cancel', 'sezzlebm', null)}",
+					errorMsgTitle: "${Resource.msg('msg.error.title', 'sezzlebm', null)}",
+					serverError: "${Resource.msg('server.error', 'sezzlebm', null)}",
+					pleaseWait: "${Resource.msg('msg.pleasewait', 'sezzlebm', null)}",
+					loadMaskText: {
+						authorization: "${Resource.msg('msg.creatingauthorizationtransaction', 'sezzlebm', null)}",
+						capture: "${Resource.msg('msg.creatingcapturetransaction', 'sezzlebm', null)}"
+					}
+				}
+			});
+		</script>
+		
+		<div class="sezzlebm_content js_sezzlebm_content">
+			<isreplace/>
+		</div>
+	
+	</isdecorate>
+
+</isif>

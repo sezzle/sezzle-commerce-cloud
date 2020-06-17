@@ -19,10 +19,9 @@ server.prepend(
     server.middleware.https,
     csrfProtection.validateAjaxRequest,
     function (req, res, next) {
-        logger.debug('****Checkout Start****');
+        logger.debug('****Checkout Started****');
         var data = res.getViewData();
         var BasketMgr = require('dw/order/BasketMgr'),
-
             currentBasket = BasketMgr.getCurrentBasket();
 
         if (data && data.csrfError) {
@@ -34,31 +33,21 @@ server.prepend(
         var paymentForm = server.forms.getForm('billing'),
             paymentMethodID = paymentForm.paymentMethod.value,
             billingFormErrors = {},
-            creditCardErrors = {},
             viewData = {};
+        
+        if (paymentMethodID != 'Sezzle') {
+        	return next();
+        }
 
 
         // Verify billing form data
         billingFormErrors = COHelpers.validateBillingForm(paymentForm.addressFields);
-
-        if (!req.form.storedPaymentUUID) {
-            // Verify credit card form data
-            creditCardErrors = COHelpers.validateCreditCard(paymentForm);
-        }
 
         if (Object.keys(billingFormErrors).length) {
             // Respond with form data and errors
             res.json({
                 form: paymentForm,
                 fieldErrors: [billingFormErrors],
-                serverErrors: [],
-                error: true
-            });
-        } else if (paymentMethodID === 'CREDIT_CARD' && Object.keys(creditCardErrors).length) {
-            // Respond with form data and errors
-            res.json({
-                form: paymentForm,
-                fieldErrors: [creditCardErrors],
                 serverErrors: [],
                 error: true
             });
@@ -84,54 +73,10 @@ server.prepend(
                 htmlName: paymentForm.paymentMethod.value
             };
 
-            if (paymentMethodID === 'CREDIT_CARD' && paymentForm.creditCardFields) {
-                viewData.paymentInformation = {
-                    cardType: {
-                        value: paymentForm.creditCardFields.cardType.value,
-                        htmlName: paymentForm.creditCardFields.cardType.htmlName
-                    },
-                    cardNumber: {
-                        value: paymentForm.creditCardFields.cardNumber.value,
-                        htmlName: paymentForm.creditCardFields.cardNumber.htmlName
-                    },
-                    securityCode: {
-                        value: paymentForm.creditCardFields.securityCode.value,
-                        htmlName: paymentForm.creditCardFields.securityCode.htmlName
-                    },
-                    expirationMonth: {
-                        value: parseInt(
-                            paymentForm.creditCardFields.expirationMonth.selectedOption,
-                            10
-                        ),
-                        htmlName: paymentForm.creditCardFields.expirationMonth.htmlName
-                    },
-                    expirationYear: {
-                        value: parseInt(paymentForm.creditCardFields.expirationYear.value,
-                            10),
-                        htmlName: paymentForm.creditCardFields.expirationYear.htmlName
-                    }
-                };
-            }
-
-
-            if (paymentMethodID === 'CREDIT_CARD' && req.form.storedPaymentUUID) {
-                viewData.storedPaymentUUID = req.form.storedPaymentUUID;
-            }
-
-            if (paymentMethodID === 'CREDIT_CARD' && paymentForm.creditCardFields) {
-                viewData.saveCard = paymentForm.creditCardFields.saveCard.checked;
-            }
-
             /* Currently phone is hardcoded to credit card form so we will take phone from shipping address */
             var shippingAddress = currentBasket.defaultShipment.shippingAddress;
 
             viewData.phone = { value: shippingAddress.phone };
-
-            if (paymentMethodID === 'CREDIT_CARD') {
-                viewData.email = {
-                    value: paymentForm.email.value
-                };
-            }
 
             res.setViewData(viewData);
 
@@ -171,11 +116,6 @@ server.prepend(
                     var result;
                     paymentMethodID = billingData.paymentMethod.value;
 
-                    if (paymentMethodID === 'CREDIT_CARD' && billingForm.creditCardFields) {
-                        billingForm.creditCardFields.cardNumber.htmlValue = '';
-                        billingForm.creditCardFields.securityCode.htmlValue = '';
-                    }
-
                     Transaction.wrap(function () {
                         if (!billingAddress) {
                             billingAddress = currentBasket.createBillingAddress();
@@ -195,9 +135,6 @@ server.prepend(
                         if (req.currentCustomer.profile && billingData.storedPaymentUUID) {
                             billingAddress.setPhone(req.currentCustomer.profile.phone);
                             currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
-                        } else if (paymentMethodID === 'CREDIT_CARD') {
-                            billingAddress.setPhone(billingData.phone.value);
-                            currentBasket.setCustomerEmail(billingData.email.value);
                         }
 
                         if (paymentMethodID === 'Sezzle' && req.currentCustomer.profile) {
@@ -236,29 +173,6 @@ server.prepend(
 
                     var processor = PaymentMgr.getPaymentMethod(paymentMethodID).getPaymentProcessor();
 
-                    if (paymentMethodID === 'CREDIT_CARD' && billingData.storedPaymentUUID
-            && req.currentCustomer.raw.authenticated
-            && req.currentCustomer.raw.registered
-                    ) {
-                        var paymentInstruments = req.currentCustomer.wallet.paymentInstruments;
-                        var paymentInstrument = array.find(paymentInstruments,
-                            function (item) {
-                                return billingData.storedPaymentUUID === item.UUID;
-                            });
-
-                        billingData.paymentInformation.cardNumber.value = paymentInstrument
-                            .creditCardNumber;
-                        billingData.paymentInformation.cardType.value = paymentInstrument
-                            .creditCardType;
-                        billingData.paymentInformation.securityCode.value = req.form.securityCode;
-                        billingData.paymentInformation.expirationMonth.value = paymentInstrument
-                            .creditCardExpirationMonth;
-                        billingData.paymentInformation.expirationYear.value = paymentInstrument
-                            .creditCardExpirationYear;
-                        billingData.paymentInformation.creditCardToken = paymentInstrument
-                            .raw.creditCardToken;
-                    }
-
                     if (HookMgr.hasHook('app.payment.processor.' + processor.ID.toLowerCase())) {
                         result = HookMgr.callHook(
                             'app.payment.processor.' + processor.ID.toLowerCase(),
@@ -285,59 +199,6 @@ server.prepend(
                         return;
                     }
 
-                    if (!billingData.storedPaymentUUID
-            && req.currentCustomer.raw.authenticated
-            && req.currentCustomer.raw.registered
-            && billingData.saveCard
-            && (paymentMethodID === 'CREDIT_CARD')
-                    ) {
-                        var customer = CustomerMgr.getCustomerByCustomerNumber(req.currentCustomer.profile.customerNo),
-
-                            saveCardResult = COHelpers.savePaymentInstrumentToWallet(
-                                billingData,
-                                currentBasket,
-                                customer
-                            );
-
-                        req.currentCustomer.wallet.paymentInstruments.push({
-                            creditCardHolder: saveCardResult.creditCardHolder,
-                            maskedCreditCardNumber: saveCardResult.maskedCreditCardNumber,
-                            creditCardType: saveCardResult.creditCardType,
-                            creditCardExpirationMonth: saveCardResult.creditCardExpirationMonth,
-                            creditCardExpirationYear: saveCardResult.creditCardExpirationYear,
-                            UUID: saveCardResult.UUID,
-                            creditCardNumber: Object.hasOwnProperty.call(
-                                saveCardResult,
-                                'creditCardNumber'
-                            )
-                                ? saveCardResult.creditCardNumber
-                                : null,
-                            raw: saveCardResult
-                        });
-
-                        // Calculate the basket
-                        Transaction.wrap(function () {
-                            basketCalculationHelpers.calculateTotals(currentBasket);
-                        });
-
-                        // Re-calculate the payments.
-                        var calculatedPaymentTransaction = COHelpers.calculatePaymentTransaction(currentBasket);
-
-                        if (calculatedPaymentTransaction.error) {
-                            res.json({
-                                form: paymentForm,
-                                fieldErrors: [],
-                                serverErrors: [Resource.msg('error.technical',
-                                    'checkout',
-                                    null)],
-                                error: true
-                            });
-
-                            return;
-                        }
-                    }
-
-
                     var usingMultiShipping = req.session.privacyCache.get('usingMultiShipping');
 
                     if (usingMultiShipping === true && currentBasket.shipments.length < 2) {
@@ -356,20 +217,20 @@ server.prepend(
 
                     var currentLocale = Locale.getLocale(req.locale.id),
 
-                        basketModel = new OrderModel(
-                            currentBasket,
-                            {
-                                usingMultiShipping: usingMultiShipping,
-                                countryCode: currentLocale.country,
-                                containerView: 'basket'
-                            }
-                        ),
+                    basketModel = new OrderModel(
+                        currentBasket,
+                        {
+                            usingMultiShipping: usingMultiShipping,
+                            countryCode: currentLocale.country,
+                            containerView: 'basket'
+                        }
+                    ),
 
-                        accountModel = new AccountModel(req.currentCustomer),
-                        renderedStoredPaymentInstrument = COHelpers.getRenderedPaymentInstruments(
-                            req,
-                            accountModel
-                        );
+                    accountModel = new AccountModel(req.currentCustomer),
+                    renderedStoredPaymentInstrument = COHelpers.getRenderedPaymentInstruments(
+                        req,
+                        accountModel
+                    );
 
                     delete billingData.paymentInformation;
 
@@ -393,18 +254,11 @@ server.prepend('PlaceOrder',
     function (req, res, next) {
         var BasketMgr = require('dw/order/BasketMgr');
         var URLUtils = require('dw/web/URLUtils');
+        var sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
         var paymentMethod = '';
 
-        var currentBasket = BasketMgr.getCurrentBasket(),
-
-            paymentInstruments = currentBasket.paymentInstruments;
-
-        for (var i = 0; i < paymentInstruments.length; i++) {
-            var paymentInstrument = paymentInstruments[i];
-
-            paymentMethod = paymentInstrument.paymentMethod;
-        }
-
+        var currentBasket = BasketMgr.getCurrentBasket();
+        
         if (!currentBasket) {
             res.json({
                 error: true,
@@ -414,8 +268,26 @@ server.prepend('PlaceOrder',
                 redirectUrl: URLUtils.url('Cart-Show').toString()
             });
 
-            return;
+            return next();
         }
+        
+        var paymentInstruments = currentBasket.paymentInstruments;
+        
+        if (paymentInstruments.length <= 0) {
+        	res.json({
+                error: true,
+                cartError: true,
+                fieldErrors: [],
+                serverErrors: ['Payment method not selected.'],
+                redirectUrl: URLUtils.url('Cart-Show').toString()
+            });
+
+            return next();
+        }
+        
+        paymentMethod = paymentInstruments[paymentInstruments.length - 1].paymentMethod;
+
+        
 
         if (paymentMethod === 'Sezzle') {
             logger.debug('Selected payment method : {0}',

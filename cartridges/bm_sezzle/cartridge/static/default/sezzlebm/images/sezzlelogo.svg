@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="113px" height="112px" viewBox="0 0 113 112" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 61.2 (89653) - https://sketch.com -->
+    <title>Group 18</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="9.23893961%" y1="7.80755093%" x2="170.501229%" y2="145.033569%" id="linearGradient-1">
+            <stop stop-color="#382757" offset="0%"></stop>
+            <stop stop-color="#8333D4" offset="100%"></stop>
+        </linearGradient>
+        <path d="M29.1259469,2.06023452 L81.8754432,2.09310955 C96.7738682,2.10239468 108.849157,14.1775469 108.858611,29.0759717 L108.890875,79.9226381 C108.900337,94.8343234 96.8196981,106.930303 81.9080129,106.939765 C81.896693,106.939772 81.885373,106.939773 81.8740531,106.939765 L29.1245568,106.90689 C14.2261318,106.897605 2.15084302,94.8224531 2.14138938,79.9240283 L2.10912513,29.0773619 C2.09966307,14.1656766 14.1803019,2.06969677 29.0919871,2.06023471 C29.103307,2.06022753 29.114627,2.06022747 29.1259469,2.06023452 Z" id="path-2"></path>
+        <filter x="-7.5%" y="-2.8%" width="111.2%" height="111.4%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="-2" dy="3" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.273601399 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <linearGradient x1="80.1902401%" y1="85.6202908%" x2="45.7994927%" y2="37.6798239%" id="linearGradient-4">
+            <stop stop-color="#CE5DCB" offset="0%"></stop>
+            <stop stop-color="#C558CC" offset="20.95%"></stop>
+            <stop stop-color="#AC4ACF" offset="55.25%"></stop>
+            <stop stop-color="#8534D4" offset="98.45%"></stop>
+            <stop stop-color="#8333D4" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-0.00122003011%" y1="49.9952968%" x2="99.9968433%" y2="49.9952968%" id="linearGradient-5">
+            <stop stop-color="#FF5667" offset="2.37%"></stop>
+            <stop stop-color="#FC8B82" offset="65.92%"></stop>
+            <stop stop-color="#FBA28E" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="13.42004%" x2="19.18346%" y2="13.42004%" id="linearGradient-6">
+            <stop stop-color="#00B874" offset="0%"></stop>
+            <stop stop-color="#29D3A2" offset="51.26%"></stop>
+            <stop stop-color="#53DFB6" offset="68.17%"></stop>
+            <stop stop-color="#9FF4D9" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-0.00260647448%" y1="50.000149%" x2="99.9997915%" y2="50.000149%" id="linearGradient-7">
+            <stop stop-color="#00B874" offset="0%"></stop>
+            <stop stop-color="#29D3A2" offset="51.26%"></stop>
+            <stop stop-color="#53DFB6" offset="68.17%"></stop>
+            <stop stop-color="#9FF4D9" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-0.00281499244%" y1="49.9994784%" x2="99.9985404%" y2="49.9994784%" id="linearGradient-8">
+            <stop stop-color="#FCD77E" offset="0%"></stop>
+            <stop stop-color="#FEA500" offset="52.41%"></stop>
+            <stop stop-color="#FF5B00" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Homepage" transform="translate(-999.000000, -3806.000000)">
+            <g id="Group-7" transform="translate(0.000000, 3740.000000)">
+                <g id="Group-18" transform="translate(1000.000000, 62.903722)">
+                    <g id="Group-14" transform="translate(57.500000, 56.500000) rotate(2.000000) translate(-57.500000, -56.500000) translate(2.000000, 2.000000)">
+                        <g id="Rectangle" transform="translate(55.500000, 54.500000) rotate(-2.000000) translate(-55.500000, -54.500000) ">
+                            <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                            <use fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-2"></use>
+                        </g>
+                    </g>
+                    <g id="SezzleIcon" transform="translate(29.000000, 20.096278)">
+                        <path d="M4.84765432,48.312 C11.31,54.81 21.7858025,54.81 28.2481481,48.312 L28.8675309,47.6892 C32.0969136,44.442 25.6345679,27.4068 28.8675309,24.1596 L4.84765432,48.312 Z" id="Path" fill="url(#linearGradient-4)" fill-rule="nonzero"></path>
+                        <path d="M29.4904938,23.5332 L28.8711111,24.156 C25.6417284,27.4032 32.1004938,44.4384 28.8711111,47.6856 L52.8909877,23.5332 C49.6580247,20.286 45.4261728,18.662394 41.1907407,18.662394 C36.9553086,18.6588 32.7198765,20.286 29.4904938,23.5332" id="Path" fill="url(#linearGradient-5)" fill-rule="nonzero"></path>
+                        <g id="SVGID_3_-link" stroke-width="1" fill-rule="evenodd" fill="url(#linearGradient-7)">
+                            <path d="M4.84765432,24.7824 C-1.61469136,31.2804 -1.61469136,41.814 4.84765432,48.312 L29.4940741,23.5296 C35.9564198,17.0316 35.9564198,6.498 29.4940741,-5.1159077e-15 L4.84765432,24.7824 Z" id="SVGID_3_" fill-rule="nonzero"></path>
+                        </g>
+                        <path d="M28.2481481,48.312 C21.7858025,54.81 21.7858025,65.3436 28.2481481,71.8416 L52.8945679,47.0592 C59.3569136,40.5612 59.3569136,30.0276 52.8945679,23.5296 L28.2481481,48.312 Z" id="Path" fill="url(#linearGradient-8)" fill-rule="nonzero"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
