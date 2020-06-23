@@ -354,6 +354,7 @@
 				profile.custom.SezzleCustomerTokenizeStatus = false;
 				profile.custom.SezzleCustomerUUIDExpiration = null;
 				profile.custom.SezzleCustomerCreateOrderLink = null;
+				profile.custom.SezzleGetCustomerLink = null;
 			});
 		};
 		
