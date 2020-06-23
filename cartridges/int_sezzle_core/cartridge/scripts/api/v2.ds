@@ -221,6 +221,30 @@
 		};
 		
 		/**
+		 * Get customer by customer uuid
+		 *
+		 * @param {dw.customer.Profile} profile
+		 * @returns {Object} response object
+		 */
+		self.getCustomer = function (profile) {
+			try {
+				var obj = {
+					'authToken' : self.authenticate(),
+					'httpMethod': 'GET'
+				};
+				
+				var sezzleService = service.initService('sezzle.getcustomer');
+				sezzleService.URL = profile.custom.SezzleGetCustomerLink;
+				return sezzleService.call(obj).object;
+			} catch (e) {
+				logger.debug('Api:getCustomer. - {0}', e);
+				return {
+					error : true
+				};
+			}
+		};
+		
+		/**
 		 * Create Checkout Session
 		 *
 		 * @param {Object} checkoutObject

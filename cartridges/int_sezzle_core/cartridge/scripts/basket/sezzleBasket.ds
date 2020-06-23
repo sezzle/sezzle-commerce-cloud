@@ -323,12 +323,18 @@
 					var currentTimestamp = Date.now();
 					var customerUUIDExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(customerUUIDExpiration);
 					if (isCustomerTokenized && currentTimestamp <= customerUUIDExpirationTimestamp) {
-						logger.debug("Found customer token and moving forward");
-						return {
-							'customer_uuid': customerUUID,
-							'is_tokenized': isCustomerTokenized,
-							'customer_uuid_expiration': customerUUIDExpiration
-						};	
+						var customer = v2.getCustomer(profile);
+						if (customer != null && !customer.error) {
+							var customerEmail = customer.response.email_address;
+							if (customerEmail) {
+								logger.debug("Found customer token and moving forward");
+								return {
+									'customer_uuid': customerUUID,
+									'is_tokenized': isCustomerTokenized,
+									'customer_uuid_expiration': customerUUIDExpiration
+								};
+							}	
+						}
 					}
 					self.deleteCustomerToken(profile);
 					logger.debug("Customer token has been expired and hence deleted the record from Profile");
