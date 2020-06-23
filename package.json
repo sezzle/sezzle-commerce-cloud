@@ -1,6 +1,6 @@
 {
   "name": "int_sezzle_sfra",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Sezzle payment integration for sfcc (sfra)",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "type": "git",
     "url": "git@github.com:SalesforceCommerceCloud/link_sezzle.git"
   },
-  "author": "Rajan Bhuyan <rajan.bhuyan@sezzle.com>",
+  "author": "Sezzle",
   "license": "MIT",
   "devDependencies": {
     "@tridnguyen/config": "^2.3.1",
