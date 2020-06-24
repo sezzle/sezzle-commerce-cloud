@@ -322,13 +322,16 @@
 				if (customerUUID && customerUUIDExpiration && isCustomerTokenized) {
 					var currentTimestamp = Date.now();
 					var customerUUIDExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(customerUUIDExpiration);
-					if (isCustomerTokenized && currentTimestamp <= customerUUIDExpirationTimestamp) {
-						logger.debug("Found customer token and moving forward");
-						return {
-							'customer_uuid': customerUUID,
-							'is_tokenized': isCustomerTokenized,
-							'customer_uuid_expiration': customerUUIDExpiration
-						};	
+					if (currentTimestamp <= customerUUIDExpirationTimestamp) {
+						var customer = v2.getCustomer(profile);
+						if (customer != null && !customer.error && customer.response.email) {
+							logger.debug("Found customer token and moving forward");
+							return {
+								'customer_uuid': customerUUID,
+								'is_tokenized': isCustomerTokenized,
+								'customer_uuid_expiration': customerUUIDExpiration
+							};
+						}
 					}
 					self.deleteCustomerToken(profile);
 					logger.debug("Customer token has been expired and hence deleted the record from Profile");
@@ -348,6 +351,7 @@
 				profile.custom.SezzleCustomerTokenizeStatus = false;
 				profile.custom.SezzleCustomerUUIDExpiration = null;
 				profile.custom.SezzleCustomerCreateOrderLink = null;
+				profile.custom.SezzleGetCustomerLink = null;
 			});
 		};
 		

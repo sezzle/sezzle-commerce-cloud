@@ -85,8 +85,19 @@ function storeTokenizeRecord(order, tokenizeObject) {
 					if (customerLinks) {
 						for (var k in customerLinks) {
 							var link = customerLinks[k];
-							if (link.rel == 'order' && link.method == 'POST') {
-								profile.custom.SezzleCustomerCreateOrderLink = link.href;	
+							switch (link.rel) {
+								case 'order' :
+									if (link.method == 'POST') {
+										profile.custom.SezzleCustomerCreateOrderLink = link.href;	
+									}	
+									break;
+								case 'self' :
+									if (link.method == 'GET') {
+										profile.custom.SezzleGetCustomerLink = link.href;	
+									}	
+									break;
+								default :
+									break;	
 							}
 						}
 					}
