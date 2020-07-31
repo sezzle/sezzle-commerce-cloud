@@ -63,7 +63,6 @@
                 paymentInstrument.paymentTransaction.amount = new Money(response.amount, order.currencyCode).divide(100);
                 paymentInstrument.paymentTransaction.setPaymentProcessor(paymentProcessor);
 
-                order.custom.SezzleCustomerUUID = response.token;
                 order.custom.SezzleExternalId = response.id;
                 order.custom.SezzleStatus = 'AUTH';
                 order.custom.SezzlePaymentAction = data.getSezzlePaymentAction();

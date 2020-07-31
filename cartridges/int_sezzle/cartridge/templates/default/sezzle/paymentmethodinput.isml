@@ -1,16 +1,18 @@
 <isif condition="${require('*/cartridge/scripts/data/sezzleData').getSezzleOnlineStatus()}">
 <div class="form-row label-inline sezzle-payment-method">
 	<div class="field-wrapper">
-		<input id="is-${paymentMethodType.value}" type="radio" class="input-radio" name="${pdict.CurrentForms.billing.paymentMethods.selectedPaymentMethodID.htmlName}" value="${paymentMethodType.htmlValue}" <isif condition="${paymentMethodType.value == pdict.CurrentForms.billing.paymentMethods.selectedPaymentMethodID.htmlValue}">checked="checked"</isif> />
-		<label for="is-${radioID}" class="field-label">
+		<input id="is-${paymentMethodType.value}" type="radio" class="input-radio" name="${pdict.CurrentForms.billing.paymentMethods.selectedPaymentMethodID.htmlName}" value="${paymentMethodType.htmlValue}" <isif condition="${paymentMethodType.value == pdict.CurrentForms.billing.paymentMethods.selectedPaymentMethodID.htmlValue}">checked="checked"</isif> />	
+	</div>
+	<label for="is-${paymentMethodType.value}" class="field-label">
 			<img alt="${Resource.msg(paymentMethodType.label,'forms',null)}" 
 				src="${Resource.msg('payment.urllogo', 'sezzle', null)}"
-				title="${Resource.msg(paymentMethodType.label,'forms',null)}"/>
+				title="${Resource.msg(paymentMethodType.label,'forms',null)}"
+				style="margin-top:-7px"/>
 <!-- 			<a class="sezzle-product-modal" style=""
 			data-amount="${pdict.Basket.totalGrossPrice.multiply(100).getValue().toFixed()}"
 			>${Resource.msg('payment.learnmore', 'sezzle', null)}</a> -->
 		</label>
-	</div>
+		<br><br>
 	${Resource.msg('payment.info', 'sezzle', null)}
 </div>
 </isif>

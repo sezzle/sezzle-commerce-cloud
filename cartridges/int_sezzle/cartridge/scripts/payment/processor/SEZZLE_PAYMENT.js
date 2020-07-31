@@ -47,8 +47,7 @@ function authorize(args) {
         var sezzleResponseObject = {
             id: session.privacy.referenceId,
             events: [{ id: session.privacy.sezzleFirstEventID }],
-            amount: session.privacy.sezzleAmount,
-            token: session.privacy.SezzleCustomerUUID
+            amount: session.privacy.sezzleAmount
         };
         sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
     });
