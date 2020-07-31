@@ -2,9 +2,9 @@
 
 var SezzlePaymentMethod = 'Sezzle';
 var BasketMgr = require('dw/order/BasketMgr');
-var sezzle = require('*/cartridge/scripts/sezzle.ds');
-var v2 = require('*/cartridge/scripts/api/v2.ds');
-var sezzleData = require('~/cartridge/scripts/data/sezzleData.ds'); 
+var sezzle = require('*/cartridge/scripts/sezzle');
+var v2 = require('*/cartridge/scripts/api/v2');
+var sezzleData = require('~/cartridge/scripts/data/sezzleData');
 var Transaction = require('dw/system/Transaction');
 var Order = require('dw/order/Order');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');

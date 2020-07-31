@@ -8,10 +8,10 @@
 	 */
 	var V2Api = function () {
 		var self = this,
-			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
+			sezzleData = require('*/cartridge/scripts/data/sezzleData'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
-			service = require('*/cartridge/scripts/init/initSezzleServices.ds'),
-			sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils.ds');
+			service = require('*/cartridge/scripts/init/initSezzleServices'),
+			sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils');
 		
 		/**
 		 * Authenticate the merchant by public and private key

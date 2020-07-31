@@ -11,11 +11,11 @@
 			web = require('dw/web'),
 			system = require('dw/system'),
 			PaymentMgr = require('dw/order/PaymentMgr'),
-			sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils.ds'),
-			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
+			sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils'),
+			sezzleData = require('*/cartridge/scripts/data/sezzleData'),
 			logger = require('dw/system').Logger.getLogger('Sezzle', ''),
-			v2 = require('*/cartridge/scripts/api/v2.ds'),
-			sezzleOrder = require('*/cartridge/scripts/order/sezzleOrder.ds'),
+			v2 = require('*/cartridge/scripts/api/v2'),
+			sezzleOrder = require('*/cartridge/scripts/order/sezzleOrder'),
 			Transaction = require('dw/system/Transaction');
 
 		self.utils = sezzleUtils;

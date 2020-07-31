@@ -15,8 +15,8 @@
 			File = require('dw/io/File'),
 			FileReader = require('dw/io/FileReader'),
 			FileWriter = require('dw/io/FileWriter'),
-			data = require('~/cartridge/scripts/data/sezzleData.ds'),
-			v2 = require('~/cartridge/scripts/api/v2.ds'),
+			data = require('~/cartridge/scripts/data/sezzleData'),
+			v2 = require('~/cartridge/scripts/api/v2'),
 			filepath = File.IMPEX + File.SEPARATOR + 'sezzle' + File.SEPARATOR,
 			filename = 'sezzle.dat';
 			

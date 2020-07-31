@@ -22,9 +22,9 @@ var PaymentMgr = require('dw/order/PaymentMgr');
 var Order = require('dw/order/Order');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
-var sezzle = require('*/cartridge/scripts/sezzle.ds');
+var sezzle = require('*/cartridge/scripts/sezzle');
 var OrderModel = require('*/cartridge/models/order');
-var sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
+var sezzleData = require('*/cartridge/scripts/data/sezzleData');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 

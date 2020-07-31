@@ -23,7 +23,7 @@
 
     </fieldset>
 </div>
-<isif condition="${require('*/cartridge/scripts/sezzle.ds').data.getSezzleOnlineStatus()}">
+<isif condition="${require('*/cartridge/scripts/sezzle').data.getSezzleOnlineStatus()}">
 <link href="${Resource.msg('sezzle.css', 'sezzle', null)}" type="text/css" rel="stylesheet" />
 </isif>
 <script type="text/javascript">

@@ -45,7 +45,7 @@ var commonCreateRequest = function (svc, args) {
 function initService(serviceName) {
     var service = require('dw/svc/LocalServiceRegistry').createService(serviceName, {
     	createRequest: commonCreateRequest,
-    	parseResponse: require('~/cartridge/scripts/utils/sezzleUtils.ds').responseParser,
+    	parseResponse: require('~/cartridge/scripts/utils/sezzleUtils').responseParser,
     	getRequestLogMessage: function (request) {
             return prepareLogData(request);
         },

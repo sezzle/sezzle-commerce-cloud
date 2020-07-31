@@ -4,7 +4,7 @@ var sezzleBMHelper = require('*/cartridge/scripts/helper/sezzleBMHelper');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 var v2 = require('*/cartridge/scripts/api/v2');
 var Money = require('dw/value/Money');
-var sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils.ds');
+var sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils');
 
 var ISML = require('dw/template/ISML');
 var Transaction = require('dw/system/Transaction');
