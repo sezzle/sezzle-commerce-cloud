@@ -4,9 +4,9 @@
  */
 (function () {
     module.exports = {
-        basket: require('*/cartridge/scripts/basket/sezzleBasket.ds'),
-        data: require('*/cartridge/scripts/data/sezzleData.ds'),
-        order: require('*/cartridge/scripts/order/sezzleOrder.ds'),
-        utils: require('*/cartridge/scripts/utils/sezzleUtils.ds')
+        basket: require('*/cartridge/scripts/basket/sezzleBasket'),
+        data: require('*/cartridge/scripts/data/sezzleData'),
+        order: require('*/cartridge/scripts/order/sezzleOrder'),
+        utils: require('*/cartridge/scripts/utils/sezzleUtils')
     };
 }());

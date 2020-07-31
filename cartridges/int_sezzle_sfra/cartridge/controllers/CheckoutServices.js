@@ -33,6 +33,7 @@ server.prepend(
         var paymentForm = server.forms.getForm('billing'),
             paymentMethodID = paymentForm.paymentMethod.value,
             billingFormErrors = {},
+			contactInfoFormErrors = {},
             viewData = {};
         
         if (paymentMethodID != 'Sezzle') {
@@ -42,6 +43,23 @@ server.prepend(
 
         // Verify billing form data
         billingFormErrors = COHelpers.validateBillingForm(paymentForm.addressFields);
+		contactInfoFormErrors = COHelpers.validateFields(paymentForm.contactInfoFields);
+		
+		if (Object.keys(contactInfoFormErrors).length) {
+            res.json({
+                form: paymentForm,
+                fieldErrors: [contactInfoFormErrors],
+                serverErrors: [],
+                error: true
+            });
+			return next();
+        } else {
+            viewData.email = {
+                value: paymentForm.contactInfoFields.email.value
+            };
+
+            viewData.phone = { value: paymentForm.contactInfoFields.phone.value };
+        }
 
         if (Object.keys(billingFormErrors).length) {
             // Respond with form data and errors
@@ -137,8 +155,12 @@ server.prepend(
                             currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
                         }
 
-                        if (paymentMethodID === 'Sezzle' && req.currentCustomer.profile) {
-                            currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
+                        if (paymentMethodID === 'Sezzle') { 
+							if (req.currentCustomer.profile) {
+                            	currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
+							} else {
+								currentBasket.setCustomerEmail(billingData.email.value);
+							}
                         }
                     });
 
@@ -254,7 +276,7 @@ server.prepend('PlaceOrder',
     function (req, res, next) {
         var BasketMgr = require('dw/order/BasketMgr');
         var URLUtils = require('dw/web/URLUtils');
-        var sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
+        var sezzleData = require('*/cartridge/scripts/data/sezzleData');
         var paymentMethod = '';
 
         var currentBasket = BasketMgr.getCurrentBasket();
