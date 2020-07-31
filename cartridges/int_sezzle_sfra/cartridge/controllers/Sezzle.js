@@ -26,6 +26,7 @@ var sezzle = require('*/cartridge/scripts/sezzle');
 var OrderModel = require('*/cartridge/models/order');
 var sezzleData = require('*/cartridge/scripts/data/sezzleData');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+var consentTracking = require('*/cartridge/scripts/middleware/consentTracking');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 
 /**
@@ -112,7 +113,14 @@ server.get('Redirect', function(req, res, next) {
 /**
  * Handle successful response from Sezzle
  */
-server.get('Success', function(req, res, next) {
+server.get(
+	'Success',
+	consentTracking.consent,
+    server.middleware.https,
+    csrfProtection.generateToken,
+    function(req, res, next) {
+	var reportingUrlsHelper = require('*/cartridge/scripts/reportingUrls');
+	var Locale = require('dw/util/Locale');
 	var basket : Basket = BasketMgr.getCurrentBasket();
 	if (!basket) {
 		res.redirect(URLUtils.url('Home-Show'));
@@ -170,31 +178,50 @@ server.get('Success', function(req, res, next) {
         return next();
     }
     logger.debug("Post process successfully completed");
+
+ 	var config = {
+            numberOfLineItems: '*'
+    };
+
+	
+	var currentLocale = Locale.getLocale(req.locale.id);
+	var orderModel = new OrderModel(order, { config: config, countryCode: currentLocale.country, containerView: 'order' });
+
+	var reportingURLs = reportingUrlsHelper.getOrderReportingURLs(order);
     
     var passwordForm;
-    var config = {
-            numberOfLineItems: '*'
-        };
-        var orderModel = new OrderModel(order, { config: config });
-        if (!req.currentCustomer.profile) {
-        	logger.debug("Guest order has been created");
-        	passwordForm = server.forms.getForm('newPasswords');
-            passwordForm.clear();
-            res.render('checkout/confirmation/confirmation', {
-                order: orderModel,
-                returningCustomer: false,
-                passwordForm: passwordForm
-            });
-        } else {
-        	logger.debug("Registered customer order has been created");
-        	COHelpers.sendConfirmationEmail(order, req.locale.id);
-            res.render('checkout/confirmation/confirmation', {
-                order: orderModel,
-                returningCustomer: true
-            });
-        }
-        logger.debug("****Checkout completed****");
-        return next();
+
+	var CustomerMgr = require('dw/customer/CustomerMgr');
+    var profile = CustomerMgr.searchProfile('email={0}', orderModel.orderEmail);
+    if (profile) {
+        var Transaction = require('dw/system/Transaction');
+        Transaction.wrap(function () {
+            order.setCustomer(profile.getCustomer());
+        });
+    }
+   
+        
+    if (!req.currentCustomer.profile && !profile) {
+    	logger.debug("Guest order has been created");
+    	passwordForm = server.forms.getForm('newPasswords');
+        passwordForm.clear();
+        res.render('checkout/confirmation/confirmation', {
+            order: orderModel,
+            returningCustomer: false,
+            passwordForm: passwordForm,
+			reportingURLs: reportingURLs
+        });
+    } else {
+    	logger.debug("Registered customer order has been created");
+    	COHelpers.sendConfirmationEmail(order, req.locale.id);
+        res.render('checkout/confirmation/confirmation', {
+            order: orderModel,
+            returningCustomer: true
+        });
+    }
+	req.session.raw.custom.orderID = req.querystring.ID; // eslint-disable-line no-param-reassign
+    logger.debug("****Checkout completed****");
+    return next();
 });
 
 
