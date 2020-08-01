@@ -48,14 +48,14 @@ function getSelectedPaymentInstruments(selectedPaymentInstruments) {
             paymentMethod: paymentInstrument.paymentMethod,
             amount: paymentInstrument.paymentTransaction.amount.value
         };
-        if (paymentInstrument.paymentMethod === 'CREDIT_CARD') {
+        if (paymentInstrument.paymentMethod == 'CREDIT_CARD') {
             results.lastFour = paymentInstrument.creditCardNumberLastDigits;
             results.owner = paymentInstrument.creditCardHolder;
             results.expirationYear = paymentInstrument.creditCardExpirationYear;
             results.type = paymentInstrument.creditCardType;
             results.maskedCreditCardNumber = paymentInstrument.maskedCreditCardNumber;
             results.expirationMonth = paymentInstrument.creditCardExpirationMonth;
-        } else if (paymentInstrument.paymentMethod === 'GIFT_CERTIFICATE') {
+        } else if (paymentInstrument.paymentMethod == 'GIFT_CERTIFICATE') {
             results.giftCertificateCode = paymentInstrument.giftCertificateCode;
             results.maskedGiftCertificateCode = paymentInstrument.maskedGiftCertificateCode;
         }

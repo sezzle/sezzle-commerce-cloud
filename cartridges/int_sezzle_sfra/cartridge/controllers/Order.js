@@ -23,8 +23,8 @@ server.get(
 
         if (!order
             || !token
-            || token !== order.orderToken
-            || order.customer.ID !== req.currentCustomer.raw.ID
+            || token != order.orderToken
+            || order.customer.ID != req.currentCustomer.raw.ID
         ) {
             res.render('/error', {
                 message: Resource.msg('error.confirmation.error', 'confirmation', null)
@@ -116,12 +116,12 @@ server.get(
 
             // check the email and postal code of the form
             if (req.querystring.trackOrderEmail.toLowerCase()
-                    !== orderModel.orderEmail.toLowerCase()) {
+                    != orderModel.orderEmail.toLowerCase()) {
                 validForm = false;
             }
 
             if (req.querystring.trackOrderPostal
-                !== orderModel.billing.billingAddress.address.postalCode) {
+                != orderModel.billing.billingAddress.address.postalCode) {
                 validForm = false;
             }
 
@@ -219,7 +219,7 @@ server.get(
             }
         ];
 
-        if (order && orderCustomerNo === currentCustomerNo) {
+        if (order && orderCustomerNo == currentCustomerNo) {
             var config = {
                 numberOfLineItems: '*'
             };
@@ -294,7 +294,7 @@ server.post(
         var passwordForm = server.forms.getForm('newPasswords');
         var newPassword = passwordForm.newpassword.htmlValue;
         var confirmPassword = passwordForm.newpasswordconfirm.htmlValue;
-        if (newPassword !== confirmPassword) {
+        if (newPassword != confirmPassword) {
             passwordForm.valid = false;
             passwordForm.newpasswordconfirm.valid = false;
             passwordForm.newpasswordconfirm.error = Resource.msg('error.message.mismatch.newpassword', 'forms', null);

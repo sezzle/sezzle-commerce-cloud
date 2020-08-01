@@ -98,11 +98,11 @@
 
 
     module.exports = function (include) {
-      if (typeof include === 'function') {
+      if (typeof include == 'function') {
         include();
-      } else if (typeof include === 'object') {
+      } else if (typeof include == 'object') {
         Object.keys(include).forEach(function (key) {
-          if (typeof include[key] === 'function') {
+          if (typeof include[key] == 'function') {
             include[key]();
           }
         });
@@ -136,11 +136,11 @@
      */
     function optionValueForAddress(shipping, selected, order, options) {
       var safeOptions = options || {};
-      var isBilling = safeOptions.type && safeOptions.type === 'billing';
+      var isBilling = safeOptions.type && safeOptions.type == 'billing';
       var className = safeOptions.className || '';
       var isSelected = selected;
       var isNew = !shipping;
-      if (typeof shipping === 'string') {
+      if (typeof shipping == 'string') {
         return $('<option class="' + className + '" disabled>' + shipping + '</option>');
       }
       var safeShipping = shipping || {};
@@ -216,7 +216,7 @@
         var mappedKey = keyMap[key];
         var mappedValue = shippingAddress[mappedKey];
         // In case of country code
-        if (mappedValue && typeof mappedValue === 'object') {
+        if (mappedValue && typeof mappedValue == 'object') {
           mappedValue = mappedValue.value;
         }
 
@@ -319,7 +319,7 @@
       var $billingAddressSelector = $('.addressSelector', form);
       var hasSelectedAddress = false;
 
-      if ($billingAddressSelector && $billingAddressSelector.length === 1) {
+      if ($billingAddressSelector && $billingAddressSelector.length == 1) {
         $billingAddressSelector.empty();
         // Add New Address option
         $billingAddressSelector.append(addressHelpers.methods.optionValueForAddress(
@@ -338,7 +338,7 @@
         ));
 
         shippings.forEach(function (aShipping) {
-          var isSelected = order.billing.matchingAddressId === aShipping.UUID;
+          var isSelected = order.billing.matchingAddressId == aShipping.UUID;
           hasSelectedAddress = hasSelectedAddress || isSelected;
           // Shipping Address option
           $billingAddressSelector.append(
@@ -355,7 +355,7 @@
             order.resources.accountAddresses, false, order
           ));
           customer.addresses.forEach(function (address) {
-            var isSelected = order.billing.matchingAddressId === address.ID;
+            var isSelected = order.billing.matchingAddressId == address.ID;
             hasSelectedAddress = hasSelectedAddress || isSelected;
             // Customer Address option
             $billingAddressSelector.append(
@@ -464,7 +464,7 @@
       var htmlToAppend = '';
 
       if (order.billing.payment && order.billing.payment.selectedPaymentInstruments
-        && order.billing.payment.selectedPaymentInstruments.length > 0 && ($('.payment-information').data('payment-method-id') === 'CREDIT_CARD')) {
+        && order.billing.payment.selectedPaymentInstruments.length > 0 && ($('.payment-information').data('payment-method-id') == 'CREDIT_CARD')) {
         htmlToAppend += '<span>' + order.resources.cardType + ' '
           + order.billing.payment.selectedPaymentInstruments[0].type
           + '</span><div>'
@@ -474,7 +474,7 @@
           + order.billing.payment.selectedPaymentInstruments[0].expirationMonth
           + '/' + order.billing.payment.selectedPaymentInstruments[0].expirationYear
           + '</span></div>';
-      } else if ($('.payment-information').data('payment-method-id') === 'Sezzle') {
+      } else if ($('.payment-information').data('payment-method-id') == 'Sezzle') {
         htmlToAppend += '<span><div>Sezzle</div></span>';
       }
 
@@ -521,7 +521,7 @@
           var selectedOption = $('option:selected', this);
           var optionID = selectedOption[0].value;
 
-          if (optionID === 'new') {
+          if (optionID == 'new') {
             // Show Address
             $(form).attr('data-address-mode', 'new');
           } else {
@@ -534,8 +534,8 @@
           var element;
 
           Object.keys(attrs).forEach(function (attr) {
-            element = attr === 'countryCode' ? 'country' : attr;
-            if (element === 'cardNumber') {
+            element = attr == 'countryCode' ? 'country' : attr;
+            if (element == 'cardNumber') {
               $('.cardNumber').data('cleave').setRawValue(attrs[attr]);
             } else {
               $('[name$=' + element + ']', form).val(attrs[attr]);
@@ -737,7 +737,7 @@
             var stage = checkoutStages[members.currentStage];
             var defer = $.Deferred(); // eslint-disable-line
 
-            if (stage === 'shipping') {
+            if (stage == 'shipping') {
               //
               // Clear Previous Errors
               //
@@ -751,7 +751,7 @@
                 ? '.multi-shipping .active form' : '.single-shipping .shipping-form';
               var form = $(formSelector);
 
-              if (isMultiShip && form.length === 0) {
+              if (isMultiShip && form.length == 0) {
                 // in case the multi ship form is already submitted
                 var url = $('#checkout-main').attr('data-checkout-get-url');
                 $.ajax({
@@ -795,7 +795,7 @@
                 });
               }
               return defer;
-            } if (stage === 'payment') {
+            } if (stage == 'payment') {
               //
               // Submit the Billing Address Form
               //
@@ -816,14 +816,14 @@
             	  paymentForm = removePaymentMethod(paymentForm, 'Sezzle');
               }
 
-              if ($('.data-checkout-stage').data('customer-type') === 'registered') {
+              if ($('.data-checkout-stage').data('customer-type') == 'registered') {
                 // if payment method is credit card
-                if ($('.payment-information').data('payment-method-id') === 'CREDIT_CARD') {
+                if ($('.payment-information').data('payment-method-id') == 'CREDIT_CARD') {
                   if (!($('.payment-information').data('is-new-payment'))) {
                     var cvvCode = $('.saved-payment-instrument.'
                       + 'selected-payment .saved-payment-security-code').val();
 
-                    if (cvvCode === '') {
+                    if (cvvCode == '') {
                       $('.saved-payment-instrument.'
                         + 'selected-payment '
                         + '.form-control').addClass('is-invalid');
@@ -900,7 +900,7 @@
               });
 
               return defer;
-            } if (stage === 'placeOrder') {
+            } if (stage == 'placeOrder') {
               $.ajax({
                 url: $('.place-order').data('action'),
                 method: 'POST',
@@ -920,7 +920,7 @@
                       token: data.orderToken
                     };
 
-                    continueUrl += (continueUrl.indexOf('?') !== -1 ? '&' : '?')
+                    continueUrl += (continueUrl.indexOf('?') != -1 ? '&' : '?')
                       + Object.keys(urlParams).map(function (key) {
                         return key + '=' + encodeURIComponent(urlParams[key]);
                       }).join('&');
@@ -956,7 +956,7 @@
             // Handle Payment option selection
             //
             $('input[name$="paymentMethod"]', plugin).on('change', function () {
-              $('.credit-card-form').toggle($(this).val() === 'CREDIT_CARD');
+              $('.credit-card-form').toggle($(this).val() == 'CREDIT_CARD');
             });
 
             //
@@ -990,7 +990,7 @@
               // Back button when event state less than current state in ordered
               // checkoutStages array.
               //
-              if (e.state === null
+              if (e.state == null
                 || checkoutStages.indexOf(e.state) < members.currentStage) {
                 members.handlePrevStage(false);
               } else if (checkoutStages.indexOf(e.state) > members.currentStage) {
@@ -1022,7 +1022,7 @@
                 if (data.errorStage) {
                   members.gotoStage(data.errorStage.stage);
 
-                  if (data.errorStage.step === 'billingAddress') {
+                  if (data.errorStage.step == 'billingAddress') {
                     var $billingAddressSameAsShipping = $(
                       'input[name$="_shippingAddressUseAsBillingAddress"]'
                     );
@@ -1136,8 +1136,8 @@
   /** */ function (module, exports, __webpack_require__) {
     (function webpackUniversalModuleDefinition(root, factory) {
       if (true) module.exports = factory();
-      else if (typeof define === 'function' && define.amd) define([], factory);
-      else if (typeof exports === 'object') exports.Cleave = factory();
+      else if (typeof define == 'function' && define.amd) define([], factory);
+      else if (typeof exports == 'object') exports.Cleave = factory();
       else root.Cleave = factory();
     }(this, function () {
       return /** *** */ (function (modules) { // webpackBootstrap
@@ -1194,10 +1194,10 @@
             var Cleave = function (element, opts) {
               var owner = this;
 
-              if (typeof element === 'string') {
+              if (typeof element == 'string') {
                 owner.element = document.querySelector(element);
               } else {
-                owner.element = ((typeof element.length !== 'undefined') && element.length > 0) ? element[0] : element;
+                owner.element = ((typeof element.length != 'undefined') && element.length > 0) ? element[0] : element;
               }
 
               if (!owner.element) {
@@ -1217,7 +1217,7 @@
                   pps = owner.properties;
 
                 // no need to use this lib
-                if (!pps.numeral && !pps.phone && !pps.creditCard && !pps.time && !pps.date && (pps.blocksLength === 0 && !pps.prefix)) {
+                if (!pps.numeral && !pps.phone && !pps.creditCard && !pps.time && !pps.date && (pps.blocksLength == 0 && !pps.prefix)) {
                   owner.onInput(pps.initValue);
 
                   return;
@@ -1327,7 +1327,7 @@
                   Util = Cleave.Util,
                   currentValue = owner.element.value;
 
-                if (charCode === 229
+                if (charCode == 229
                   && Util.isAndroidBackspaceKeydown(owner.lastInputValue, currentValue)
                 ) {
                   charCode = 8;
@@ -1336,7 +1336,7 @@
                 owner.lastInputValue = currentValue;
 
                 // hit backspace when last character is delimiter
-                if (charCode === 8 && Util.isDelimiter(currentValue.slice(-pps.delimiterLength), pps.delimiter, pps.delimiters)) {
+                if (charCode == 8 && Util.isDelimiter(currentValue.slice(-pps.delimiterLength), pps.delimiter, pps.delimiters)) {
                   pps.backspace = true;
 
                   return;
@@ -1457,7 +1457,7 @@
                   value = pps.prefix + value;
 
                   // no blocks specified, no need to do formatting
-                  if (pps.blocksLength === 0) {
+                  if (pps.blocksLength == 0) {
                     pps.result = value;
                     owner.updateValueState();
 
@@ -1490,7 +1490,7 @@
                   creditCardInfo;
 
                 // At least one of the first 4 characters has changed
-                if (Util.headStr(pps.result, 4) === Util.headStr(value, 4)) {
+                if (Util.headStr(pps.result, 4) == Util.headStr(value, 4)) {
                   return;
                 }
 
@@ -1501,7 +1501,7 @@
                 pps.maxLength = Util.getMaxLength(pps.blocks);
 
                 // credit card type changed
-                if (pps.creditCardType !== creditCardInfo.type) {
+                if (pps.creditCardType != creditCardInfo.type) {
                   pps.creditCardType = creditCardInfo.type;
 
                   pps.onCreditCardTypeChanged.call(owner, pps.creditCardType);
@@ -1565,7 +1565,7 @@
                 var owner = this,
                   pps = owner.properties;
 
-                value = value !== undefined && value !== null ? value.toString() : '';
+                value = value != undefined && value != null ? value.toString() : '';
 
                 if (pps.numeral) {
                   value = value.replace('.', pps.numeralDecimalMark);
@@ -1631,7 +1631,7 @@
             Cleave.DefaultProperties = __webpack_require__(7);
 
             // for angular directive
-            ((typeof global === 'object' && global) ? global : window).Cleave = Cleave;
+            ((typeof global == 'object' && global) ? global : window).Cleave = Cleave;
 
             // CommonJS
             module.exports = Cleave;
@@ -1655,8 +1655,8 @@
             owner.numeralDecimalScale = numeralDecimalScale >= 0 ? numeralDecimalScale : 2;
             owner.numeralThousandsGroupStyle = numeralThousandsGroupStyle || NumeralFormatter.groupStyle.thousand;
             owner.numeralPositiveOnly = !!numeralPositiveOnly;
-            owner.stripLeadingZeroes = stripLeadingZeroes !== false;
-            owner.delimiter = (delimiter || delimiter === '') ? delimiter : ',';
+            owner.stripLeadingZeroes = stripLeadingZeroes != false;
+            owner.delimiter = (delimiter || delimiter == '') ? delimiter : ',';
             owner.delimiterRE = delimiter ? new RegExp('\\' + delimiter, 'g') : '';
           };
 
@@ -1713,7 +1713,7 @@
               }
 
               if (owner.numeralIntegerScale > 0) {
-                partInteger = partInteger.slice(0, owner.numeralIntegerScale + (value.slice(0, 1) === '-' ? 1 : 0));
+                partInteger = partInteger.slice(0, owner.numeralIntegerScale + (value.slice(0, 1) == '-' ? 1 : 0));
               }
 
               switch (owner.numeralThousandsGroupStyle) {
@@ -1756,7 +1756,7 @@
             initBlocks: function () {
               var owner = this;
               owner.datePattern.forEach(function (value) {
-                if (value === 'Y') {
+                if (value == 'Y') {
                   owner.blocks.push(4);
                 } else {
                   owner.blocks.push(2);
@@ -1791,7 +1791,7 @@
 
                   switch (owner.datePattern[index]) {
                     case 'd':
-                      if (sub === '00') {
+                      if (sub == '00') {
                         sub = '01';
                       } else if (parseInt(sub0, 10) > 3) {
                         sub = '0' + sub0;
@@ -1802,7 +1802,7 @@
                       break;
 
                     case 'm':
-                      if (sub === '00') {
+                      if (sub == '00') {
                         sub = '01';
                       } else if (parseInt(sub0, 10) > 1) {
                         sub = '0' + sub0;
@@ -1839,8 +1839,8 @@
                 fullYearDone = false;
 
               // mm-dd || dd-mm
-              if (value.length === 4 && datePattern[0].toLowerCase() !== 'y' && datePattern[1].toLowerCase() !== 'y') {
-                dayStartIndex = datePattern[0] === 'd' ? 0 : 2;
+              if (value.length == 4 && datePattern[0].toLowerCase() != 'y' && datePattern[1].toLowerCase() != 'y') {
+                dayStartIndex = datePattern[0] == 'd' ? 0 : 2;
                 monthStartIndex = 2 - dayStartIndex;
                 day = parseInt(value.slice(dayStartIndex, dayStartIndex + 2), 10);
                 month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);
@@ -1849,7 +1849,7 @@
               }
 
               // yyyy-mm-dd || yyyy-dd-mm || mm-dd-yyyy || dd-mm-yyyy || dd-yyyy-mm || mm-yyyy-dd
-              if (value.length === 8) {
+              if (value.length == 8) {
                 datePattern.forEach(function (type, index) {
                   switch (type) {
                     case 'd':
@@ -1872,14 +1872,14 @@
                 month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);
                 year = parseInt(value.slice(yearStartIndex, yearStartIndex + 4), 10);
 
-                fullYearDone = value.slice(yearStartIndex, yearStartIndex + 4).length === 4;
+                fullYearDone = value.slice(yearStartIndex, yearStartIndex + 4).length == 4;
 
                 date = this.getFixedDate(day, month, year);
               }
 
               owner.date = date;
 
-              return date.length === 0 ? value : datePattern.reduce(function (previous, current) {
+              return date.length == 0 ? value : datePattern.reduce(function (previous, current) {
                 switch (current) {
                   case 'd':
                     return previous + owner.addLeadingZero(date[0]);
@@ -1896,15 +1896,15 @@
               month = Math.min(month, 12);
               year = parseInt((year || 0), 10);
 
-              if ((month < 7 && month % 2 === 0) || (month > 8 && month % 2 === 1)) {
-                day = Math.min(day, month === 2 ? (this.isLeapYear(year) ? 29 : 28) : 30);
+              if ((month < 7 && month % 2 == 0) || (month > 8 && month % 2 == 1)) {
+                day = Math.min(day, month == 2 ? (this.isLeapYear(year) ? 29 : 28) : 30);
               }
 
               return [day, month, year];
             },
 
             isLeapYear: function (year) {
-              return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
+              return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
             },
 
             addLeadingZero: function (number) {
@@ -2008,7 +2008,7 @@
                 minute,
                 hour;
 
-              if (value.length === 6) {
+              if (value.length == 6) {
                 timePattern.forEach(function (type, index) {
                   switch (type) {
                     case 's':
@@ -2034,7 +2034,7 @@
                 time = this.getFixedTime(hour, minute, second);
               }
 
-              if (value.length === 4 && owner.timePattern.indexOf('s') < 0) {
+              if (value.length == 4 && owner.timePattern.indexOf('s') < 0) {
                 timePattern.forEach(function (type, index) {
                   switch (type) {
                     case 'm':
@@ -2058,7 +2058,7 @@
 
               owner.time = time;
 
-              return time.length === 0 ? value : timePattern.reduce(function (previous, current) {
+              return time.length == 0 ? value : timePattern.reduce(function (previous, current) {
                 switch (current) {
                   case 's':
                     return previous + owner.addLeadingZero(time[2]);
@@ -2092,7 +2092,7 @@
           var PhoneFormatter = function (formatter, delimiter) {
             var owner = this;
 
-            owner.delimiter = (delimiter || delimiter === '') ? delimiter : ' ';
+            owner.delimiter = (delimiter || delimiter == '') ? delimiter : ' ';
             owner.delimiterRE = delimiter ? new RegExp('\\' + delimiter, 'g') : '';
 
             owner.formatter = formatter;
@@ -2264,13 +2264,13 @@
 
             isDelimiter: function (letter, delimiter, delimiters) {
               // single delimiter
-              if (delimiters.length === 0) {
-                return letter === delimiter;
+              if (delimiters.length == 0) {
+                return letter == delimiter;
               }
 
               // multiple delimiters
               return delimiters.some(function (current) {
-                if (letter === current) {
+                if (letter == current) {
                   return true;
                 }
               });
@@ -2283,7 +2283,7 @@
             getNextCursorPosition: function (prevPos, oldValue, newValue, delimiter, delimiters) {
               // If cursor was at the end of value, just place it back.
               // Because new value could contain additional chars.
-              if (oldValue.length === prevPos) {
+              if (oldValue.length == prevPos) {
                 return newValue.length;
               }
 
@@ -2299,14 +2299,14 @@
               newRawValue = this.stripDelimiters(newValue.slice(0, prevPos), delimiter, delimiters);
               lengthOffset = oldRawValue.length - newRawValue.length;
 
-              return (lengthOffset !== 0) ? (lengthOffset / Math.abs(lengthOffset)) : 0;
+              return (lengthOffset != 0) ? (lengthOffset / Math.abs(lengthOffset)) : 0;
             },
 
             stripDelimiters: function (value, delimiter, delimiters) {
               var owner = this;
 
               // single delimiter
-              if (delimiters.length === 0) {
+              if (delimiters.length == 0) {
                 var delimiterRE = delimiter ? owner.getDelimiterREByDelimiter(delimiter) : '';
 
                 return value.replace(delimiterRE, '');
@@ -2335,7 +2335,7 @@
             // (PRE123, 3) -> 123
             // (PR123, 3) -> 23 this happens when user hits backspace in front of "PRE"
             getPrefixStrippedValue: function (value, prefix, prefixLength, prevValue) {
-              if (value.slice(0, prefixLength) !== prefix) {
+              if (value.slice(0, prefixLength) != prefix) {
                 // Check whether if it is a deletion
                 if (value.length < prevValue.length) {
                   value = value.length > prefixLength ? prevValue : prefix;
@@ -2351,8 +2351,8 @@
             getFirstDiffIndex: function (prev, current) {
               var index = 0;
 
-              while (prev.charAt(index) === current.charAt(index)) {
-                if (prev.charAt(index++) === '') {
+              while (prev.charAt(index) == current.charAt(index)) {
+                if (prev.charAt(index++) == '') {
                   return -1;
                 }
               }
@@ -2366,7 +2366,7 @@
                 currentDelimiter;
 
               // no options, normal input
-              if (blocksLength === 0) {
+              if (blocksLength == 0) {
                 return value;
               }
 
@@ -2390,7 +2390,7 @@
                   } else {
                     result += sub;
 
-                    if (sub.length === length && index < blocksLength - 1) {
+                    if (sub.length == length && index < blocksLength - 1) {
                       result += currentDelimiter;
                     }
                   }
@@ -2426,7 +2426,7 @@
             },
 
             setSelection: function (element, position, doc) {
-              if (element !== this.getActiveElement(doc)) {
+              if (element != this.getActiveElement(doc)) {
                 return;
               }
 
@@ -2471,7 +2471,7 @@
                 return false;
               }
 
-              return currentInputValue === lastInputValue.slice(0, -1);
+              return currentInputValue == lastInputValue.slice(0, -1);
             }
           };
 
@@ -2522,7 +2522,7 @@
                 target.numeralDecimalMark = opts.numeralDecimalMark || '.';
                 target.numeralThousandsGroupStyle = opts.numeralThousandsGroupStyle || 'thousand';
                 target.numeralPositiveOnly = !!opts.numeralPositiveOnly;
-                target.stripLeadingZeroes = opts.stripLeadingZeroes !== false;
+                target.stripLeadingZeroes = opts.stripLeadingZeroes != false;
 
                 // others
                 target.numericOnly = target.creditCard || target.date || !!opts.numericOnly;
@@ -2536,9 +2536,9 @@
                 target.rawValueTrimPrefix = !!opts.rawValueTrimPrefix;
                 target.copyDelimiter = !!opts.copyDelimiter;
 
-                target.initValue = (opts.initValue !== undefined && opts.initValue !== null) ? opts.initValue.toString() : '';
+                target.initValue = (opts.initValue != undefined && opts.initValue != null) ? opts.initValue.toString() : '';
 
-                target.delimiter = (opts.delimiter || opts.delimiter === '') ? opts.delimiter
+                target.delimiter = (opts.delimiter || opts.delimiter == '') ? opts.delimiter
                   : (opts.date ? '/'
                     : (opts.time ? ':'
                       : (opts.numeral ? ','
@@ -2551,7 +2551,7 @@
                 target.blocks = opts.blocks || [];
                 target.blocksLength = target.blocks.length;
 
-                target.root = (typeof global === 'object' && global) ? global : window;
+                target.root = (typeof global == 'object' && global) ? global : window;
                 target.document = opts.document || target.root.document;
 
                 target.maxLength = 0;
@@ -2599,7 +2599,7 @@
         $shippingAddressSelector = $('.addressSelector', form);
       }
 
-      if ($shippingAddressSelector && $shippingAddressSelector.length === 1) {
+      if ($shippingAddressSelector && $shippingAddressSelector.length == 1) {
         $shippingAddressSelector.empty();
         // Add New Address option
         $shippingAddressSelector.append(addressHelpers.methods.optionValueForAddress(
@@ -2616,7 +2616,7 @@
           ));
 
           customer.addresses.forEach(function (address) {
-            var isSelected = shipping.matchingAddressId === address.ID;
+            var isSelected = shipping.matchingAddressId == address.ID;
             $shippingAddressSelector.append(
               addressHelpers.methods.optionValueForAddress(
                 { UUID: 'ab_' + address.ID, shippingAddress: address },
@@ -2631,7 +2631,7 @@
           order.resources.shippingAddresses, false, order, { className: 'multi-shipping' }
         ));
         shippings.forEach(function (aShipping) {
-          var isSelected = shipping.UUID === aShipping.UUID;
+          var isSelected = shipping.UUID == aShipping.UUID;
           hasSelectedAddress = hasSelectedAddress || isSelected;
           var addressOption = addressHelpers.methods.optionValueForAddress(
             aShipping,
@@ -2640,8 +2640,8 @@
             { className: 'multi-shipping' }
           );
 
-          var newAddress = addressOption.html() === order.resources.addNewAddress;
-          var matchingUUID = aShipping.UUID === shipping.UUID;
+          var newAddress = addressOption.html() == order.resources.addNewAddress;
+          var matchingUUID = aShipping.UUID == shipping.UUID;
           if ((newAddress && matchingUUID) || (!newAddress && matchingUUID) || (!newAddress && !matchingUUID)) {
             $shippingAddressSelector.append(addressOption);
           }
@@ -2704,7 +2704,7 @@
         $('select[name$=_stateCode],input[name$=_stateCode]', form)
           .val(addressObject.stateCode);
 
-        if (countryCode && typeof countryCode === 'object') {
+        if (countryCode && typeof countryCode == 'object') {
           $('select[name$=_country]', form).val(addressObject.countryCode.value);
         } else {
           $('select[name$=_country]', form).val(addressObject.countryCode);
@@ -2747,7 +2747,7 @@
                 .prop('id', 'shippingMethod-' + shippingMethod.ID)
                 .prop('name', shippingMethodFormID)
                 .prop('value', shippingMethod.ID)
-                .attr('checked', shippingMethod.ID === selected.ID);
+                .attr('checked', shippingMethod.ID == selected.ID);
 
               $('label', tmpl)
                 .prop('for', 'shippingMethod-' + shippingMethod.ID);
@@ -3294,7 +3294,7 @@
                   customer: response.customer
                 });
 
-                if ($('#checkout-main').data('customer-type') === 'guest') {
+                if ($('#checkout-main').data('customer-type') == 'guest') {
                   clearShippingForms(response.order);
                 } else {
                   response.order.shipping.forEach(function (shipping) {
@@ -3360,17 +3360,17 @@
           var element;
 
           Object.keys(attrs).forEach(function (attr) {
-            element = attr === 'countryCode' ? 'country' : attr;
+            element = attr == 'countryCode' ? 'country' : attr;
             $('[name$=' + element + ']', form).val(attrs[attr]);
           });
 
           $('[name$=stateCode]', form).trigger('change');
 
-          if (shipmentUUID === 'new') {
+          if (shipmentUUID == 'new') {
             $(form).attr('data-address-mode', 'new');
-          } else if (shipmentUUID === originalUUID) {
+          } else if (shipmentUUID == originalUUID) {
             $(form).attr('data-address-mode', 'shipment');
-          } else if (shipmentUUID.indexOf('ab_') === 0) {
+          } else if (shipmentUUID.indexOf('ab_') == 0) {
             $(form).attr('data-address-mode', 'customer');
           } else {
             $(form).attr('data-address-mode', 'edit');
@@ -3389,16 +3389,16 @@
 
           var element;
           Object.keys(attrs).forEach(function (attr) {
-            if (attr === 'isGift') {
+            if (attr == 'isGift') {
               $('[name$=' + attr + ']', form).prop('checked', attrs[attr]);
               $('[name$=' + attr + ']', form).trigger('change');
             } else {
-              element = attr === 'countryCode' ? 'country' : attr;
+              element = attr == 'countryCode' ? 'country' : attr;
               $('[name$=' + element + ']', form).val(attrs[attr]);
             }
           });
 
-          if (shipmentUUID === 'new' && pliUUID) {
+          if (shipmentUUID == 'new' && pliUUID) {
             var createShipmentUrl = $(this).attr('data-create-shipment-url');
             createNewShipment(createShipmentUrl, { productLineItemUUID: pliUUID })
               .done(function (response) {
@@ -3422,10 +3422,10 @@
               .fail(function () {
                 $.spinner().stop();
               });
-          } else if (shipmentUUID === originalUUID) {
+          } else if (shipmentUUID == originalUUID) {
             $('select[name$=stateCode]', form).trigger('change');
             $(form).attr('data-address-mode', 'shipment');
-          } else if (shipmentUUID.indexOf('ab_') === 0) {
+          } else if (shipmentUUID.indexOf('ab_') == 0) {
             var url = $(form).attr('action');
             var serializedData = $(form).serialize();
             createNewShipment(url, serializedData)
@@ -3586,7 +3586,7 @@
 
             updateShippingAddressFormValues(restoreStateObj);
 
-            if (stateCode !== originalStateCode) {
+            if (stateCode != originalStateCode) {
               $('[data-action=save]', form).trigger('click');
             } else {
               $(form).attr('data-address-mode', 'edit');
@@ -3683,7 +3683,7 @@
         }
 
         var stateRequiredAttr = $('#shippingState').attr('required');
-        var isRequired = stateRequiredAttr !== undefined && stateRequiredAttr !== false;
+        var isRequired = stateRequiredAttr != undefined && stateRequiredAttr != false;
         var stateExists = (shipping.shippingAddress && shipping.shippingAddress.stateCode)
           ? shipping.shippingAddress.stateCode
           : false;
@@ -3780,7 +3780,7 @@
               : 'unknown'];
             $(cardTypeSelector).val(cardType);
             $('.card-number-wrapper').attr('data-type', type);
-            if (type === 'visa' || type === 'mastercard' || type === 'discover') {
+            if (type == 'visa' || type == 'mastercard' || type == 'discover') {
               $('#securityCode').attr('maxlength', 3);
             } else {
               $('#securityCode').attr('maxlength', 4);

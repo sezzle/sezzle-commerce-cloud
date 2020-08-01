@@ -17,7 +17,7 @@
     </isif>
 
     <div class="cart-error-messaging cart-error">
-        <isif condition="${pdict.valid.error && pdict.items.length !== 0}">
+        <isif condition="${pdict.valid.error && pdict.items.length != 0}">
             <div class="alert alert-danger alert-dismissible valid-cart-error fade show" role="alert">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -48,7 +48,7 @@
         <hr class="no-margin-top">
     </div>
 
-    <isif condition="${pdict.items.length === 0}">
+    <isif condition="${pdict.items.length == 0}">
         <div class="container cart-empty">
             <div class="row">
                 <div class="col-12 text-center">
@@ -62,10 +62,10 @@
                 <!---product cards--->
                 <div class="col-sm-7 col-md-8">
                     <isloop items="${pdict.items}" var="lineItem">
-                        <isif condition="${lineItem.productType === 'bundle'}">
+                        <isif condition="${lineItem.productType == 'bundle'}">
                             <isinclude template="cart/productCard/cartBundleCard" />
                         <iselse/>
-                            <isif condition="${lineItem.noProduct === true}">
+                            <isif condition="${lineItem.noProduct == true}">
                                 <isinclude template="cart/productCard/uncategorizedCartProductCard" />
                             <iselse/>
                                 <isinclude template="cart/productCard/cartProductCard" />

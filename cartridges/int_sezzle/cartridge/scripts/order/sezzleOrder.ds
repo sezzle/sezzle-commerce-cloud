@@ -59,7 +59,7 @@
 		 */
         this.updateAttributes = function (order, response, paymentProcessor, paymentInstrument) {
             try {
-                paymentInstrument.paymentTransaction.transactionID = response.token;
+                paymentInstrument.paymentTransaction.transactionID = response.id;
                 paymentInstrument.paymentTransaction.amount = new Money(response.amount, order.currencyCode).divide(100);
                 paymentInstrument.paymentTransaction.setPaymentProcessor(paymentProcessor);
 

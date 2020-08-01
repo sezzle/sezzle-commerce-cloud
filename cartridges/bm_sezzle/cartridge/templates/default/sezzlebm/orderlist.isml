@@ -108,7 +108,7 @@ if (!isSearchByOrderNo && !isSearchByTransaction) {
 					<isprint value="${order.orderDate}"/>
 				</td>
 				<td class="table_detail e s" nowrap="nowrap"><isprint value="${order.createdBy}"/></td>
-				<isif condition="${typeof order.isRegestered === 'boolean'}">
+				<isif condition="${typeof order.isRegestered == 'boolean'}">
 					<td class="table_detail e s" nowrap="nowrap"><isprint value="${order.isRegestered ? Resource.msg('search.grid.registration.registered', 'sezzlebm', null) : Resource.msg('search.grid.registration.unregistered', 'sezzlebm', null)}"/></td>
 				<iselse>
 					<td class="table_detail e s" nowrap="nowrap"><isprint value="${order.isRegestered}"/></td>

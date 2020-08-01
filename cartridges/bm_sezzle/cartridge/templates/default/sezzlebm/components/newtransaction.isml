@@ -57,7 +57,7 @@
                 <td class="infobox_item top">
                     <select name="currencycode" class="js_sezzle_new_transaction_currency_select">
                         <isloop items="${allCurrencies}" var="currency" >
-                            <isif condition="${currency === defaultCurrency}">
+                            <isif condition="${currency == defaultCurrency}">
                                 <option value="${currency}" selected="selected">${currency}</option>
                             <iselse>
                                 <option value="${currency}">${currency}</option>
@@ -117,9 +117,9 @@
 				<td class="infobox_title top">${Resource.msg('transaction.newtransaction.paymentaction', 'sezzlebm', null)}</td>
 				<td class="infobox_item top">
 					<select name='paymentAction'>
-						<option ${currentPaymentAction === "Sale" ? "selected" : ''} value='Sale'>${Resource.msg('transaction.newtransaction.paymentaction.sale', 'sezzlebm', null)}</option>
-						<option ${currentPaymentAction === "Authorization" ? "selected" : ''} value='Authorization'>${Resource.msg('transaction.newtransaction.paymentaction.authorization', 'sezzlebm', null)}</option>
-						<option ${currentPaymentAction === "Order" ? "selected" : ''} value='Order'>${Resource.msg('transaction.newtransaction.paymentaction.order', 'sezzlebm', null)}</option>
+						<option ${currentPaymentAction == "Sale" ? "selected" : ''} value='Sale'>${Resource.msg('transaction.newtransaction.paymentaction.sale', 'sezzlebm', null)}</option>
+						<option ${currentPaymentAction == "Authorization" ? "selected" : ''} value='Authorization'>${Resource.msg('transaction.newtransaction.paymentaction.authorization', 'sezzlebm', null)}</option>
+						<option ${currentPaymentAction == "Order" ? "selected" : ''} value='Order'>${Resource.msg('transaction.newtransaction.paymentaction.order', 'sezzlebm', null)}</option>
 					</select>
 				</td>
 			</tr>

@@ -109,7 +109,7 @@ var sezzleAdmin = (function ($) {
             success: function (data) {
             	console.log(data);
                 actionFormWindow.maskOver.hide();
-                if (data.result === 'Success') {
+                if (data.result == 'Success') {
                     actionFormWindow.close();
                     if (sezzleAdmin.currentOrderNo) {
                         loadOrderTransaction(sezzleAdmin.currentOrderNo, data.transactionid, sezzleAdmin.isCustomOrder, sezzleAdmin.currentCurrencyCode);
@@ -247,7 +247,7 @@ var sezzleAdmin = (function ($) {
             var init = 0;
 
             $countedFields.each(function (pos, el) {
-                var val = el.value.trim().length === 0 ? 0 : el.value;
+                var val = el.value.trim().length == 0 ? 0 : el.value;
                 var err = isNaN(val) || !isFinite(val);
                 init += err ? NaN : parseFloat(val);
             });
@@ -262,7 +262,7 @@ var sezzleAdmin = (function ($) {
 
     function referenceIdCheck($referenceInput) {
         $referenceInput.bind('input change', function () {
-            var method = $('input[name=methodName]').val() === 'DoReferenceTransaction';
+            var method = $('input[name=methodName]').val() == 'DoReferenceTransaction';
             var enterValue = $.trim($(this).val());
             var reg = new RegExp('^B');
             var indexValue = !reg.test(enterValue) && !!enterValue[0];
@@ -380,19 +380,19 @@ var sezzleAdmin = (function ($) {
 
     function recalculateModalWindowSize(el) {
         var modalWindow;
-        if (typeof el === 'undefined') {
+        if (typeof el == 'undefined') {
             $('.x-window').each(function () {
                 recalculateModalWindowSize($(this).attr('id'));
             });
             return;
         }
-        if (el.ctype === 'Ext.Component') {
+        if (el.ctype == 'Ext.Component') {
             modalWindow = el;
         }
         if (el.jquery) {
             el = el.parents('.x-window').attr('id'); // eslint-disable-line no-param-reassign
         }
-        if (typeof el === 'string') {
+        if (typeof el == 'string') {
             modalWindow = Ext.getCmp(el);
         }
         var windowHeight = $window.height() - 30;
@@ -418,7 +418,7 @@ var sezzleAdmin = (function ($) {
         var status;
 
         $select.on('change', function () {
-            if ($(this).find(':selected').val() !== 'ba') {
+            if ($(this).find(':selected').val() != 'ba') {
                 $('#paymentInfo tr').removeClass('sezzle_error_field');
                 status = $('.js_sezzle_required_toggle').first().find('input').attr('disabled');
                 $billingAddress.find('input').removeAttr('disabled');
@@ -448,7 +448,7 @@ var sezzleAdmin = (function ($) {
                 $orderOption.removeAttr('disabled');
                 $requiredToggleInputs.removeAttr('data-validation');
                 $method.val('DoReferenceTransaction');
-                if (status !== 'disabled') {
+                if (status != 'disabled') {
                     $acctInput.find('input').attr('disabled', 'disabled');
                 } else {
                     $creditCard.find('input').attr('disabled', 'disabled');

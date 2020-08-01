@@ -58,16 +58,22 @@ function validateFields(form) {
     return formErrors.getFormErrors(form);
 }
 
+/**
+ * Get Sezzle Payment Instrument
+ *
+ * @param {dw.order.Basket} basket - Basket
+ * @returns {Object} Payment Instrument
+ */
 function getSezzlePaymentInstrument(basket) {
     var paymentInstruments = basket.getPaymentInstruments();
     var iterator = paymentInstruments.iterator();
     var paymentInstrument = null;
     while (iterator.hasNext()) {
         paymentInstrument = iterator.next();
-        var paymentMethod = dw.order.PaymentMgr.getPaymentMethod(paymentInstrument.getPaymentMethod());
+        var paymentMethod = PaymentMgr.getPaymentMethod(paymentInstrument.getPaymentMethod());
         if (paymentMethod) {
             var paymentProcessorId = paymentMethod.getPaymentProcessor().getID();
-            if (paymentProcessorId === 'SEZZLE_PAYMENT') {
+            if (paymentProcessorId == 'SEZZLE_PAYMENT') {
                 return paymentInstrument;
             }
         }
@@ -117,7 +123,7 @@ function copyCustomerAddressToShipment(address, shipmentOrNull) {
     var shippingAddress = shipment.shippingAddress;
 
     Transaction.wrap(function () {
-        if (shippingAddress === null) {
+        if (shippingAddress == null) {
             shippingAddress = shipment.createShippingAddress();
         }
 
@@ -174,7 +180,7 @@ function copyShippingAddressToShipment(shippingData, shipmentOrNull) {
     var shippingAddress = shipment.shippingAddress;
 
     Transaction.wrap(function () {
-        if (shippingAddress === null) {
+        if (shippingAddress == null) {
             shippingAddress = shipment.createShippingAddress();
         }
 
@@ -340,7 +346,7 @@ function getProductLineItem(currentBasket, pliUUID) {
     var pli;
     for (var i = 0, ii = currentBasket.productLineItems.length; i < ii; i++) {
         pli = currentBasket.productLineItems[i];
-        if (pli.UUID === pliUUID) {
+        if (pli.UUID == pliUUID) {
             productLineItem = pli;
             break;
         }
@@ -487,10 +493,10 @@ function createOrder(currentBasket) {
 function handlePayments(order, orderNumber) {
     var result = {};
 
-    if (order.totalNetPrice !== 0.00) {
+    if (order.totalNetPrice != 0.00) {
         var paymentInstruments = order.paymentInstruments;
 
-        if (paymentInstruments.length === 0) {
+        if (paymentInstruments.length == 0) {
             Transaction.wrap(function () { OrderMgr.failOrder(order); });
             result.error = true;
         }
@@ -502,7 +508,7 @@ function handlePayments(order, orderNumber) {
                     .getPaymentMethod(paymentInstrument.paymentMethod)
                     .paymentProcessor;
                 var authorizationResult;
-                if (paymentProcessor === null) {
+                if (paymentProcessor == null) {
                     Transaction.begin();
                     paymentInstrument.paymentTransaction.setTransactionID(orderNumber);
                     Transaction.commit();
@@ -571,11 +577,11 @@ function placeOrder(order, fraudDetectionStatus) {
     try {
         Transaction.begin();
         var placeOrderStatus = OrderMgr.placeOrder(order);
-        if (placeOrderStatus === Status.ERROR) {
+        if (placeOrderStatus == Status.ERROR) {
             throw new Error();
         }
 
-        if (fraudDetectionStatus.status === 'flag') {
+        if (fraudDetectionStatus.status == 'flag') {
             order.setConfirmationStatus(Order.CONFIRMATION_STATUS_NOTCONFIRMED);
         } else {
             order.setConfirmationStatus(Order.CONFIRMATION_STATUS_CONFIRMED);
@@ -686,6 +692,11 @@ function setGift(shipment, isGift, giftMessage) {
     return result;
 }
 
+/**
+ *
+ * @param {dw.order.Basket} basket Basket
+ * @return {dw.value.Money} amount
+ */
 function getNonGiftCertificateAmount(basket) {
     // The total redemption amount of all gift certificate payment instruments in the basket.
     var giftCertTotal = new Money(0.0, basket.getCurrencyCode());

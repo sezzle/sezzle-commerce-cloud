@@ -51,9 +51,9 @@
 				<td class="infobox_title top">${Resource.msg('transaction.referencetransaction.paymentaction', 'sezzlebm', null)}</td>
 				<td class="infobox_item top">
 					<select name='paymentAction'>					
-						<option ${currentPaymentAction === "Sale" ? "selected" : ''} value='Sale'>${Resource.msg('transaction.referencetransaction.paymentaction.sale', 'sezzlebm', null)}</option>
-						<option ${currentPaymentAction === "Authorization" ? "selected" : ''} value='Authorization'>${Resource.msg('transaction.referencetransaction.paymentaction.authorization', 'sezzlebm', null)}</option>
-						<option ${currentPaymentAction === "Order" ? "selected" : ''} value='Order'>${Resource.msg('transaction.referencetransaction.paymentaction.order', 'sezzlebm', null)}</option>
+						<option ${currentPaymentAction == "Sale" ? "selected" : ''} value='Sale'>${Resource.msg('transaction.referencetransaction.paymentaction.sale', 'sezzlebm', null)}</option>
+						<option ${currentPaymentAction == "Authorization" ? "selected" : ''} value='Authorization'>${Resource.msg('transaction.referencetransaction.paymentaction.authorization', 'sezzlebm', null)}</option>
+						<option ${currentPaymentAction == "Order" ? "selected" : ''} value='Order'>${Resource.msg('transaction.referencetransaction.paymentaction.order', 'sezzlebm', null)}</option>
 					</select>
 				</td>
 			</tr>

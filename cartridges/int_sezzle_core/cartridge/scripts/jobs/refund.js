@@ -4,8 +4,8 @@ var Status = require('dw/system/Status');
 
 /**
  * Print values
- * 
- * @param {Object} args
+ *
+ * @param {Object} args Arguments
  * @returns {dw.system.Status} refund status
  */
 function execute(args) {
