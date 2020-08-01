@@ -12,6 +12,7 @@
         "no-shadow": ["error", { "allow": ["err", "callback"]}],
         "max-len": "off",
         "no-plusplus": "off",
-        "func-style":"off"
+        "func-style":"off",
+        "no-unused-vars": "off"
     }
 }

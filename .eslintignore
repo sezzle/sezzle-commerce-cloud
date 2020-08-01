@@ -1,4 +1,6 @@
 cartridges/app_storefront_base/cartridge/
+cartridges/app_storefront_controllers/cartridge/
+cartridges/app_storefront_core/cartridge/
 coverage/
 doc/
 bin/
