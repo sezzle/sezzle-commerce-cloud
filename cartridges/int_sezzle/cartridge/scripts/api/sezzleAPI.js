@@ -8,9 +8,9 @@
 	 */
     var Api = function () {
         var self = this,
-            sezzleData = require('*/cartridge/scripts/data/sezzleData.ds'),
+            sezzleData = require('*/cartridge/scripts/data/sezzleData'),
             logger = require('dw/system').Logger.getLogger('Sezzle', ''),
-            service = require('*/cartridge/scripts/init/initSezzleServices.ds');
+            service = require('*/cartridge/scripts/init/initSezzleServices');
 
         /**
 		 * Authenticate the merchant by public and private key
@@ -30,7 +30,7 @@
                 });
                 return resp.object;
             } catch (e) {
-                logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+                logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
                 return {
                     error: false
                 };
@@ -54,7 +54,7 @@
                 sezzleService.URL = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
                 return sezzleService.call(obj).object;
             } catch (e) {
-                logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+                logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
                 return {
                     error: false
                 };
@@ -80,7 +80,7 @@
 
                 return sezzleService.call(obj).object;
             } catch (e) {
-                logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+                logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
                 return {
                     error: false
                 };
@@ -103,7 +103,7 @@
                 sezzleService.URL = sezzleData.getURLPath() + 'checkouts/';
                 return sezzleService.call(checkoutObject).object;
             } catch (e) {
-                logger.debug('Sezzle. File - sezzleAPI.ds. Error - {0}', e);
+                logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
                 return {
                     error: false
                 };

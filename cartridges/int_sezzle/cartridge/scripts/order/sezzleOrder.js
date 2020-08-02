@@ -15,9 +15,9 @@
             File = require('dw/io/File'),
             FileReader = require('dw/io/FileReader'),
             FileWriter = require('dw/io/FileWriter'),
-            data = require('~/cartridge/scripts/data/sezzleData.ds'),
-            basket = require('~/cartridge/scripts/basket/sezzleBasket.ds'),
-            api = require('~/cartridge/scripts/api/sezzleAPI.ds'),
+            data = require('~/cartridge/scripts/data/sezzleData'),
+            basket = require('~/cartridge/scripts/basket/sezzleBasket'),
+            api = require('~/cartridge/scripts/api/sezzleAPI'),
             filepath = File.IMPEX + File.SEPARATOR + 'sezzle' + File.SEPARATOR,
             filename = 'sezzle.dat';
 
@@ -67,7 +67,7 @@
                 order.custom.SezzleStatus = 'AUTH';
                 order.custom.SezzlePaymentAction = data.getSezzlePaymentAction();
             } catch (e) {
-                logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+                logger.debug('Sezzle. File - sezzleOrder. Error - {0}', e);
             }
         };
 
@@ -86,7 +86,7 @@
                         order.custom.SezzleStatus = 'REFUNDED';
                     }
                 } catch (e) {
-                    logger.debug('Sezzle. File - sezzleOrder.ds. Error - {0}', e);
+                    logger.debug('Sezzle. File - sezzleOrder. Error - {0}', e);
                 }
             }, 'status = {0} AND custom.SezzleStatus = {1}', Order.ORDER_STATUS_CANCELLED, 'CAPTURE');
         };

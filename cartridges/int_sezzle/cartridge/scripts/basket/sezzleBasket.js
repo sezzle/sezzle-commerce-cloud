@@ -12,9 +12,9 @@
 			system = require('dw/system'),
 			PaymentMgr = require('dw/order/PaymentMgr'),
 			ProductMgr = require('dw/catalog/ProductMgr'),
-			sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils.ds'),
-			sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
-			sezzleAPI = require('*/cartridge/scripts/api/sezzleAPI.ds');
+			sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils'),
+			sezzleData = require('*/cartridge/scripts/data/sezzleData');
+			sezzleAPI = require('*/cartridge/scripts/api/sezzleAPI');
 
 		self.utils = sezzleUtils;
 
