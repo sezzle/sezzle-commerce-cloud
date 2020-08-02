@@ -1,6 +1,7 @@
 /**
- * This script used for init and configure Affirm services
- *
+ * This script used for init and configure Sezzle services
+ * @param {dw.system.Site} currentSite current site
+ * @returns {string} authentication string
  */
 var getAuthHeader = function (currentSite) {
     var authString = currentSite.getCustomPreferenceValue('SezzlePublicKey')
@@ -33,17 +34,17 @@ function initService(serviceName) {
     return service;
 }
 function prepareLogData(data) {
-	if (data === null) {
+    if (data === null) {
         return 'Data of response or request is null';
     } else {
     	var obj = JSON.parse(data);
     	var result = printValues(obj);
     	return result;
-	}
+    }
 };
 
 function printValues(obj) {
-	var result = '\n';
+    var result = '\n';
     for(var k in obj) {
     	obj[k] = filterSensitiveData(k, obj[k]);	
         if(obj[k] instanceof Object) {
@@ -56,12 +57,12 @@ function printValues(obj) {
 };
 
 function filterSensitiveData(key, value) {
-	var identifiers = ["public_key","private_key","billing","shipping","token","authToken","merchant_uuid"];
-	if (identifiers.indexOf(key) !== -1) {
+    var identifiers = ["public_key","private_key","billing","shipping","token","authToken","merchant_uuid"];
+    if (identifiers.indexOf(key) !== -1) {
     	return "****";	
     } else {
     	return value;
-	}
+    }
 }
 
 module.exports.initService = initService;

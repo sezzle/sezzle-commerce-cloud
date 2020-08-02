@@ -4,7 +4,6 @@
 	 *
 	 * @constructor
 	 * @this {Data}
-	 * @returns Data instance
 	 */
     var Data = function () {
         var system = require('dw/system'),

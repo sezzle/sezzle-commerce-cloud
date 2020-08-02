@@ -5,12 +5,11 @@
 	 *
 	 * @constructor
 	 * @this {Order}
-	 * @returns Order instance
 	 */
     var Order = function () {
         var logger = require('dw/system').Logger.getLogger('Sezzle', ''),
             OrderMgr = require('dw/order/OrderMgr'),
-            Order = require('dw/order/Order'),
+            OrderModel = require('dw/order/Order'),
             Money = require('dw/value/Money'),
             File = require('dw/io/File'),
             FileReader = require('dw/io/FileReader'),
@@ -52,10 +51,10 @@
         /**
 		 * Updates PaymentInstrument and Order system objects
 		 *
-		 * @param {dw.order.Order} Order demnadware order instance
-		 * @param {Object} Reponse auth response from Sezzle
-		 * @param {dw.order.PaymentProcessor} PaymentProcessor payment processor instance
-		 * @param {dw.order.PaymentInstrument} PaymentInstrument payment isntrument instance
+		 * @param {dw.order.Order} order demnadware order instance
+		 * @param {Object} response auth response from Sezzle
+		 * @param {dw.order.PaymentProcessor} paymentProcessor payment processor instance
+		 * @param {dw.order.PaymentInstrument} paymentInstrument payment isntrument instance
 		 */
         this.updateAttributes = function (order, response, paymentProcessor, paymentInstrument) {
             try {
@@ -81,14 +80,14 @@
         this.refundOrders = function () {
             OrderMgr.processOrders(function (order) {
                 try {
-                    response = api.refund(order.custom.SezzleExternalId);
-                    if (!response.error) {
+                    var response = api.refund(order.custom.SezzleExternalId);
+                    if (response != null && !response.error) {
                         order.custom.SezzleStatus = 'REFUNDED';
                     }
                 } catch (e) {
                     logger.debug('Sezzle. File - sezzleOrder. Error - {0}', e);
                 }
-            }, 'status = {0} AND custom.SezzleStatus = {1}', Order.ORDER_STATUS_CANCELLED, 'CAPTURE');
+            }, 'status = {0} AND custom.SezzleStatus = {1}', OrderModel.ORDER_STATUS_CANCELLED, 'CAPTURE');
         };
     };
 

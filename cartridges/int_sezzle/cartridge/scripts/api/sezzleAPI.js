@@ -4,7 +4,6 @@
 	 *
 	 * @constructor
 	 * @this {Api}
-	 * @returns Api instance
 	 */
     var Api = function () {
         var self = this,
@@ -41,7 +40,8 @@
 		 * Capture charge by order reference ID
 		 *
 		 * @param {string} order_reference_id ref
-		 * @returns status
+		 * @param {string} order_number order number
+		 * @returns {Object} status
 		 */
         self.capture = function (order_reference_id, order_number) {
             try {
@@ -64,8 +64,9 @@
         /**
 		 * Refund payment by order reference ID
 		 *
-		 * @param {string} order_reference_id
-		 * @returns status		 */
+		 * @param {string} order_reference_id Ref ID
+		 * @returns {Object} status
+         * */
         self.refund = function (order_reference_id) {
             try {
                 var authentication = self.authenticate();
@@ -90,7 +91,7 @@
         /**
 		 * Initiate a checkout - fetch the checkout url
 		 *
-		 * @param {Object} - Checkout Object
+		 * @param {Object} checkoutObject Checkout Object
 		 * @returns {Object} object with checkout url
 		 */
         self.initiateCheckout = function (checkoutObject) {

@@ -54,7 +54,7 @@ function updateOrderData(order, transactionId, methodName, amount) {
     	var updatedAuthAmount = orderTotal.getValue() - finalReleasedAmount.getValue();
     	order.custom.SezzleOrderAmount = new Money(updatedAuthAmount, order.currencyCode);
 
-		if (authAmount.equals(finalReleasedAmount)) {
+        if (authAmount.equals(finalReleasedAmount)) {
     		order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
     	}
     }
