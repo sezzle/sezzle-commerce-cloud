@@ -1,0 +1,9 @@
+<!--- TEMPLATENAME: PaymentInstrumentInfo_SEZZLE_PAYMENT.isml --->
+<div>
+<img class="sezzle-payment"
+                src="${Resource.msg('payment.urllogo', 'sezzle', null)}"
+                height="32"
+                alt="${paymentOption.name}"
+                title="${paymentOption.name}"
+        >
+</div>

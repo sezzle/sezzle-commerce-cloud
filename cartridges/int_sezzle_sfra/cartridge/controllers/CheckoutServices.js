@@ -33,9 +33,9 @@ server.prepend(
         var paymentForm = server.forms.getForm('billing'),
             paymentMethodID = paymentForm.paymentMethod.value,
             billingFormErrors = {},
-			contactInfoFormErrors = {},
+            contactInfoFormErrors = {},
             viewData = {};
-        
+
         if (paymentMethodID != 'Sezzle') {
         	return next();
         }
@@ -43,23 +43,23 @@ server.prepend(
 
         // Verify billing form data
         billingFormErrors = COHelpers.validateBillingForm(paymentForm.addressFields);
-		contactInfoFormErrors = COHelpers.validateFields(paymentForm.contactInfoFields);
-		
-		if (Object.keys(contactInfoFormErrors).length) {
+        contactInfoFormErrors = COHelpers.validateFields(paymentForm.contactInfoFields);
+
+        if (Object.keys(contactInfoFormErrors).length) {
             res.json({
                 form: paymentForm,
                 fieldErrors: [contactInfoFormErrors],
                 serverErrors: [],
                 error: true
             });
-			return next();
-        } else {
-            viewData.email = {
-                value: paymentForm.contactInfoFields.email.value
-            };
-
-            viewData.phone = { value: paymentForm.contactInfoFields.phone.value };
+            return next();
         }
+        viewData.email = {
+            value: paymentForm.contactInfoFields.email.value
+        };
+
+        viewData.phone = { value: paymentForm.contactInfoFields.phone.value };
+
 
         if (Object.keys(billingFormErrors).length) {
             // Respond with form data and errors
@@ -155,12 +155,12 @@ server.prepend(
                             currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
                         }
 
-                        if (paymentMethodID === 'Sezzle') { 
-							if (req.currentCustomer.profile) {
+                        if (paymentMethodID == 'Sezzle') {
+                            if (req.currentCustomer.profile) {
                             	currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
-							} else {
-								currentBasket.setCustomerEmail(billingData.email.value);
-							}
+                            } else {
+                                currentBasket.setCustomerEmail(billingData.email.value);
+                            }
                         }
                     });
 
@@ -223,13 +223,13 @@ server.prepend(
 
                     var usingMultiShipping = req.session.privacyCache.get('usingMultiShipping');
 
-                    if (usingMultiShipping === true && currentBasket.shipments.length < 2) {
+                    if (usingMultiShipping == true && currentBasket.shipments.length < 2) {
                         req.session.privacyCache.set('usingMultiShipping',
                             false);
                         usingMultiShipping = false;
                     }
 
-                    if (paymentMethodID !== 'Sezzle') {
+                    if (paymentMethodID != 'Sezzle') {
                         hooksHelper('app.customer.subscription',
                             'subscribeTo',
                             [paymentForm.subscribe.checked,
@@ -239,20 +239,20 @@ server.prepend(
 
                     var currentLocale = Locale.getLocale(req.locale.id),
 
-                    basketModel = new OrderModel(
-                        currentBasket,
-                        {
-                            usingMultiShipping: usingMultiShipping,
-                            countryCode: currentLocale.country,
-                            containerView: 'basket'
-                        }
-                    ),
+                        basketModel = new OrderModel(
+                            currentBasket,
+                            {
+                                usingMultiShipping: usingMultiShipping,
+                                countryCode: currentLocale.country,
+                                containerView: 'basket'
+                            }
+                        ),
 
-                    accountModel = new AccountModel(req.currentCustomer),
-                    renderedStoredPaymentInstrument = COHelpers.getRenderedPaymentInstruments(
-                        req,
-                        accountModel
-                    );
+                        accountModel = new AccountModel(req.currentCustomer),
+                        renderedStoredPaymentInstrument = COHelpers.getRenderedPaymentInstruments(
+                            req,
+                            accountModel
+                        );
 
                     delete billingData.paymentInformation;
 
@@ -280,7 +280,7 @@ server.prepend('PlaceOrder',
         var paymentMethod = '';
 
         var currentBasket = BasketMgr.getCurrentBasket();
-        
+
         if (!currentBasket) {
             res.json({
                 error: true,
@@ -292,9 +292,9 @@ server.prepend('PlaceOrder',
 
             return next();
         }
-        
+
         var paymentInstruments = currentBasket.paymentInstruments;
-        
+
         if (paymentInstruments.length <= 0) {
         	res.json({
                 error: true,
@@ -306,12 +306,11 @@ server.prepend('PlaceOrder',
 
             return next();
         }
-        
+
         paymentMethod = paymentInstruments[paymentInstruments.length - 1].paymentMethod;
 
-        
 
-        if (paymentMethod === 'Sezzle') {
+        if (paymentMethod == 'Sezzle') {
             logger.debug('Selected payment method : {0}',
                 paymentMethod);
             res.json({

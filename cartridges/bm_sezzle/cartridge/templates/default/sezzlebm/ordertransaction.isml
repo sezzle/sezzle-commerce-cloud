@@ -59,7 +59,7 @@
 		<td class="infobox_title top">${Resource.msg('transaction.detail.subtotal', 'sezzlebm', null)}:</td>
 		<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, subtotal)}</td>
 	</tr>
-    <isif condition="${taxAmount !== undefined}">
+    <isif condition="${taxAmount != undefined}">
     	<tr class="sezzlebm_gray">
     		<td class="infobox_title top">${Resource.msg('transaction.detail.salestax', 'sezzlebm', null)}:</td>
     		<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, taxAmount)}</td>
@@ -71,13 +71,13 @@
 			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, taxAmount)}</td>
 		</tr>
 	</iscomment>
-        <isif condition="${shippingAmount !== undefined}">
+        <isif condition="${shippingAmount != undefined}">
     		<tr>
     			<td class="infobox_title top">${Resource.msg('transaction.detail.shippingamt', 'sezzlebm', null)}:</td>
     			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, shippingAmount)}</td>
     		</tr>
         </isif>
-        <isif condition="${orderTotal !== undefined}">
+        <isif condition="${orderTotal != undefined}">
     		<tr class="sezzlebm_gray">
     			<td class="infobox_title top">${Resource.msg('transaction.detail.ordertotal', 'sezzlebm', null)}:</td>
     			<td class="infobox_item top">${Resource.msgf('transaction.detail.moneyformat', 'sezzlebm', null, orderTotal)}</td>

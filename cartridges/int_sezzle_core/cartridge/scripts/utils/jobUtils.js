@@ -2,9 +2,9 @@
 /**
  * Library for providing access to DW site preferences and resources
  *
- * @constructor
- * @this {Data}
- * @returns Data instance
+ * @param {dw.svc} svc Svc
+ * @param {Object} client Client
+ * @returns {Object} Data instance
  */
 function responseParser(svc, client) {
     var response;
@@ -22,6 +22,8 @@ function responseParser(svc, client) {
                 error: true,
                 response: JSON.parse(client.text)
             };
+            break;
+        default:
             break;
     }
     return response;

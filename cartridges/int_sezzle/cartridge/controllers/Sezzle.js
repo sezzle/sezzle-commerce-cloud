@@ -7,14 +7,14 @@
  */
 var SEZZLE_PAYMENT_METHOD = 'Sezzle';
 var Resource = require('dw/web/Resource');
-var sezzleData = require('*/cartridge/scripts/data/sezzleData.ds');
+var sezzleData = require('*/cartridge/scripts/data/sezzleData');
 var storeFrontPath = sezzleData.getStoreFrontPath();
 var fullStoreFrontPath = Resource.msg('sezzle.controllers.cartridge', 'sezzle', storeFrontPath);
 var app = require(fullStoreFrontPath + '/cartridge/scripts/app');
 var guard = require(fullStoreFrontPath + '/cartridge/scripts/guard');
 var BasketMgr = require('dw/order/BasketMgr');
 var ISML = require('dw/template/ISML');
-var sezzle = require('*/cartridge/scripts/sezzle.ds'),
+var sezzle = require('*/cartridge/scripts/sezzle'),
     CurrentForms = session.getForms();
 var Status = require('dw/system/Status');
 var Transaction = require('dw/system/Transaction');
@@ -38,8 +38,6 @@ function redirect() {
             {
                 SezzleRedirectUrl: checkoutObject.redirect_url
             });
-        session.privacy.SezzleCustomerUUID = sezzle.utils.getQueryString('id',
-            checkoutObject.redirect_url);
         session.privacy.sezzled = true;
         session.privacy.sezzleAmount = checkoutObject.amount_in_cents;
         session.privacy.referenceId = checkoutObject.order_reference_id;

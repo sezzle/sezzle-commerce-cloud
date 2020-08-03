@@ -1,5 +1,5 @@
 <!--- TEMPLATENAME: sezzlepaymentmethod.isml --->
-<isif condition="${require('*/cartridge/scripts/sezzle.ds').data.getSezzleOnlineStatus() && pdict.Basket.getGiftCertificateLineItems().empty}">
+<isif condition="${require('*/cartridge/scripts/sezzle').data.getSezzleOnlineStatus() && pdict.Basket.getGiftCertificateLineItems().empty}">
 	<div class="payment-method ${(!empty(pdict.selectedPaymentID) && pdict.selectedPaymentID == 'Sezzle') ? 'payment-method-expanded' : ''}" data-method="Sezzle">
 		<div class="sezzle-payment-method-description">
 			<isslot id="sezzle-payment-method" description="Banner for Sezzle method on billing page" context="global" />
