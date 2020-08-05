@@ -12,6 +12,7 @@ var Transaction = require('dw/system/Transaction');
 var sezzleUtils = require('*/cartridge/scripts/sezzle');
 var OrderMgr = require('dw/order/OrderMgr');
 var Order = require('dw/order/Order');
+var logger = require('dw/system').Logger.getLogger('Sezzle','');
 
 /*
  * Export the publicly available controller methods
@@ -30,12 +31,12 @@ function authorize(args) {
     // Check the reference token passed during redirection
     var reference_id = request.httpParameterMap.order_reference_id;
 
-    dw.system.Logger.debug('Sezzle Payment Reference Id - {0} {1}',
+    logger.debug('Sezzle Payment Reference Id - {0} {1}',
         reference_id,
         session.privacy.referenceId);
 
     if (session.privacy.referenceId != reference_id) {
-        dw.system.Logger.debug('Sezzle Error - Reference ID has changed');
+        logger.debug('Sezzle Error - Reference ID has changed');
 
         return { error: true };
     }
@@ -43,7 +44,7 @@ function authorize(args) {
     Transaction.wrap(function () {
         paymentInstrument.paymentTransaction.transactionID = orderNo;
         paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
-        dw.system.Logger.debug('Sezzle Payment Reference Id - {0}', session.privacy.referenceId);
+        logger.debug('Sezzle Payment Reference Id - {0}', session.privacy.referenceId);
         var sezzleResponseObject = {
             id: session.privacy.referenceId,
             events: [{ id: session.privacy.sezzleFirstEventID }],
@@ -56,10 +57,6 @@ function authorize(args) {
 }
 
 function postProcess(order) {
-    var logger = require('dw/system').Logger.getLogger('Sezzle',
-            ''),
-        payment_action = sezzleUtils.data.getSezzlePaymentAction();
-
     if (sezzleUtils.data.getSezzlePaymentAction() === 'CAPTURE') {
         try {
             Transaction.wrap(function () {

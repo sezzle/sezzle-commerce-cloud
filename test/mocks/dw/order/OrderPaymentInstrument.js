@@ -5,4 +5,8 @@ var OrderPaymentInstrument = function (ID, money) {
     this.custom = {};
 };
 
+OrderPaymentInstrument.prototype.getPaymentMethod = function () {
+    return 'SEZZLE';
+};
+
 module.exports = OrderPaymentInstrument;
