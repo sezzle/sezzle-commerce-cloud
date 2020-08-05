@@ -6,6 +6,6 @@ doc/
 bin/
 node_modules/
 cartridges/int_sezzle_sfra/cartridge/static/
-cartridges/int_sezzle_core/cartridge/static/
-cartridges/bm_sezzle/cartridge/static/
 cartridges/int_sezzle/cartridge/static/
+cartridges/bm_sezzle/cartridge/static/
+cartridges/int_sezzle_sg/cartridge/static/
