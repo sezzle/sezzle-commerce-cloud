@@ -14,6 +14,7 @@
         var sezzleData = require('*/cartridge/scripts/data/sezzleData');
         var logger = require('dw/system').Logger.getLogger('Sezzle', '');
         var v2 = require('*/cartridge/scripts/api/v2');
+        var v1 = require('*/cartridge/scripts/api/v1');
         var sezzleOrder = require('*/cartridge/scripts/order/sezzleOrder');
         var Transaction = require('dw/system/Transaction');
 
@@ -110,12 +111,17 @@
         /**
 		 * Build object with confirmation and cancel URLs
 		 *
+         * @param {string} type SFRA/SG
 		 * @returns {Object} simple object contained URLs
 		 */
-        self.getMerchant = function () {
+        self.getMerchant = function (type) {
+            var cancelURL = web.URLUtils.https('Checkout-Begin').toString();
+            if (type === "SG") {
+                cancelURL = web.URLUtils.https('COBilling-Start').toString();
+            }
             return {
                 user_confirmation_url: web.URLUtils.https('Sezzle-Success').toString(),
-                user_cancel_url: web.URLUtils.https('Checkout-Begin').toString(),
+                user_cancel_url: cancelURL,
                 user_confirmation_url_action: 'GET'
             };
         };
@@ -297,6 +303,42 @@
                 }
             }
             return returnObj;
+        };
+
+        /**
+         * V1 Checkout
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {Object} checkout data object in JSON format
+         */
+        self.initiateV1Checkout = function (basket) {
+            var order_ref_id = sezzleUtils.generateUUID();
+            var checkoutObject = {
+                'items' : self.getItems(basket),
+                'billing_address' : self.getBillingAddress(basket),
+                'shipping_address': self.getShippingAddress(basket),
+                'customer_details': {
+                    email: basket.getCustomerEmail(),
+                    first_name: basket.getCustomerNo() ? basket.getCustomer().getProfile().getFirstName() : basket.getBillingAddress().getFirstName(),
+                    last_name: basket.getCustomerNo() ? basket.getCustomer().getProfile().getLastName() : basket.getBillingAddress().getLastName(),
+                    phone: basket.getCustomerNo() ? basket.getCustomer().getProfile().getPhoneMobile() : basket.getBillingAddress().getPhone(),
+                },
+                'discounts' : self.getDiscounts(basket),
+                'metadata' : self.getMetadata(basket),
+                'shipping_amount' : {'amount_in_cents' : self.getShippingAmmout(basket), 'currency': basket.getCurrencyCode()},
+                'tax_amount' : {'amount_in_cents' : self.getTaxAmount(basket), 'currency': basket.getCurrencyCode()},
+                'amount_in_cents' : self.getTotal(basket),
+                'currency_code' : basket.getCurrencyCode(),
+                'order_description' : "Commerce cloud order",
+                'order_reference_id' : order_ref_id,
+                'checkout_complete_url' : self.getMerchant("SG").user_confirmation_url + "?order_reference_id="+order_ref_id,
+                'checkout_cancel_url' : self.getMerchant("SG").user_cancel_url,
+                'requires_shipping_info' : false,
+                'merchant_completes' : true
+            };
+            let checkoutResponse = v1.createCheckout(checkoutObject)
+            checkoutObject['redirect_url'] = checkoutResponse.response.checkout_url;
+            return checkoutObject;
         };
 
         /**

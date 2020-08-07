@@ -1,6 +1,6 @@
 <isloop items="${pdict.order.billing.payment.applicablePaymentMethods}" var="paymentOption" status="loopSate">
     <isif condition="${paymentOption.ID == 'Sezzle' && require('*/cartridge/scripts/utils/sezzleHelper').IsSezzleApplicable()}">
-       <isinclude template="sezzle/sezzlepaymethodli" />
+       <isinclude template="sezzle/sezzlePaymentMethod" />
     </isif>
     <isif condition="${paymentOption.ID == 'CREDIT_CARD'}">
         <isinclude template="checkout/billing/paymentOptions/creditCardTab" />

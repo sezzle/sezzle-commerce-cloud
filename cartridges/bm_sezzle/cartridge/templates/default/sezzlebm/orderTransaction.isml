@@ -1,17 +1,17 @@
-<isdecorate template="sezzlebm/util/pt_sezzle">
+<isdecorate template="sezzlebm/util/ptSezzle">
 
 <isinclude template="inc/Modules">
 <isinclude template="sezzlebm/util/modules">
 
 <isscript>
-    var sezzleBMHelper = require('*/cartridge/scripts/helper/sezzleBMHelper');
+    var sezzleBmHelper = require('*/cartridge/scripts/helper/sezzleBmHelper');
 	var order = pdict.Order;
 	var canCapture = pdict.CanCapture;
 	var canRefund = pdict.CanRefund;
 	var canRelease = pdict.CanRelease;
 	var shippingAmount = order.getShippingTotalPrice();
 	var taxAmount = order.getTotalTax();
-	var subtotal =  sezzleBMHelper.getSubtotal(order);
+	var subtotal =  sezzleBmHelper.getSubtotal(order);
 	var orderTotal = order.getTotalGrossPrice();	
 	var email = order.customerEmail || 'Unknown';
 	var authAmount = order.custom.SezzleOrderAmount;
@@ -153,7 +153,7 @@
 <div class="sezzlebm_footer">
 	<a class="button" href="${transactionsUrl}">&lt;&lt; ${Resource.msg('ordertransaction.backtolist', 'sezzlebm', null)}</a>
 </div>
-<isinclude template="sezzlebm/components/actioncaptureform"/>
-<isinclude template="sezzlebm/components/actionrefundform"/>
-<isinclude template="sezzlebm/components/actionreleaseform"/>
+<isinclude template="sezzlebm/components/actionCaptureForm"/>
+<isinclude template="sezzlebm/components/actionRefundForm"/>
+<isinclude template="sezzlebm/components/actionReleaseForm"/>
 </isdecorate>

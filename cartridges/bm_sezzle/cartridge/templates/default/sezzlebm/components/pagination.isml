@@ -38,6 +38,7 @@
 </isscript>
 
 <form class="sezzlebm_pagination" method="post" action="${pageURL}">
+    <input type="hidden" name="${dw.web.CSRFProtection.getTokenName()}" value="${dw.web.CSRFProtection.generateToken()}"/>
 	<table class="pagecursor">
 		<tr>
 			<td nowrap="nowrap" width="40%" align="left" class="pagecursortxt top">
