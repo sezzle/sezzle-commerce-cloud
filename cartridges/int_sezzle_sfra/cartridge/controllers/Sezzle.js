@@ -57,7 +57,7 @@ server.get('Redirect', function (req, res, next) {
         logger.debug('Redirection - {0}', erMsg);
     }
 
-    res.render('sezzle/sezzleredirect', {
+    res.render('sezzle/sezzleRedirect', {
         SezzleRedirectUrl: redirectURL
     });
 

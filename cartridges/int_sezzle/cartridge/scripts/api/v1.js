@@ -5,7 +5,7 @@
 	 * @constructor
 	 * @this {Api}
 	 */
-    var Api = function () {
+    var V1Api = function () {
         var self = this,
             sezzleData = require('*/cartridge/scripts/data/sezzleData'),
             logger = require('dw/system').Logger.getLogger('Sezzle', ''),
@@ -22,7 +22,7 @@
                 var public_key = sezzleData.getPublicKey();
                 var private_key = sezzleData.getPrivateKey();
 
-                sezzleService.URL = sezzleData.getURLPath() + 'authentication/';
+                sezzleService.URL = sezzleData.getV1URLPath() + 'authentication/';
                 var resp = sezzleService.call({
                     public_key: public_key,
                     private_key: private_key
@@ -51,7 +51,7 @@
                 };
 
                 var sezzleService = service.initService('sezzle.capture');
-                sezzleService.URL = sezzleData.getURLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
+                sezzleService.URL = sezzleData.getV1URLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
                 return sezzleService.call(obj).object;
             } catch (e) {
                 logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
@@ -77,7 +77,7 @@
                 };
                 var sezzleService = service.initService('sezzle.refund');
 
-                sezzleService.URL = sezzleData.getURLPath() + 'orders/' + order_reference_id + '/refund';
+                sezzleService.URL = sezzleData.getV1URLPath() + 'orders/' + order_reference_id + '/refund';
 
                 return sezzleService.call(obj).object;
             } catch (e) {
@@ -89,19 +89,19 @@
         };
 
         /**
-		 * Initiate a checkout - fetch the checkout url
+		 * Create a checkout - fetch the checkout url
 		 *
 		 * @param {Object} checkoutObject Checkout Object
 		 * @returns {Object} object with checkout url
 		 */
-        self.initiateCheckout = function (checkoutObject) {
+        self.createCheckout = function (checkoutObject) {
             try {
                 var authentication = self.authenticate();
                 checkoutObject.authToken = authentication.response.token;
                 logger.debug('Token', checkoutObject.authToken);
                 var sezzleService = service.initService('sezzle.initiatecheckout');
 
-                sezzleService.URL = sezzleData.getURLPath() + 'checkouts/';
+                sezzleService.URL = sezzleData.getV1URLPath() + 'checkouts/';
                 return sezzleService.call(checkoutObject).object;
             } catch (e) {
                 logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
@@ -112,5 +112,5 @@
         };
     };
 
-    module.exports = new Api();
+    module.exports = new V1Api();
 }());

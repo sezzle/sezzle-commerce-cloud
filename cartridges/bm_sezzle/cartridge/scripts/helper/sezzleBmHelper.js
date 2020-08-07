@@ -5,7 +5,7 @@
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 var Money = require('dw/value/Money');
 
-var sezzleBMHelper = {};
+var sezzleBmHelper = {};
 
 /**
  * Update transaction history of a Order
@@ -66,7 +66,7 @@ function updateOrderData(order, transactionId, methodName, amount) {
  * @param {dw.order.Order} order Order
  * @param {number} amount Amount
  */
-sezzleBMHelper.updateSezzleOrderAmount = function (order, amount) {
+sezzleBmHelper.updateSezzleOrderAmount = function (order, amount) {
     amount = new Money(amount, order.currencyCode);
     order.custom.SezzleOrderAmount = amount;
 };
@@ -77,7 +77,7 @@ sezzleBMHelper.updateSezzleOrderAmount = function (order, amount) {
  * @param {dw.order.LineItemCtnr} basket - Basket
  * @returns {dw.order.OrderPaymentInstrument} payment instrument with id SEZZLE_PAYMENT
  */
-sezzleBMHelper.getSezzlePaymentInstrument = function (basket) {
+sezzleBmHelper.getSezzlePaymentInstrument = function (basket) {
     var paymentInstruments = basket.getPaymentInstruments();
     var iterator = paymentInstruments.iterator();
     var paymentInstrument = null;
@@ -100,7 +100,7 @@ sezzleBMHelper.getSezzlePaymentInstrument = function (basket) {
  * @param {dw.order.Order} order Order
  * @returns {money} order subtotal
  */
-sezzleBMHelper.getSubtotal = function (order) {
+sezzleBmHelper.getSubtotal = function (order) {
     var items = [];
     var productLineItems = order.getProductLineItems().iterator();
 
@@ -128,15 +128,15 @@ sezzleBMHelper.getSubtotal = function (order) {
  * @param {number} amount - Amount passed
  * @returns {boolean} true in case of success and false when error
  */
-sezzleBMHelper.updateOrderTransaction = function (order, isCustomOrder, transactionID, methodName, amount) {
+sezzleBmHelper.updateOrderTransaction = function (order, isCustomOrder, transactionID, methodName, amount) {
     try {
         updateOrderData(order, transactionID, methodName, amount);
     } catch (error) {
-    	logger.debug('sezzleBMHelper.updateOrderTransaction.- {0}', error);
+    	logger.debug('sezzleBmHelper.updateOrderTransaction.- {0}', error);
         return false;
     }
 
     return true;
 };
 
-module.exports = sezzleBMHelper;
+module.exports = sezzleBmHelper;

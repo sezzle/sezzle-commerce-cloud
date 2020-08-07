@@ -1,10 +1,10 @@
-<isdecorate template="sezzlebm/util/pt_sezzle">
+<isdecorate template="sezzlebm/util/ptSezzle">
 
 <isinclude template="inc/Modules">
 <isinclude template="sezzlebm/util/modules">
 
 <isscript>
-<!-- var sezzleBMHelper = require('*/cartridge/scripts/helper/sezzleHelper'); -->
+<!-- var sezzleBmHelper = require('*/cartridge/scripts/helper/sezzleHelper'); -->
 
 var isSearchByOrderNo = pdict.CurrentHttpParameterMap.orderNo.submitted;
 var isSearchByTransaction = pdict.CurrentHttpParameterMap.transactionId.submitted;
@@ -29,45 +29,15 @@ if (!isSearchByOrderNo && !isSearchByTransaction) {
 	<table class="infobox w e s n">
 		<tr>
 			<td class="infobox_title_search">${Resource.msg('search.order.title', 'sezzlebm', null)}</td>
-			<td align="right" nowrap="nowrap" class="infobox_item_search">
-				<span class="switch_link">${Resource.msg('search.orderbynumber', 'sezzlebm', null)}</span>&nbsp;
-				<a href="#sezzlebm_search_transaction_by_id" class="switch_link js_sezzlebm_switch">${Resource.msg('search.referencebyid', 'sezzlebm', null)}</a>
-			</td>
 		</tr>
 		<tr>
 			<td class="infobox_item_search" colspan="2">
 				<form action="${URLUtils.https('SezzleAdmin-Orders')}" method="post">
+				    <input type="hidden" name="${dw.web.CSRFProtection.getTokenName()}" value="${dw.web.CSRFProtection.generateToken()}"/>
 					<table style="width:inherit">
 						<tr>
-							<td class="infobox_item_search" nowrap="nowrap" style="width:110px"><span>${Resource.msg('search.order.number', 'sezzlebm', null)}:</span>&nbsp;</td>
+							<td class="infobox_item_search" nowrap="nowrap" style="width:7.875em"><span>${Resource.msg('search.order.number', 'sezzlebm', null)}:</span>&nbsp;</td>
 							<td class="infobox_item_search"><input type="text" name="orderNo" value="${pdict.CurrentHttpParameterMap.orderNo.submitted ? pdict.CurrentHttpParameterMap.orderNo.stringValue : ''}" maxlength="350" size="35" class="inputfield_en"></td>
-							<td class="infobox_item_search">&nbsp;</td>
-							<td class="infobox_item_search"><button name="simpleSearch" value="true" class="button">${Resource.msg('search.submitbutton', 'sezzlebm', null)}</button></td>
-						</tr>
-					</table>
-				</form>
-			</td>
-		</tr>
-		<tr><td colspan="2">&nbsp;</td></tr>
-	</table>
-</div>
-
-<div id="sezzlebm_search_transaction_by_id" class="js_sezzlebm_switch_block" style="display:${isSearchByTransaction ? 'block' : 'none'}">
-	<table class="infobox w e s n">
-		<tr>
-			<td class="infobox_title_search">${Resource.msg('search.order.title', 'sezzlebm', null)}</td>
-			<td align="right" nowrap="nowrap" class="infobox_item_search">
-				<a href="#sezzlebm_search_order_by_id" class="switch_link js_sezzlebm_switch">${Resource.msg('search.orderbynumber', 'sezzlebm', null)}</a>&nbsp;
-				<span class="switch_link">${Resource.msg('search.referencebyid', 'sezzlebm', null)}</span>
-			</td>
-		</tr>
-		<tr>
-			<td class="infobox_item_search" colspan="2">
-				<form action="${URLUtils.https('SezzleAdmin-Orders')}" method="post">
-					<table style="width:inherit">
-						<tr>
-							<td class="infobox_item_search" nowrap="nowrap" style="width:110px"><span>${Resource.msg('search.transactionnumber', 'sezzlebm', null)}:</span>&nbsp;</td>
-							<td class="infobox_item_search"><input type="text" name="transactionId" value="${pdict.CurrentHttpParameterMap.transactionId.submitted ? pdict.CurrentHttpParameterMap.transactionId.stringValue : ''}" maxlength="350" size="35" class="inputfield_en"></td>
 							<td class="infobox_item_search">&nbsp;</td>
 							<td class="infobox_item_search"><button name="simpleSearch" value="true" class="button">${Resource.msg('search.submitbutton', 'sezzlebm', null)}</button></td>
 						</tr>

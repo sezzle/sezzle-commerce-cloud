@@ -19,22 +19,23 @@ var sezzle = require('*/cartridge/scripts/sezzle'),
 var Status = require('dw/system/Status');
 var Transaction = require('dw/system/Transaction');
 var Order = require('dw/order/Order');
+var logger = require('dw/system').Logger.getLogger('Sezzle','');
 
 /**
  * Redirects the user to Sezzle's checkout
  */
 
 function redirect() {
-    var logger = require('dw/system').Logger.getLogger('Sezzle',
-        '');
-
     logger.debug('Selected Payment Method Id - {0}',
         CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value);
     if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
         var basket = BasketMgr.getCurrentBasket();
-        var checkoutObject = sezzle.basket.initiateCheckout(basket);
+        var checkoutObject = sezzle.basket.initiateV1Checkout(basket);
+        if (empty(checkoutObject)) {
+            return false;
+        }
 
-        ISML.renderTemplate('sezzle/sezzleredirect',
+        ISML.renderTemplate('sezzle/sezzleRedirect',
             {
                 SezzleRedirectUrl: checkoutObject.redirect_url
             });
@@ -54,25 +55,20 @@ function init(basket, applicablePaymentMethods) {
 }
 
 function postProcess(order) {
-    var logger = require('dw/system').Logger.getLogger('Snow',
-        '');
+    try {
+        Transaction.wrap(function () {
+            sezzle.order.captureOrder(order, 'v1');
+            order.custom.SezzleCapturedAmount = order.totalGrossPrice.toString();
+            order.custom.SezzleStatus = 'CAPTURE';
+            order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
+            order.setStatus(Order.ORDER_STATUS_COMPLETED);
+        });
+    } catch (e) {
+        logger.error('Sezzle Capturing error. Details - {0}',
+            e);
 
-    if (sezzle.data.getSezzlePaymentAction() === 'CAPTURE') {
-        try {
-            Transaction.wrap(function () {
-                sezzle.order.captureOrder(order.custom.SezzleExternalId, order.orderNo);
-                order.custom.SezzleStatus = 'CAPTURE';
-                order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-                order.setStatus(Order.ORDER_STATUS_COMPLETED);
-            });
-        } catch (e) {
-            logger.error('Sezzle Capturing error. Details - {0}',
-                e);
-
-            return new Status(Status.ERROR);
-        }
+        return new Status(Status.ERROR);
     }
-
     return new Status(Status.OK);
 }
 

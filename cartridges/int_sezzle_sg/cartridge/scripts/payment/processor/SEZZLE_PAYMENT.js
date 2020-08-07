@@ -42,48 +42,19 @@ function authorize(args) {
     }
 
     Transaction.wrap(function () {
-        paymentInstrument.paymentTransaction.transactionID = orderNo;
+        paymentInstrument.paymentTransaction.transactionID = reference_id;
         paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
         logger.debug('Sezzle Payment Reference Id - {0}', session.privacy.referenceId);
         var sezzleResponseObject = {
-            id: session.privacy.referenceId,
+            reference_id: session.privacy.referenceId,
             events: [{ id: session.privacy.sezzleFirstEventID }],
-            amount: session.privacy.sezzleAmount
+            amount: session.privacy.sezzleAmount,
+            type: "sg"
         };
         sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
     });
 
     return { authorized: true };
-}
-
-function postProcess(order) {
-    if (sezzleUtils.data.getSezzlePaymentAction() === 'CAPTURE') {
-        try {
-            Transaction.wrap(function () {
-                var resp = sezzleUtils.order.captureOrder(order.custom.SezzleExternalId, order.orderNo);
-                if (resp) {
-                    if (!resp.error) {
-                        order.custom.SezzleStatus = 'CAPTURE';
-                        order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-                    } else {
-                        logger.debug('Sezzle Capturing error');
-                        return { error: true };
-                    }
-                } else {
-                    logger.debug('Sezzle Capturing error. Details');
-                    return { error: true };
-                }
-                return { error: false };
-            });
-        } catch (e) {
-            logger.debug('Sezzle Capturing error. Details - {0}',
-                e);
-
-            return { error: true };
-        }
-    }
-
-    return { error: false };
 }
 
 function handle() {

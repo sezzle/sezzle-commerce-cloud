@@ -1,6 +1,6 @@
 /* global dw request response empty */
 
-var sezzleBMHelper = require('*/cartridge/scripts/helper/sezzleBMHelper');
+var sezzleBmHelper = require('*/cartridge/scripts/helper/sezzleBmHelper');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 var v2 = require('*/cartridge/scripts/api/v2');
 var Money = require('dw/value/Money');
@@ -9,28 +9,6 @@ var sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils');
 var ISML = require('dw/template/ISML');
 var Transaction = require('dw/system/Transaction');
 var CSRFProtection = require('dw/web/CSRFProtection');
-
-/**
- * Get SezzleNewTransactions Custom Object with given order number
- *
- * @param {string} orderNo - Order number
- * @returns {Object} (transactionIdFromOrder: String - Transaction ID from order, order: dw.object.CustomObject - Custom Object that matched with order number)
- */
-function getCustomOrderInfo(orderNo) {
-    var order;
-    var transactionId;
-    try {
-        order = dw.object.CustomObjectMgr.getCustomObject('SezzleNewTransactions', orderNo);
-        transactionId = order.custom.transactionId;
-    } catch (error) {
-        logger.error(error);
-        return false;
-    }
-    return {
-        transactionIdFromOrder: transactionId,
-        order: order
-    };
-}
 
 /**
  * Get Sezzle orders into one array for pagination
@@ -48,7 +26,6 @@ function getOrders(orderNo, referenceID) {
     var order;
     var paymentInstrument;
     var orderDate;
-    var orderTotal;
     var obj;
 
     var orderIndex = 0;
@@ -66,7 +43,7 @@ function getOrders(orderNo, referenceID) {
             break;
         }
         order = systemOrders.next();
-        paymentInstrument = new Date(sezzleBMHelper.getSezzlePaymentInstrument(order));
+        paymentInstrument = new Date(sezzleBmHelper.getSezzlePaymentInstrument(order));
         if (paymentInstrument == null) {
             continue; // eslint-disable-line no-continue
         }
@@ -140,52 +117,6 @@ function createNewTransaction() {
 }
 
 /**
- * Returns max amount is allowed for multiple capture operation
- */
-function helperGetCaptureAmount() {
-    var order = null;
-    var responseResult = 'Success';
-
-    if (!empty(request.httpParameterMap.orderNo.value)) {
-        if (request.httpParameterMap.isCustomOrder.booleanValue) {
-            var orderInfo = getCustomOrderInfo(request.httpParameterMap.orderNo.stringValue);
-            if (!orderInfo) {
-                responseResult = 'Error';
-            } else {
-                order = orderInfo.order;
-            }
-        } else {
-            order = dw.order.OrderMgr.getOrder(request.httpParameterMap.orderNo.stringValue);
-        }
-    }
-
-    if (!order) {
-        responseResult = 'Error';
-    }
-
-    renderJson(responseResult);
-}
-
-/**
- * Create new SezzleNewTransactions Custom Object with data from a new transaction
- *
- * @param {Object} transactionData - Response data from a API call
- * @param {string} invNum - Custom order number for a SezzleNewTransactions Custom Object
- */
-function createNewTransactionCustomObject(transactionData, invNum) {
-    var newOrder = dw.object.CustomObjectMgr.createCustomObject('SezzleNewTransactions', invNum);
-    newOrder.custom.orderDate = transactionData.ordertime;
-    newOrder.custom.orderTotal = transactionData.amt;
-    newOrder.custom.paymentStatus = transactionData.paymentstatus || 'Unknown';
-    newOrder.custom.transactionId = transactionData.transactionid;
-    newOrder.custom.firstName = transactionData.firstname;
-    newOrder.custom.lastName = transactionData.lastname;
-    newOrder.custom.email = transactionData.email || 'Unknown';
-    newOrder.custom.currencyCode = transactionData.currencycode;
-    newOrder.custom.transactionsHistory = [transactionData.transactionid];
-}
-
-/**
  * Get orders list. Can be filtered by order ID or reference ID
  */
 function orders() {
@@ -193,14 +124,22 @@ function orders() {
     var referenceID = '';
     var alternativeFlow = false;
     var orders; // eslint-disable-line no-shadow
+    var HashMap = require('dw/util/HashMap');
+    var errorMsg = new HashMap();
+
+    if (!CSRFProtection.validateRequest()) {
+        errorMsg.put('l_longmessage0', 'CSRF token mismatch');
+        renderJson('Error', errorMsg);
+        return;
+    }
 
     if (request.httpParameterMap.transactionId.submitted) {
-        var callApiResponse = v2.getOrder(request.httpParameterMap.transactionId.stringValue);
-        if (!callApiResponse.error) {
+        var callApiResponse = v2.getOrderByOrderUUID(request.httpParameterMap.transactionId.stringValue);
+        if (callApiResponse !== null && !callApiResponse.error) {
             referenceID = callApiResponse.response.reference_id;
         }
     }
-    if (!orderNo) {
+    if (!referenceID) {
         alternativeFlow = true;
     }
 
@@ -214,7 +153,7 @@ function orders() {
         orders = getOrders(orderNo, referenceID);
     } catch (error) {
         logger.error(error);
-        render('sezzlebm/components/servererror');
+        render('sezzlebm/components/serverError');
         return;
     }
 
@@ -227,7 +166,7 @@ function orders() {
     orderPagingModel.setPageSize(pageSize);
     orderPagingModel.setStart(start);
 
-    render('sezzlebm/orderlist', {
+    render('sezzlebm/orderList', {
         PagingModel: orderPagingModel
     });
 }
@@ -236,31 +175,19 @@ function orders() {
  * Get order transaction details
  */
 function orderTransaction() {
-    var errorFlow = false;
     var order = null;
-    var paymentInstrument = null;
-    var transactionIdFromOrder = null;
     var canCapture = false;
     var canRefund = false;
     var canRelease = false;
 
-
-    if (request.httpParameterMap.orderNo && !empty(request.httpParameterMap.orderNo.value)) {
-        if (request.httpParameterMap.isCustomOrder && !empty(request.httpParameterMap.isCustomOrder.stringValue)) {
-            var orderInfo = getCustomOrderInfo(request.httpParameterMap.orderNo.stringValue);
-            if (!orderInfo) {
-                errorFlow = true;
-            } else {
-                order = orderInfo.order;
-                transactionIdFromOrder = orderInfo.transactionIdFromOrder;
-            }
-        } else {
-            order = dw.order.OrderMgr.getOrder(request.httpParameterMap.orderNo.stringValue);
-        }
+    if (!request.httpParameterMap.orderNo || empty(request.httpParameterMap.orderNo.value)) {
+        render('sezzlebm/components/serverError');
+        return;
     }
 
+    order = dw.order.OrderMgr.getOrder(request.httpParameterMap.orderNo.stringValue);
     if (!order) {
-        render('sezzlebm/components/servererror');
+        render('sezzlebm/components/serverError');
         return;
     }
 
@@ -277,7 +204,7 @@ function orderTransaction() {
         var authExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(order.custom.SezzleAuthExpiration);
         if (currentTimestamp > authExpirationTimestamp) {
             Transaction.wrap(function () {
-                sezzleBMHelper.updateSezzleOrderAmount(order, capturedAmountInFloat);
+                sezzleBmHelper.updateSezzleOrderAmount(order, capturedAmountInFloat);
             });
         }
     }
@@ -300,7 +227,7 @@ function orderTransaction() {
         canRefund = true;
     }
 
-    render('sezzlebm/ordertransaction', {
+    render('sezzlebm/orderTransaction', {
         isCustomOrder: false,
         Order: order,
         CanCapture: canCapture,
@@ -364,7 +291,7 @@ function action() {
 
         	logger.debug('SezzleAdmin.API Call successfull - {0}', methodName);
         	Transaction.wrap(function () {
-                transactionResult = sezzleBMHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt);
+                transactionResult = sezzleBmHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt);
             });
 	    } else {
 	    	logger.debug('SezzleAdmin.Failed to get post data from form');

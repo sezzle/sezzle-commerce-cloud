@@ -1,5 +1,3 @@
-
-
 <div class="tab-pane sezzle-payment-content" id="sezzle-payment-content" role="tabpanel">
 	<isif condition="${!empty(session.privacy.sezzleErrorMessage)}">
             <div class="sezzle-error" style="display:none"><isprint value="${session.privacy.sezzleErrorMessage}"/></div>
@@ -24,7 +22,11 @@
     </fieldset>
 </div>
 <isif condition="${require('*/cartridge/scripts/sezzle').data.getSezzleOnlineStatus()}">
-<link href="${Resource.msg('sezzle.css', 'sezzle', null)}" type="text/css" rel="stylesheet" />
+	<isset name="sezzle_css" value="${Resource.msg('sezzle.css', 'sezzle', null)}" scope="page"/>
+    <isscript>
+        var assets = require('*/cartridge/scripts/assets.js');
+        assets.addCss(sezzle_css);
+    </isscript>
 </isif>
 <script type="text/javascript">
 	if (document.getElementsByClassName('sezzle-error').length &&

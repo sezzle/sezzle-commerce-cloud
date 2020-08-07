@@ -16,6 +16,7 @@
         var FileWriter = require('dw/io/FileWriter');
         var data = require('~/cartridge/scripts/data/sezzleData');
         var v2 = require('~/cartridge/scripts/api/v2');
+        var v1 = require('~/cartridge/scripts/api/v1');
         var filepath = File.IMPEX + File.SEPARATOR + 'sezzle' + File.SEPARATOR;
         var filename = 'sezzle.dat';
 
@@ -68,8 +69,10 @@
         this.updateAttributes = function (order, response, paymentProcessor, paymentInstrument) {
             try {
                 order.custom.SezzleExternalId = response.reference_id;
-                order.custom.SezzlePaymentAction = String(data.getSezzlePaymentAction());
-                order.custom.SezzleOrderUUID = response.order_uuid != 'undefined' ? response.order_uuid : '';
+                order.custom.SezzlePaymentAction = (response.order_uuid && response.order_uuid != 'undefined') ? String(data.getSezzlePaymentAction()) : "CAPTURE";
+                if (response.type === "sfra") {
+                    order.custom.SezzleOrderUUID = (response.order_uuid && response.order_uuid != 'undefined') ? response.order_uuid : '';
+                }
                 order.custom.SezzleOrderAmount = new Money(response.amount, order.currencyCode).divide(100);
                 if (!empty(response.order_links)) {
                     order.custom.SezzleGetOrderLink = response.order_links.get_order;
@@ -85,11 +88,16 @@
         };
 
         /**
-		 * Capture payment
-		 *
-		 * @param {dw.order.Order} order Order
-		 */
-        this.captureOrder = function (order) {
+         * Capture payment
+         *
+         * @param {dw.order.Order} order Order
+         * @param {string} apiVersion Api Version v1/v2
+         */
+        this.captureOrder = function (order, apiVersion) {
+            if (apiVersion === 'v1') {
+                v1.capture(order.custom.SezzleExternalId, order.orderNo);
+                return;
+            }
             var captureAmount = order.totalGrossPrice.multiply(100).getValue();
             v2.capture(order, captureAmount, false);
         };
@@ -141,13 +149,21 @@
         this.refundOrders = function () {
             try {
                 OrderMgr.processOrders(function (order) {
+                    var response = null;
                     var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
 			    	var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
 			    	var authAmountInCents = new Money(authAmountInFloat, order.currencyCode).multiply(100).getValue();
                     if ((order.custom.SezzleOrderAmount == order.custom.SezzleCapturedAmount)
 						&& authAmountInCents > 0) {
-                        var response = v2.refund(order, authAmountInCents);
+                        if (!order.custom.SezzleOrderUUID || order.custom.SezzleOrderUUID === null) {
+                            response = v1.refund(order.custom.SezzleExternalId);
+                        } else {
+                            response = v2.refund(order, authAmountInCents);
+                        }
                         if (response != null && !response.error) {
+                            if (!order.custom.SezzleOrderUUID || order.custom.SezzleOrderUUID === null) {
+                                order.custom.SezzleStatus = 'REFUNDED';
+                            }
                             order.custom.SezzleRefundedAmount = order.totalGrossPrice.toString();
                         }
                     }

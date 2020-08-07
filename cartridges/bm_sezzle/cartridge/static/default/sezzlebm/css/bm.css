@@ -1,55 +1,55 @@
-.sezzlebm_header {margin-bottom:10px}
-.sezzlebm_footer {padding:15px 0 0 0}
+.sezzlebm_header {margin-bottom:0.625em}
+.sezzlebm_footer {padding:0.9375em 0 0 0}
 .sezzle_hide {display:none}
 
 .sezzlebm_content table {width:100%; border-spacing:0; border-collapse:collapse}
-.sezzlebm_content h2 {color: #84BD00; padding:0 0 10px; margin:0; font-size:15px; font-weight:bold; line-height:25px}
-.sezzlebm_content .error_box {margin-bottom:10px}
-.sezzlebm_content .sezzlebm_transaction_detail_table {font-size:13px; line-height:1.4; margin-bottom:10px; width:100%}
-.sezzlebm_content .sezzlebm_transaction_detail_table td {padding:4px 6px}
+.sezzlebm_content h2 {color: #84BD00; padding:0 0 0.625em; margin:0; font-size:1.5em; font-weight:bold; line-height:1.5625em}
+.sezzlebm_content .error_box {margin-bottom:0.625em}
+.sezzlebm_content .sezzlebm_transaction_detail_table {font-size:1.2em; line-height:1.4; margin-bottom:0.625em; width:100%}
+.sezzlebm_content .sezzlebm_transaction_detail_table td {padding:0.25em 0.375em}
 .sezzlebm_content .sezzlebm_gray {background:#fcfcfc}
-.sezzlebm_content .sezzlebm_table_head {font-size:14px; background:#f0f0f0; font-weight:bold}
-.sezzlebm_content .sezzlebm_table_head td {border-bottom:1px solid #dadada}
-.sezzlebm_content .infobox_title {width:185px; text-align:right}
+.sezzlebm_content .sezzlebm_table_head {font-size:0.875em; background:#f0f0f0; font-weight:bold}
+.sezzlebm_content .sezzlebm_table_head td {border-bottom:0.0625em solid #dadada}
+.sezzlebm_content .infobox_title {width:11.5625em; text-align:right}
 .sezzlebm_content .infobox_title i {font-weight:normal; color:#777}
 
-.sezzlebm_pagination {padding:10px 0 0 0}
-.sezzlebm_pagination .pagecursortxt {padding:0 2px}
+.sezzlebm_pagination {padding:0.625em 0 0 0}
+.sezzlebm_pagination .pagecursortxt {padding:0 0.125em}
 
-.sezzlebm_window_content .sezzlebm_content {padding:10px 10px 0 10px}
+.sezzlebm_window_content .sezzlebm_content {padding:0.625em 0.625em 0 0.625em}
 .sezzlebm_window_content .sezzlebm_footer {display:block} 
 .sezzlebm_window_content .sezzlebm_header {display:block}
 .sezzlebm_window_content .x-window-body {background:#fff}
 .sezzlebm_window_content table {width:inherit}
 
 .sezzlebm_selectother_transactions {float:right}
-.sezzlebm_selectother_transactions span {font-size:13px}
+.sezzlebm_selectother_transactions span {font-size:0.8125em}
 
-.sezzlebm_transaction_actions {padding:0 0 5px 0}
-.sezzlebm_transaction_actions li {display:inline-block; padding:0 5px 0 0}
-.sezzlebm_transaction_actions li span {display:inline-block; padding:2px 6px; text-decoration:none; background-color:#d9d9d9; border:1px solid #d9d9d9; border-radius:3px; color:#00629b; cursor:pointer; margin:0; white-space:nowrap; font-size:13px}
-.sezzlebm_transaction_actions li span:hover {background-color:#eee; border:1px solid #ccc}
+.sezzlebm_transaction_actions {padding:0 0 0.3125em 0}
+.sezzlebm_transaction_actions li {display:inline-block; padding:0 0.3125em 0 0}
+.sezzlebm_transaction_actions li span {display:inline-block; padding:0.125em 0.375em; text-decoration:none; background-color:#d9d9d9; border:0.0625em solid #d9d9d9; border-radius:0.1875em; color:#00629b; cursor:pointer; margin:0; white-space:nowrap; font-size:1.2em}
+.sezzlebm_transaction_actions li span:hover {background-color:#eee; border:0.0625em solid #ccc}
 
-.sezzle_action_form h2 {color: #84BD00; padding:0 0 10px; margin:0; font-size:15px; font-weight:bold; line-height:1.1em}
-.sezzle_action_form input {width:100px; border:1px solid #a5aeb5}
-.sezzle_action_form .js_sezzle_reference_transaction_card input {width:200px}
-.sezzle_action_form textarea {width:300px}
+.sezzle_action_form h2 {color: #84BD00; padding:0 0 0.625em; margin:0; font-size:1.5em; font-weight:bold; line-height:1.1em}
+.sezzle_action_form input {width:7.25em; border:0.0625em solid #a5aeb5}
+.sezzle_action_form .js_sezzle_reference_transaction_card input {width:12.5em}
+.sezzle_action_form textarea {width:18.75em}
 .sezzle_action_form .sezzle_error_field .infobox_title {color:#f00}
 .sezzle_action_form .sezzle_error_field input {border-color:#f00}
 .sezzle_action_form table {width:100%; border-spacing:0; border-collapse:collapse}
 
-.sezzle_error_msg_box {display:none; min-height:30px; margin:0 0 10px 0; border:1px solid #ffcf0f; padding:12px 12px 0 60px; background-repeat: no-repeat; color:#000; background: #ffffde url('../images/icon_alert.gif') no-repeat 15px 10px; font-size:13px; line-height:1.3em}
-.sezzle_error_msg_box p {padding:0 0 12px 0}
+.sezzle_error_msg_box {display:none; min-height:1.875em; margin:0 0 0.625em 0; border:0.0625em solid #ffcf0f; padding:0.75em 0.75em 0 3.75em; background-repeat: no-repeat; color:#000; background: #ffffde url('../images/icon_alert.gif') no-repeat 0.9375em 0.625em; font-size:0.8125em; line-height:1.3em}
+.sezzle_error_msg_box p {padding:0 0 0.75em 0}
 
-.sezzle_ba_customer_search {padding: 6px}
+.sezzle_ba_customer_search {padding: 0.375em}
 
 .js_sezzle_create_reference_transaction {float: right}
 
-.sezzle_new_transaction_form td .biginput{width: 220px;}
+.sezzle_new_transaction_form td .biginput{width: 13.75em;}
 
 .sezzle_new_transaction_title {float: left}
 
-.js_sezzle_toggle_button {margin-left: 10px; margin-bottom: 10px; padding: 0px 7px}
+.js_sezzle_toggle_button {margin-left: 0.625em; margin-bottom: 0.625em; padding: 0em 0.4375em}
 
 
 

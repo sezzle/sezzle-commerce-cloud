@@ -35,7 +35,7 @@
         *
         * @returns {string} storeFront Path
         */
-        this.get = function () {
+        this.getStoreFrontPath = function () {
             return currentSite.getCustomPreferenceValue('StoreFrontPath');
         };
         /**

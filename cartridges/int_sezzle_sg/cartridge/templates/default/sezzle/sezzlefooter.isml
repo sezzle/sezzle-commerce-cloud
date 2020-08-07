@@ -1,4 +1,0 @@
-<!--- TEMPLATENAME: sezzlefooter.isml --->
-<isif condition="${require('*/cartridge/scripts/sezzle').data.getSezzleOnlineStatus()}">
-	<link href="${URLUtils.staticURL('/css/sezzlestyle.css')}" type="text/css" rel="stylesheet" />
-</isif>

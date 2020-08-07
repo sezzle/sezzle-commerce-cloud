@@ -22,6 +22,7 @@
 		<input type="hidden" name="maxAmount" value="captureInputAmount" />
 		<input type="hidden" name="orderNo" value="${order.orderNo}" />
 		<input type="hidden" name="isCustomOrder" value="${pdict.isCustomOrder}" />
+		<input type="hidden" name="${dw.web.CSRFProtection.getTokenName()}" value="${dw.web.CSRFProtection.generateToken()}"/>
 		
 		<h2>${Resource.msg('transaction.capture.title', 'sezzlebm', null)}</h2>
 		
