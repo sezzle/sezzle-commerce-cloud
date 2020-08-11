@@ -230,7 +230,7 @@ server.prepend(
                         hooksHelper('app.customer.subscription',
                             'subscribeTo',
                             [paymentForm.subscribe.checked,
-                                billingForm.email.htmlValue],
+                                paymentForm.contactInfoFields.email.htmlValue],
                             function () {
                             });
                     }
