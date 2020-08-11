@@ -1,10 +1,10 @@
 (function () {
     /**
-	 * Creates library-wrapper for Sezzle API
-	 *
-	 * @constructor
-	 * @this {Api}
-	 */
+     * Creates library-wrapper for Sezzle API
+     *
+     * @constructor
+     * @this {Api}
+     */
     var V2Api = function () {
         var self = this;
         var sezzleData = require('*/cartridge/scripts/data/sezzleData');
@@ -13,13 +13,13 @@
         var sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils');
 
         /**
-		 * Authenticate the merchant by public and private key
-		 *
-		 * @returns {Object} response object
-		 */
+         * Authenticate the merchant by public and private key
+         *
+         * @returns {Object} response object
+         */
         self.authenticate = function () {
             try {
-                if (sezzleUtils.getAuthToken() != '') {
+                if (sezzleUtils.getAuthToken() !== '') {
                     return sezzleUtils.getAuthToken();
                 }
                 var sezzleService = service.initService('sezzle.authenticate');
@@ -43,13 +43,13 @@
         };
 
         /**
-		 * Capture charge by order UUID
-		 *
-		 * @param {dw.order.Order} order Order
-		 * @param {string} amount Amount
-		 * @param {boolean} isPartialCapture Is Partial Capture
-		 * @returns {Object} response object
-		 */
+         * Capture charge by order UUID
+         *
+         * @param {dw.order.Order} order Order
+         * @param {string} amount Amount
+         * @param {boolean} isPartialCapture Is Partial Capture
+         * @returns {Object} response object
+         */
         self.capture = function (order, amount, isPartialCapture) {
             try {
                 var obj = {
@@ -57,7 +57,7 @@
                     capture_amount: {
                         amount_in_cents: amount,
                         currency: order.getCurrencyCode()
-							  },
+                    },
                     partial_capture: isPartialCapture
                 };
 
@@ -73,11 +73,11 @@
         };
 
         /**
-		 * Get customer UUID by token
-		 *
-		 * @param {string} token Token
-		 * @returns {Object} response object
-		 */
+         * Get customer UUID by token
+         *
+         * @param {string} token Token
+         * @returns {Object} response object
+         */
         self.getCustomerUUID = function (token) {
             try {
                 var obj = {
@@ -97,14 +97,13 @@
         };
 
         /**
-		 * Get order by order UUID
-		 *
-		 * @param {dw.order.Order} order Order
-		 * @returns {Object} response object
-		 */
+         * Get order by order UUID
+         *
+         * @param {dw.order.Order} order Order
+         * @returns {Object} response object
+         */
         self.getOrderByOrderUUID = function (order) {
             try {
-                var authentication = self.authenticate();
                 var obj = {
                     authToken: self.authenticate(),
                     httpMethod: 'GET'
@@ -122,17 +121,18 @@
         };
 
         /**
-		 * Create order by customer uuid
-		 *
-		 * @param {Object} requestObj Request Object
-		 * @returns {Object} order response object
-		 */
+         * Create order by customer uuid
+         *
+         * @param {Object} requestObj Request Object
+         * @returns {Object} order response object
+         */
         self.createOrderByCustomerUUID = function (requestObj) {
             try {
-                requestObj.authToken = self.authenticate();
+                var payloadObj = requestObj;
+                payloadObj.authToken = self.authenticate();
                 var sezzleService = service.initService('sezzle.createorderbycustomeruuid');
-                sezzleService.URL = requestObj.link;
-                return sezzleService.call(requestObj).object;
+                sezzleService.URL = payloadObj.link;
+                return sezzleService.call(payloadObj).object;
             } catch (e) {
                 logger.debug('Api:createOrderByCustomerUUID. - {0}', e);
                 return {
@@ -142,12 +142,12 @@
         };
 
         /**
-		 * Refund payment by order UUID
-		 *
-		 * @param {dw.order.Order} order Order
-		 * @param {string} amount Amount
-		 * @returns {Object} response object
-		 */
+         * Refund payment by order UUID
+         *
+         * @param {dw.order.Order} order Order
+         * @param {string} amount Amount
+         * @returns {Object} response object
+         */
         self.refund = function (order, amount) {
             try {
                 var obj = {
@@ -168,12 +168,12 @@
         };
 
         /**
-		 * Release payment by order UUID
-		 *
-		 * @param {dw.order.Order} order Order
-		 * @param {string} amount Amount
-		 * @returns {Object} response object
-		 */
+         * Release payment by order UUID
+         *
+         * @param {dw.order.Order} order Order
+         * @param {string} amount Amount
+         * @returns {Object} response object
+         */
         self.release = function (order, amount) {
             try {
                 var obj = {
@@ -193,11 +193,11 @@
         };
 
         /**
-		 * Update order reference id
-		 *
-		 * @param {dw.order.Order} order Order
-		 * @returns {Object} response object
-		 */
+         * Update order reference id
+         *
+         * @param {dw.order.Order} order Order
+         * @returns {Object} response object
+         */
         self.updateOrder = function (order) {
             try {
                 var obj = {
@@ -218,11 +218,11 @@
         };
 
         /**
-		 * Get customer by customer uuid
-		 *
-		 * @param {dw.customer.Profile} profile Profile
-		 * @returns {Object} response object
-		 */
+         * Get customer by customer uuid
+         *
+         * @param {dw.customer.Profile} profile Profile
+         * @returns {Object} response object
+         */
         self.getCustomer = function (profile) {
             try {
                 var obj = {
@@ -242,17 +242,18 @@
         };
 
         /**
-		 * Create Checkout Session
-		 *
-		 * @param {Object} checkoutObject Checkout Request Object
-		 * @returns {Object} response object
-		 */
+         * Create Checkout Session
+         *
+         * @param {Object} checkoutObject Checkout Request Object
+         * @returns {Object} response object
+         */
         self.createSession = function (checkoutObject) {
             try {
-                checkoutObject.authToken = self.authenticate();
+                var payloadObj = checkoutObject;
+                payloadObj.authToken = self.authenticate();
                 var sezzleService = service.initService('sezzle.createsession');
                 sezzleService.URL = sezzleData.getV2URLPath() + 'session';
-                return sezzleService.call(checkoutObject).object;
+                return sezzleService.call(payloadObj).object;
             } catch (e) {
                 logger.debug('Api:createSession. - {0}', e);
                 return {

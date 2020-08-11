@@ -22,8 +22,8 @@ var URLUtils = require('dw/web/URLUtils');
 var Countries = require('app_storefront_core/cartridge/scripts/util/Countries');
 
 /* Script Modules */
-var app = require('~/cartridge/scripts/app');
-var guard = require('~/cartridge/scripts/guard');
+var app = require('*/cartridge/scripts/app');
+var guard = require('*/cartridge/scripts/guard');
 
 /**
  * Initializes the address form. If the customer chose "use as billing
@@ -77,7 +77,7 @@ function initEmailAddress(cart) {
  * @param {object} params - (optional) if passed, added to view properties so they can be accessed in the template.
  */
 function returnToForm(cart, params) {
-    var pageMeta = require('~/cartridge/scripts/meta');
+    var pageMeta = require('*/cartridge/scripts/meta');
 
     // if the payment method is set to gift certificate get the gift certificate code from the form
     if (!empty(cart.getPaymentInstrument()) && cart.getPaymentInstrument().getPaymentMethod() === PaymentInstrument.METHOD_GIFT_CERTIFICATE) {
@@ -91,7 +91,7 @@ function returnToForm(cart, params) {
     });
 
     if (params) {
-        app.getView(require('~/cartridge/scripts/object').extend(params, {
+        app.getView(require('*/cartridge/scripts/object').extend(params, {
             Basket: cart.object,
             ContinueURL: URLUtils.https('COBilling-Billing')
         })).render('checkout/billing/billing');
@@ -117,7 +117,7 @@ function start(cart, params) {
         cart.calculate();
     });
 
-    var pageMeta = require('~/cartridge/scripts/meta');
+    var pageMeta = require('*/cartridge/scripts/meta');
     pageMeta.update({
         pageTitle: Resource.msg('billing.meta.pagetitle', 'checkout', 'SiteGenesis Checkout')
     });
@@ -608,7 +608,7 @@ function redeemGiftCertificateJson() {
     giftCertCode = request.httpParameterMap.giftCertCode.stringValue;
     giftCertStatus = redeemGiftCertificate(giftCertCode);
 
-    let responseUtils = require('~/cartridge/scripts/util/Response');
+    let responseUtils = require('*/cartridge/scripts/util/Response');
 
     if (request.httpParameterMap.format.stringValue !== 'ajax') {
         // @FIXME we could also build an ajax guard?
@@ -721,7 +721,7 @@ function editBillingAddress() {
  */
 function getGiftCertificateBalance() {
     var giftCertificate = GiftCertificateMgr.getGiftCertificateByCode(request.httpParameterMap.giftCertificateID.value);
-    var responseUtils = require('~/cartridge/scripts/util/Response');
+    var responseUtils = require('*/cartridge/scripts/util/Response');
 
     if (giftCertificate && giftCertificate.isEnabled()) {
         responseUtils.renderJSON({

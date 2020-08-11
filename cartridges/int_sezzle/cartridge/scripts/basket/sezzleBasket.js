@@ -1,10 +1,11 @@
+/* global empty */
 (function () {
     /**
-	 * Creates library for working with Basket
-	 *
-	 * @constructor
-	 * @this {Basket}
-	 */
+     * Creates library for working with Basket
+     *
+     * @constructor
+     * @this {Basket}
+     */
     var Basket = function () {
         var self = this;
         var web = require('dw/web');
@@ -21,11 +22,11 @@
         self.utils = sezzleUtils;
 
         /**
-		 * Build shipping address object based on Basket
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {Object} simple object with shipping address
-		 */
+         * Build shipping address object based on Basket
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {Object} simple object with shipping address
+         */
         self.getShippingAddress = function (basket) {
             var basketShippingAddress = basket.getDefaultShipment().getShippingAddress();
             return {
@@ -41,11 +42,11 @@
         };
 
         /**
-		 * Build billing address object based on Basket
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {Object} simple object with billing address
-		 */
+         * Build billing address object based on Basket
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {Object} simple object with billing address
+         */
         self.getBillingAddress = function (basket) {
             var basketBillingAddress = basket.getBillingAddress();
             if (empty(basketBillingAddress)) {
@@ -64,11 +65,11 @@
         };
 
         /**
-		 * Build items object based on Basket
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {Object} simple object contained product data
-		 */
+         * Build items object based on Basket
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {Object} simple object contained product data
+         */
         self.getItems = function (basket) {
             var items = [];
             var productLineItems = basket.getProductLineItems().iterator();
@@ -91,13 +92,13 @@
         };
 
         /**
-		 * Checks possibility of using Sezzle payment method
-		 * Removes one if it cann't be accepted
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @param {dw.util.Collection} ApplicablePaymentMethods basket
-		 * @returns {Object} simple object contained product data
-		 */
+         * Checks possibility of using Sezzle payment method
+         * Removes one if it cann't be accepted
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @param {dw.util.Collection} ApplicablePaymentMethods basket
+         * @returns {Object} simple object contained product data
+         */
         self.validatePayments = function (basket, ApplicablePaymentMethods) {
             if (!basket.getGiftCertificateLineItems().empty || !sezzleData.getSezzleOnlineStatus() || !sezzleUtils.checkBasketTotalRange('object' in basket ? basket.object : basket)) {
                 var sezzlePaymentMethod = PaymentMgr.getPaymentMethod('Sezzle');
@@ -109,14 +110,14 @@
         };
 
         /**
-		 * Build object with confirmation and cancel URLs
-		 *
+         * Build object with confirmation and cancel URLs
+         *
          * @param {string} type SFRA/SG
-		 * @returns {Object} simple object contained URLs
-		 */
+         * @returns {Object} simple object contained URLs
+         */
         self.getMerchant = function (type) {
             var cancelURL = web.URLUtils.https('Checkout-Begin').toString();
-            if (type === "SG") {
+            if (type === 'SG') {
                 cancelURL = web.URLUtils.https('COBilling-Start').toString();
             }
             return {
@@ -127,37 +128,32 @@
         };
 
         /**
-		 * Build object with configuration data
-		 *
-		 * @returns {Object} simple object contained configuration data
-		 */
+         * Build object with configuration data
+         *
+         * @returns {Object} simple object contained configuration data
+         */
         self.getConfig = function () {
             return {};
         };
 
         /**
-		 *
-		 * @param {dw.order.Basket} basket Basket
-		 * @return {Object} Discounts
-		 */
-        self.getDiscounts = function (basket) {
-            var discount = {
-
-            };
-
+         *
+         * @return {Array} Discounts
+         */
+        self.getDiscounts = function () {
             return [];
         };
 
         /**
-		 * Build object with metadata
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {Object} simple object contained metadata
-		 */
+         * Build object with metadata
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {Object} simple object contained metadata
+         */
         self.getMetadata = function (basket) {
             var compatibilityMode = (system.System.compatibilityMode / 100).toString();
             compatibilityMode = compatibilityMode.split('.').map(function (val, i) {
-                if (i != 1) {
+                if (i !== 1) {
                     return val;
                 }
                 return val.replace('0', '');
@@ -171,41 +167,41 @@
         };
 
         /**
-		 * Return shipping amount in cents
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {number} shipping amount in cents
-		 */
+         * Return shipping amount in cents
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {number} shipping amount in cents
+         */
         self.getShippingAmmout = function (basket) {
             return basket.getDefaultShipment().getShippingTotalPrice().multiply(100).getValue();
         };
 
         /**
-		 * Return tax amount in cents
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {number} tax amount in cents
-		 */
+         * Return tax amount in cents
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {number} tax amount in cents
+         */
         self.getTaxAmount = function (basket) {
             return basket.getTotalTax().multiply(100).getValue();
         };
 
         /**
-		 * Return total amount in cents
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {number} total amount in cents
-		 */
+         * Return total amount in cents
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {number} total amount in cents
+         */
         self.getTotal = function (basket) {
             return sezzleUtils.calculateNonGiftCertificateAmount(basket).multiply(100).getValue();
         };
 
         /**
-		 * Create Sezzle payment instrument
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {dw.order.PaymentInstrument} payment instrument
-		 */
+         * Create Sezzle payment instrument
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {dw.order.PaymentInstrument} payment instrument
+         */
         self.createPaymentInstrument = function (basket) {
             self.removePaymentInstrument(basket);
             var amount = sezzleUtils.calculateNonGiftCertificateAmount(basket);
@@ -214,10 +210,10 @@
         };
 
         /**
-		 * Remove Sezzle payment instrument
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 */
+         * Remove Sezzle payment instrument
+         *
+         * @param {dw.order.Basket}  basket Basket
+         */
         self.removePaymentInstrument = function (basket) {
             var paymentInstruments = basket.getPaymentInstruments('Sezzle').iterator();
 
@@ -228,16 +224,16 @@
         };
 
         /**
-		 * Build object with checkout data and fetch the checkout url
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {Object} checkout data object in JSON format
-		 */
+         * Build object with checkout data and fetch the checkout url
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {Object} checkout data object in JSON format
+         */
         self.initiateCheckout = function (basket) {
             var referenceID = sezzleUtils.generateUUID();
             var customerTokenRecord = self.getCustomerTokenRecord(basket.customer.profile);
             var returnObj = {};
-            if (customerTokenRecord.customer_uuid != undefined && customerTokenRecord.customer_uuid_expiration != undefined) {
+            if (customerTokenRecord.customer_uuid !== undefined && customerTokenRecord.customer_uuid_expiration !== undefined) {
                 logger.debug('Tokenized Checkout');
                 var createOrderLinkByCustomerUUID = basket.customer.profile.custom.SezzleCustomerCreateOrderLink;
                 var requestObject = {
@@ -254,10 +250,10 @@
                     reference_id: referenceID,
                     approved: false
                 };
-                if (createOrderLinkByCustomerUUID != '') {
+                if (createOrderLinkByCustomerUUID !== '') {
                     requestObject.link = createOrderLinkByCustomerUUID;
                     var orderResponse = sezzleOrder.createOrder(requestObject);
-                    if (orderResponse != null && !orderResponse.error) {
+                    if (orderResponse !== null && !orderResponse.error) {
                         returnObj.checkout.approved = orderResponse.response.authorization.approved;
                         returnObj.checkout.checkout_url = self.getMerchant().user_confirmation_url + '?order_reference_id=' + referenceID;
                         returnObj.checkout.order_uuid = orderResponse.response.uuid;
@@ -286,7 +282,7 @@
                     reference_id: referenceID,
                     approved: false
                 };
-                if (checkoutResponse != null && !checkoutResponse.error) {
+                if (checkoutResponse !== null && !checkoutResponse.error) {
                     if (checkoutResponse.response.order) {
                         returnObj.checkout.order_uuid = checkoutResponse.response.order.uuid;
                         returnObj.checkout.checkout_url = checkoutResponse.response.order.checkout_url;
@@ -312,41 +308,44 @@
          * @returns {Object} checkout data object in JSON format
          */
         self.initiateV1Checkout = function (basket) {
-            var order_ref_id = sezzleUtils.generateUUID();
+            var orderRefID = sezzleUtils.generateUUID();
             var checkoutObject = {
-                'items' : self.getItems(basket),
-                'billing_address' : self.getBillingAddress(basket),
-                'shipping_address': self.getShippingAddress(basket),
-                'customer_details': {
+                items: self.getItems(basket),
+                billing_address: self.getBillingAddress(basket),
+                shipping_address: self.getShippingAddress(basket),
+                customer_details: {
                     email: basket.getCustomerEmail(),
                     first_name: basket.getCustomerNo() ? basket.getCustomer().getProfile().getFirstName() : basket.getBillingAddress().getFirstName(),
                     last_name: basket.getCustomerNo() ? basket.getCustomer().getProfile().getLastName() : basket.getBillingAddress().getLastName(),
-                    phone: basket.getCustomerNo() ? basket.getCustomer().getProfile().getPhoneMobile() : basket.getBillingAddress().getPhone(),
+                    phone: basket.getCustomerNo() ? basket.getCustomer().getProfile().getPhoneMobile() : basket.getBillingAddress().getPhone()
                 },
-                'discounts' : self.getDiscounts(basket),
-                'metadata' : self.getMetadata(basket),
-                'shipping_amount' : {'amount_in_cents' : self.getShippingAmmout(basket), 'currency': basket.getCurrencyCode()},
-                'tax_amount' : {'amount_in_cents' : self.getTaxAmount(basket), 'currency': basket.getCurrencyCode()},
-                'amount_in_cents' : self.getTotal(basket),
-                'currency_code' : basket.getCurrencyCode(),
-                'order_description' : "Commerce cloud order",
-                'order_reference_id' : order_ref_id,
-                'checkout_complete_url' : self.getMerchant("SG").user_confirmation_url + "?order_reference_id="+order_ref_id,
-                'checkout_cancel_url' : self.getMerchant("SG").user_cancel_url,
-                'requires_shipping_info' : false,
-                'merchant_completes' : true
+                discounts: self.getDiscounts(),
+                metadata: self.getMetadata(basket),
+                shipping_amount: {
+                    amount_in_cents: self.getShippingAmmout(basket),
+                    currency: basket.getCurrencyCode()
+                },
+                tax_amount: { amount_in_cents: self.getTaxAmount(basket), currency: basket.getCurrencyCode() },
+                amount_in_cents: self.getTotal(basket),
+                currency_code: basket.getCurrencyCode(),
+                order_description: 'Commerce cloud order',
+                order_reference_id: orderRefID,
+                checkout_complete_url: self.getMerchant('SG').user_confirmation_url + '?order_reference_id=' + orderRefID,
+                checkout_cancel_url: self.getMerchant('SG').user_cancel_url,
+                requires_shipping_info: false,
+                merchant_completes: true
             };
-            let checkoutResponse = v1.createCheckout(checkoutObject)
-            checkoutObject['redirect_url'] = checkoutResponse.response.checkout_url;
+            var checkoutResponse = v1.createCheckout(checkoutObject);
+            checkoutObject.redirect_url = checkoutResponse.response.checkout_url;
             return checkoutObject;
         };
 
         /**
-		 * Get Customer Token Record from Profile
-		 *
-		 * @param {dw.customer.Profile}  profile Profile
-		 * @returns {Object} customer token record object in JSON format
-		 */
+         * Get Customer Token Record from Profile
+         *
+         * @param {dw.customer.Profile}  profile Profile
+         * @returns {Object} customer token record object in JSON format
+         */
         self.getCustomerTokenRecord = function (profile) {
             if (profile) {
                 var customerUUID = profile.custom.SezzleCustomerUUID;
@@ -357,7 +356,7 @@
                     var customerUUIDExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(customerUUIDExpiration);
                     if (currentTimestamp <= customerUUIDExpirationTimestamp) {
                         var customer = v2.getCustomer(profile);
-                        if (customer != null && !customer.error && customer.response.email) {
+                        if (customer !== null && !customer.error && customer.response.email) {
                             logger.debug('Found customer token and moving forward');
                             return {
                                 customer_uuid: customerUUID,
@@ -374,27 +373,28 @@
         };
 
         /**
-		 * Delete Customer Token Record from Profile
-		 *
-		 * @param {dw.customer.Profile}  profile Profile
-		 */
+         * Delete Customer Token Record from Profile
+         *
+         * @param {dw.customer.Profile}  profile Profile
+         */
         self.deleteCustomerToken = function (profile) {
+            var customerProfile = profile;
             Transaction.wrap(function () {
-                profile.custom.SezzleCustomerUUID = null;
-                profile.custom.SezzleCustomerTokenizeStatus = false;
-                profile.custom.SezzleCustomerUUIDExpiration = null;
-                profile.custom.SezzleCustomerCreateOrderLink = null;
-                profile.custom.SezzleGetCustomerLink = null;
+                customerProfile.custom.SezzleCustomerUUID = null;
+                customerProfile.custom.SezzleCustomerTokenizeStatus = false;
+                customerProfile.custom.SezzleCustomerUUIDExpiration = null;
+                customerProfile.custom.SezzleCustomerCreateOrderLink = null;
+                customerProfile.custom.SezzleGetCustomerLink = null;
             });
         };
 
 
         /**
-		 * Get customer
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {string} customer data object in JSON format
-		 */
+         * Get customer
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {string} customer data object in JSON format
+         */
         self.getCustomer = function (basket) {
             return {
                 tokenize: sezzleData.getTokenizeStatus(),
@@ -410,12 +410,12 @@
 
 
         /**
-		 * Get order
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @param {string} referenceID Order Reference ID
-		 * @returns {string} order data object in JSON format
-		 */
+         * Get order
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @param {string} referenceID Order Reference ID
+         * @returns {string} order data object in JSON format
+         */
         self.getOrder = function (basket, referenceID) {
             return {
                 intent: 'AUTH',
@@ -423,7 +423,7 @@
                 description: 'Commerce cloud order',
                 requires_shipping_info: false,
                 items: self.getItems(basket),
-                discounts: self.getDiscounts(basket),
+                discounts: self.getDiscounts(),
                 shipping_amount: {
                     amount_in_cents: self.getShippingAmmout(basket),
                     currency: basket.getCurrencyCode()

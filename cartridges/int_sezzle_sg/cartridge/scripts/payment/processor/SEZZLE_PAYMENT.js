@@ -12,7 +12,7 @@ var Transaction = require('dw/system/Transaction');
 var sezzleUtils = require('*/cartridge/scripts/sezzle');
 var OrderMgr = require('dw/order/OrderMgr');
 var Order = require('dw/order/Order');
-var logger = require('dw/system').Logger.getLogger('Sezzle','');
+var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 
 /*
  * Export the publicly available controller methods
@@ -49,9 +49,9 @@ function authorize(args) {
             reference_id: session.privacy.referenceId,
             events: [{ id: session.privacy.sezzleFirstEventID }],
             amount: session.privacy.sezzleAmount,
-            type: "sg"
+            type: 'sg'
         };
-        sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
+        sezzleUtils.order.updateAttributes(order, sezzleResponseObject);
     });
 
     return { authorized: true };

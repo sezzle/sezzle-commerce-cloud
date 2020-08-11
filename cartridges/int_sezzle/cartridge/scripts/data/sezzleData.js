@@ -1,3 +1,4 @@
+/* global empty */
 (function () {
     /**
      * Library for providing access to DW site preferences and resources
@@ -9,8 +10,6 @@
         var system = require('dw/system');
         var web = require('dw/web');
         var currentSite = system.Site.getCurrent();
-        var Site = require('dw/system/Site').getCurrent();
-        var test = Site.getCustomPreferenceValue('SezzleMode');
         var mode = !empty(currentSite.getCustomPreferenceValue('SezzleMode'))
             ? currentSite.getCustomPreferenceValue('SezzleMode').getValue()
             : 'sandbox';
@@ -31,10 +30,10 @@
             return currentSite.getCustomPreferenceValue('SezzlePrivateKey');
         };
         /**
-        * Return StoreFront Path
-        *
-        * @returns {string} storeFront Path
-        */
+         * Return StoreFront Path
+         *
+         * @returns {string} storeFront Path
+         */
         this.getStoreFrontPath = function () {
             return currentSite.getCustomPreferenceValue('StoreFrontPath');
         };
@@ -161,9 +160,9 @@
             return currentSite.getCustomPreferenceValue('SezzleFPCustomerGroup');
         };
         /**
-		 * @description Due to CyberSource changes payment can be disabled from the BM (Requirement 09.12.2017)
-		 * @returns {boolean} Sezzle Online Status
-		 */
+         * @description Due to CyberSource changes payment can be disabled from the BM (Requirement 09.12.2017)
+         * @returns {boolean} Sezzle Online Status
+         */
         this.getSezzlePaymentOnlineStatus = function () {
             return currentSite.getCustomPreferenceValue('SezzlePaymentOnlineStatus');
         };

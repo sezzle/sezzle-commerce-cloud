@@ -4,7 +4,7 @@
 
 var Web = function () {
     this.Resource = require('./Resource');
-    //this.URLUtils = require('./URLUtils');
+    // this.URLUtils = require('./URLUtils');
 };
 
 module.exports = new Web();

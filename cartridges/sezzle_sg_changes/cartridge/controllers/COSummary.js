@@ -15,8 +15,8 @@ var Transaction = require('dw/system/Transaction');
 var URLUtils = require('dw/web/URLUtils');
 
 /* Script Modules */
-var app = require('~/cartridge/scripts/app');
-var guard = require('~/cartridge/scripts/guard');
+var app = require('*/cartridge/scripts/app');
+var guard = require('*/cartridge/scripts/guard');
 
 var Cart = app.getModel('Cart');
 
@@ -45,7 +45,7 @@ function start(context) {
             }
         });
 
-        var pageMeta = require('~/cartridge/scripts/meta');
+        var pageMeta = require('*/cartridge/scripts/meta');
         var viewContext = require('app_storefront_core/cartridge/scripts/common/extend').immutable(context, {
             Basket: cart.object
         });
@@ -99,7 +99,7 @@ function showConfirmation(order) {
     app.getForm('profile.login.passwordconfirm').clear();
     app.getForm('profile.login.password').clear();
 
-    var pageMeta = require('~/cartridge/scripts/meta');
+    var pageMeta = require('*/cartridge/scripts/meta');
     pageMeta.update({pageTitle: Resource.msg('confirmation.meta.pagetitle', 'checkout', 'SiteGenesis Checkout Confirmation')});
     app.getView({
         Order: order,

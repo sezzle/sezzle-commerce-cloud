@@ -2,6 +2,7 @@
  * This script provides utility functions shared across other Sezzle related scripts.
  *
  */
+/* global session empty */
 (function () {
     var Utils = function () {
         var self = this;
@@ -9,14 +10,13 @@
         var web = require('dw/web');
         var system = require('dw/system');
         var sezzleData = require('~/cartridge/scripts/data/sezzleData');
-        var Money = require('dw/value/Money');
 
         /**
-		 * Calculate non-gift certificate amount
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {dw.value.Money} simple object with name and shipping address
-		 */
+         * Calculate non-gift certificate amount
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {dw.value.Money} simple object with name and shipping address
+         */
         self.calculateNonGiftCertificateAmount = function (basket) {
             var basketTotal = basket.getTotalGrossPrice();
             var giftCertTotal = new values.Money(0.0, basket.currencyCode);
@@ -31,16 +31,17 @@
         };
 
         /**
-		 * Compare line items from basket and from sezzle response.
-		 * If they are not identical, add error to status object
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status basket
-		 */
+         * Compare line items from basket and from sezzle response.
+         * If they are not identical, add error to status object
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @param {Object} SezzleResponse charge object
+         * @param {dw.system.Status} status basket
+         */
         self.checkLineItems = function (basket, SezzleResponse, status) {
             var productLineItems = basket.getProductLineItems().iterator();
 
+            /* eslint no-empty: "error" */
             while (!empty(productLineItems) && productLineItems.hasNext()) {
                 var productLineItem = productLineItems.next();
 
@@ -50,7 +51,7 @@
                         ? productLineItem.getBasePrice().multiply(100).getValue()
                         : productLineItem.product.getPriceModel().getPrice().multiply(100).getValue();
 
-                    if (product.unit_price != productLineItemPrice) {
+                    if (product.unit_price !== productLineItemPrice) {
                         status.addItem(
                             new system.StatusItem(
                                 system.Status.ERROR,
@@ -68,7 +69,7 @@
                             )
                         );
                     }
-                    if (product.qty != productLineItem.getQuantityValue()) {
+                    if (product.qty !== productLineItem.getQuantityValue()) {
                         status.addItem(
                             new system.StatusItem(
                                 system.Status.ERROR,
@@ -103,16 +104,16 @@
         };
 
         /**
-		 * Compare taxes from basket and from sezzle response.
-		 * If they are not identical, add error to status object
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status basket
-		 */
+         * Compare taxes from basket and from sezzle response.
+         * If they are not identical, add error to status object
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @param {Object} SezzleResponse charge object
+         * @param {dw.system.Status} status basket
+         */
         self.checkTaxation = function (basket, SezzleResponse, status) {
             var basketTax = basket.getTotalTax().multiply(100).getValue();
-            if (basketTax != SezzleResponse.details.tax_amount) {
+            if (basketTax !== SezzleResponse.details.tax_amount) {
                 status.addItem(
                     new system.StatusItem(
                         system.Status.ERROR,
@@ -130,16 +131,16 @@
         };
 
         /**
-		 * Compare total price from basket and from sezzle response.
-		 * If they are not identical, add error to status object
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status basket
-		 */
+         * Compare total price from basket and from sezzle response.
+         * If they are not identical, add error to status object
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @param {Object} SezzleResponse charge object
+         * @param {dw.system.Status} status basket
+         */
         self.checkTotalPrice = function (basket, SezzleResponse, status) {
             var totalPrice = self.calculateNonGiftCertificateAmount(basket).multiply(100).getValue();
-            if (totalPrice != SezzleResponse.details.total) {
+            if (totalPrice !== SezzleResponse.details.total) {
                 status.addItem(
                     new system.StatusItem(
                         system.Status.ERROR,
@@ -157,22 +158,12 @@
         };
 
         /**
-		 * Check addresses
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @param {Object} SezzleResponse charge object
-		 * @param {dw.system.Status} status basket
-		 */
-        self.checkAddresses	= function (basket, SezzleResponse, status) {
-        };
-
-        /**
-		 * Parse the response
-		 *
-		 * @param {dw.svc}  svc SVC
-		 * @param {Object} client Client
-		 * @return {Object} response Response
-		 */
+         * Parse the response
+         *
+         * @param {dw.svc}  svc SVC
+         * @param {Object} client Client
+         * @return {Object} response Response
+         */
         self.responseParser = function (svc, client) {
             var response;
             response = {
@@ -208,41 +199,41 @@
         };
 
         /**
-		 * Generate UUID
-		 *
-		 * @returns {string} uuid
-		 */
+         * Generate UUID
+         *
+         * @returns {string} uuid
+         */
         self.generateUUID = function () {
-		  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-		    var r = Math.random() * 16 | 0;
-		    var v = c == 'x' ? r : (r & 0x3 | 0x8);
-		    return v.toString(16);
-		  });
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0; // eslint-disable-line no-bitwise
+                var v = c === 'x' ? r : (r & 0x3 | 0x8); // eslint-disable-line no-bitwise,no-mixed-operators
+                return v.toString(16);
+            });
         };
 
         /**
-		 * Get formatted timestamp from string datetime
-		 *
-		 * @param {string}  timestampStr Timestamp
-		 * @returns {Date} date
-		 */
+         * Get formatted timestamp from string datetime
+         *
+         * @param {string}  timestampStr Timestamp
+         * @returns {Date} date
+         */
         self.getFormattedDateTimestamp = function (timestampStr) {
-            timestampStr = timestampStr.split('.');
-            timestampStr = timestampStr[0];
-            timestampStr = timestampStr.replace('Z', ' ');
-            timestampStr = timestampStr.replace('T', ' ');
-            timestampStr = timestampStr.replace('-', '/');
-            timestampStr = timestampStr.replace('-', '/');
-            return Date.parse(timestampStr);
+            var timestamp = timestampStr.split('.');
+            timestamp = timestamp[0];
+            timestamp = timestamp.replace('Z', ' ');
+            timestamp = timestamp.replace('T', ' ');
+            timestamp = timestamp.replace('-', '/');
+            timestamp = timestamp.replace('-', '/');
+            return Date.parse(timestamp);
         };
 
         /**
-		 * Get Query String from URL
-		 *
-		 * @param {string}  field Field
-		 * @param {string}  url URL
-		 * @returns {string} query string
-		 */
+         * Get Query String from URL
+         *
+         * @param {string}  field Field
+         * @param {string}  url URL
+         * @returns {string} query string
+         */
         self.getQueryString = function (field, url) {
             var href = url;
             var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
@@ -251,11 +242,11 @@
         };
 
         /**
-		 * Check total basket range
-		 *
-		 * @param {dw.order.Basket}  basket Basket
-		 * @returns {boolean} status
-		 */
+         * Check total basket range
+         *
+         * @param {dw.order.Basket}  basket Basket
+         * @returns {boolean} status
+         */
         self.checkBasketTotalRange = function (basket) {
             var basketTotal;
             if (basket.totalGrossPrice.available) {
@@ -268,21 +259,18 @@
             if (paymentMinTotal && basketTotal.value < paymentMinTotal) {
                 return false;
             }
-            if (paymentMaxTotal && basketTotal.value > paymentMaxTotal) {
-                return false;
-            }
-            return true;
+            return !(paymentMaxTotal && basketTotal.value > paymentMaxTotal);
         };
 
         /**
-		 * Validate and get auth token
-		 *
-		 * @returns {string} token
-		 */
+         * Validate and get auth token
+         *
+         * @returns {string} token
+         */
         self.getAuthToken = function () {
-            if (session.privacy.sezzleAuthToken == '' || sezzleData.getMerchantUUID() != session.privacy.sezzleMerchantUUID) {
+            if (session.privacy.sezzleAuthToken === '' || sezzleData.getMerchantUUID() !== session.privacy.sezzleMerchantUUID) {
                 return '';
-            } if (session.privacy.sezzleAuthTokenExpiration != '') {
+            } if (session.privacy.sezzleAuthTokenExpiration !== '') {
                 var authExpirationTimestamp = self.getFormattedDateTimestamp(session.privacy.sezzleAuthTokenExpiration);
                 var currentTimestamp = Date.now();
                 if (currentTimestamp > authExpirationTimestamp) {
@@ -293,9 +281,9 @@
         };
 
         /**
-		 * Set auth token for future use
-		 * @param {Object} object Object
-		 */
+         * Set auth token for future use
+         * @param {Object} object Object
+         */
         self.setAuthToken = function (object) {
             session.privacy.sezzleAuthToken = object.token;
             session.privacy.sezzleAuthTokenExpiration = object.expiration_date;

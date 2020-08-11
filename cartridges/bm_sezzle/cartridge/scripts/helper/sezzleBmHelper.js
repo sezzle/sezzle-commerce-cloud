@@ -1,6 +1,6 @@
 'use strict';
 
-/* global empty dw request session customer */
+/* global empty dw */
 
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 var Money = require('dw/value/Money');
@@ -16,47 +16,48 @@ var sezzleBmHelper = {};
  * @param {number} amount Amount
  */
 function updateOrderData(order, transactionId, methodName, amount) {
-    var orderTotal = order.totalGrossPrice;
-    var amountInMoneyFmt = dw.value.Money(amount, order.currencyCode);
+    var orderObj = order;
+    var orderTotal = orderObj.totalGrossPrice;
+    var amountInMoneyFmt = dw.value.Money(amount, orderObj.currencyCode);
 
-    var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
-    var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
-    var authAmount = new Money(authAmountInFloat, order.currencyCode);
+    var authAmountStr = orderObj.custom.SezzleOrderAmount || '0.00';
+    var authAmountInFloat = parseFloat(authAmountStr.replace(orderObj.currencyCode, ''));
+    var authAmount = new Money(authAmountInFloat, orderObj.currencyCode);
 
-    var capturedAmountStr = order.custom.SezzleCapturedAmount || '0.00';
-    var capturedAmountInFloat = parseFloat(capturedAmountStr.replace(order.currencyCode, ''));
-    var capturedAmount = new Money(capturedAmountInFloat, order.currencyCode);
+    var capturedAmountStr = orderObj.custom.SezzleCapturedAmount || '0.00';
+    var capturedAmountInFloat = parseFloat(capturedAmountStr.replace(orderObj.currencyCode, ''));
+    var capturedAmount = new Money(capturedAmountInFloat, orderObj.currencyCode);
     var finalCapturedAmount = capturedAmount.add(amountInMoneyFmt);
 
-    var refundedAmountStr = order.custom.SezzleRefundedAmount || '0.00';
-    var refundedAmountInFloat = parseFloat(refundedAmountStr.replace(order.currencyCode, ''));
-    var refundedAmount = new Money(refundedAmountInFloat, order.currencyCode);
+    var refundedAmountStr = orderObj.custom.SezzleRefundedAmount || '0.00';
+    var refundedAmountInFloat = parseFloat(refundedAmountStr.replace(orderObj.currencyCode, ''));
+    var refundedAmount = new Money(refundedAmountInFloat, orderObj.currencyCode);
     var finalRefundedAmount = refundedAmount.add(amountInMoneyFmt);
 
-    var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
-    var releasedAmountInFloat = parseFloat(releasedAmountStr.replace(order.currencyCode, ''));
-    var releasedAmount = new Money(releasedAmountInFloat, order.currencyCode);
+    var releasedAmountStr = orderObj.custom.SezzleReleasedAmount || '0.00';
+    var releasedAmountInFloat = parseFloat(releasedAmountStr.replace(orderObj.currencyCode, ''));
+    var releasedAmount = new Money(releasedAmountInFloat, orderObj.currencyCode);
     var finalReleasedAmount = releasedAmount.add(amountInMoneyFmt);
 
-    if (methodName == 'DoCapture') {
-    	order.custom.SezzleCapturedAmount = finalCapturedAmount;
-    	if (authAmount.equals(finalCapturedAmount)) {
-    		order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PAID);
-    		order.setStatus(dw.order.Order.ORDER_STATUS_COMPLETED);
-    	} else {
-    		order.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PARTPAID);
-    	}
-    } else if (methodName == 'DoRefund') {
-    	order.custom.SezzleRefundedAmount = finalRefundedAmount;
-    } else if (methodName == 'DoRelease') {
-    	order.custom.SezzleReleasedAmount = finalReleasedAmount;
+    if (methodName === 'DoCapture') {
+        orderObj.custom.SezzleCapturedAmount = finalCapturedAmount;
+        if (authAmount.equals(finalCapturedAmount)) {
+            orderObj.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PAID);
+            orderObj.setStatus(dw.order.Order.ORDER_STATUS_COMPLETED);
+        } else {
+            orderObj.setPaymentStatus(dw.order.Order.PAYMENT_STATUS_PARTPAID);
+        }
+    } else if (methodName === 'DoRefund') {
+        orderObj.custom.SezzleRefundedAmount = finalRefundedAmount;
+    } else if (methodName === 'DoRelease') {
+        orderObj.custom.SezzleReleasedAmount = finalReleasedAmount;
 
-    	var updatedAuthAmount = orderTotal.getValue() - finalReleasedAmount.getValue();
-    	order.custom.SezzleOrderAmount = new Money(updatedAuthAmount, order.currencyCode);
+        var updatedAuthAmount = orderTotal.getValue() - finalReleasedAmount.getValue();
+        orderObj.custom.SezzleOrderAmount = new Money(updatedAuthAmount, orderObj.currencyCode);
 
         if (authAmount.equals(finalReleasedAmount)) {
-    		order.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
-    	}
+            orderObj.setStatus(dw.order.Order.ORDER_STATUS_CANCELLED);
+        }
     }
 }
 
@@ -67,8 +68,8 @@ function updateOrderData(order, transactionId, methodName, amount) {
  * @param {number} amount Amount
  */
 sezzleBmHelper.updateSezzleOrderAmount = function (order, amount) {
-    amount = new Money(amount, order.currencyCode);
-    order.custom.SezzleOrderAmount = amount;
+    var orderObject = order;
+    orderObject.custom.SezzleOrderAmount = new Money(amount, orderObject.currencyCode);
 };
 
 /**
@@ -86,7 +87,7 @@ sezzleBmHelper.getSezzlePaymentInstrument = function (basket) {
         var paymentMethod = dw.order.PaymentMgr.getPaymentMethod(paymentInstrument.getPaymentMethod());
         if (paymentMethod) {
             var paymentProcessorId = paymentMethod.getPaymentProcessor().getID();
-            if (paymentProcessorId == 'SEZZLE_PAYMENT') {
+            if (paymentProcessorId === 'SEZZLE_PAYMENT') {
                 return paymentInstrument;
             }
         }
@@ -98,10 +99,9 @@ sezzleBmHelper.getSezzlePaymentInstrument = function (basket) {
  * Return Order Subtotal
  *
  * @param {dw.order.Order} order Order
- * @returns {money} order subtotal
+ * @returns {dw.value.Money} order subtotal
  */
 sezzleBmHelper.getSubtotal = function (order) {
-    var items = [];
     var productLineItems = order.getProductLineItems().iterator();
 
     var subtotal = 0.00;
@@ -132,7 +132,7 @@ sezzleBmHelper.updateOrderTransaction = function (order, isCustomOrder, transact
     try {
         updateOrderData(order, transactionID, methodName, amount);
     } catch (error) {
-    	logger.debug('sezzleBmHelper.updateOrderTransaction.- {0}', error);
+        logger.debug('sezzleBmHelper.updateOrderTransaction.- {0}', error);
         return false;
     }
 

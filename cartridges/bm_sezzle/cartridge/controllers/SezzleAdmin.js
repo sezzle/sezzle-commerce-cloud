@@ -20,7 +20,7 @@ var CSRFProtection = require('dw/web/CSRFProtection');
 function getOrders(orderNo, referenceID) {
     var systemOrders = dw.object.SystemObjectMgr.querySystemObjects('Order', 'orderNo LIKE {0} AND custom.SezzleExternalId !=null AND status != {1}', 'creationDate desc', orderNo, dw.order.Order.ORDER_STATUS_FAILED);
     if (referenceID) {
-    	systemOrders = dw.object.SystemObjectMgr.querySystemObjects('Order', 'custom.SezzleExternalId = {0} AND status != {1}', 'creationDate desc', referenceID, dw.order.Order.ORDER_STATUS_FAILED);
+        systemOrders = dw.object.SystemObjectMgr.querySystemObjects('Order', 'custom.SezzleExternalId = {0} AND status != {1}', 'creationDate desc', referenceID, dw.order.Order.ORDER_STATUS_FAILED);
     }
     var orders = new dw.util.ArrayList(); // eslint-disable-line no-shadow
     var order;
@@ -37,7 +37,7 @@ function getOrders(orderNo, referenceID) {
     }
 
     while (systemOrders.hasNext()) {
-        orderIndex++;
+        orderIndex += 1;
 
         if (orderIndex > maxSystemOrdersCount) {
             break;
@@ -50,8 +50,8 @@ function getOrders(orderNo, referenceID) {
 
         var sezzleAuthExpiration = 'NIL';
         if (order.custom.SezzleAuthExpiration != null) {
-        	var sezzleAuthExpirationTimestamp = new Date(sezzleUtils.getFormattedDateTimestamp(order.custom.SezzleAuthExpiration));
-        	sezzleAuthExpiration = dw.util.StringUtils.formatCalendar(new dw.util.Calendar(sezzleAuthExpirationTimestamp), 'M/dd/yy h:mm a');
+            var sezzleAuthExpirationTimestamp = new Date(sezzleUtils.getFormattedDateTimestamp(order.custom.SezzleAuthExpiration));
+            sezzleAuthExpiration = dw.util.StringUtils.formatCalendar(new dw.util.Calendar(sezzleAuthExpirationTimestamp), 'M/dd/yy h:mm a');
         }
         orderDate = new Date(order.creationDate);
         obj = {
@@ -82,7 +82,7 @@ function getOrders(orderNo, referenceID) {
  * @param {Object} data - pdict data
  */
 function render(templateName, data) {
-    if (typeof data != 'object') {
+    if (typeof data !== 'object') {
         data = {}; // eslint-disable-line no-param-reassign
     }
     try {
@@ -100,7 +100,7 @@ function render(templateName, data) {
 function renderJson(responseResult, responseData) {
     var data = {};
     if (!empty(responseData)) {
-    	data.ack = 'Success';
+        data.ack = 'Success';
     }
     if (!empty(responseResult)) {
         data.result = responseResult;
@@ -146,7 +146,7 @@ function orders() {
     if (alternativeFlow) {
         orderNo = empty(request.httpParameterMap.orderNo.stringValue) ? '*' : request.httpParameterMap.orderNo.stringValue;
         orderNo = request.httpParameterMap.transactionId.submitted ? '0' : orderNo;
-        orderNo = request.httpParameterMap.transactionId.stringValue == '' ? '*' : orderNo;
+        orderNo = request.httpParameterMap.transactionId.stringValue === '' ? '*' : orderNo;
     }
 
     try {
@@ -159,7 +159,7 @@ function orders() {
 
     var pageSize = !empty(request.httpParameterMap.pagesize.intValue) ? request.httpParameterMap.pagesize.intValue : 10;
     var currentPage = request.httpParameterMap.page.intValue ? request.httpParameterMap.page.intValue : 1;
-    pageSize = pageSize == 0 ? orders.length : pageSize;
+    pageSize = pageSize === 0 ? orders.length : pageSize;
     var start = pageSize * (currentPage - 1);
     var orderPagingModel = new dw.web.PagingModel(orders);
 
@@ -199,7 +199,7 @@ function orderTransaction() {
     var capturedAmountInFloat = parseFloat(capturedAmountStr.replace(order.currencyCode, ''));
 
 
-    if (sezzlePaymentAction == 'AUTH' && order.custom.SezzleAuthExpiration) {
+    if (sezzlePaymentAction === 'AUTH' && order.custom.SezzleAuthExpiration) {
         var currentTimestamp = Date.now();
         var authExpirationTimestamp = sezzleUtils.getFormattedDateTimestamp(order.custom.SezzleAuthExpiration);
         if (currentTimestamp > authExpirationTimestamp) {
@@ -214,9 +214,6 @@ function orderTransaction() {
 
     var refundedAmountStr = order.custom.SezzleRefundedAmount || '0.00';
     var refundedAmountInFloat = parseFloat(refundedAmountStr.replace(order.currencyCode, ''));
-
-    var releasedAmountStr = order.custom.SezzleReleasedAmount || '0.00';
-    var releasedAmountInFloat = parseFloat(releasedAmountStr.replace(order.currencyCode, ''));
 
     if (authAmountInFloat > capturedAmountInFloat) {
         canCapture = true;
@@ -256,50 +253,48 @@ function action() {
 
 
     try {
-	    if (!params.helperAction.submitted) {
-	        var methodName = params.methodName.stringValue;
-	        var methodData = params;
-	        var orderNo = params.orderNo.stringValue;
-	        var transactionResult = false;
+        if (!params.helperAction.submitted) {
+            var methodName = params.methodName.stringValue;
+            var orderNo = params.orderNo.stringValue;
 
-	        if (orderNo) {
-	        	order = dw.order.OrderMgr.getOrder(orderNo);
-	        } else {
-	            errorMsg.put('l_longmessage0', 'Order No missing');
-	            renderJson('Error', errorMsg);
-	            return;
-	        }
+            if (orderNo) {
+                order = dw.order.OrderMgr.getOrder(orderNo);
+            } else {
+                errorMsg.put('l_longmessage0', 'Order No missing');
+                renderJson('Error', errorMsg);
+                return;
+            }
 
 
-	        var amtInCents = dw.value.Money(params.amt, order.currencyCode).multiply(100).getValue();
-	        var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
-	    	var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
-	    	var authAmountInCents = new Money(authAmountInFloat, order.currencyCode).multiply(100).getValue();
+            var amtInCents = dw.value.Money(params.amt, order.currencyCode).multiply(100).getValue();
+            var authAmountStr = order.custom.SezzleOrderAmount || '0.00';
+            var authAmountInFloat = parseFloat(authAmountStr.replace(order.currencyCode, ''));
+            var authAmountInCents = new Money(authAmountInFloat, order.currencyCode).multiply(100).getValue();
 
-	        if (methodName == 'DoCapture') {
-	        	var isPartialCapture = (amtInCents < authAmountInCents);
-	        	callApiResponse = v2.capture(order, amtInCents, isPartialCapture);
-	        } else if (methodName == 'DoRefund') {
-	        	callApiResponse = v2.refund(order, amtInCents);
-	        } else if (methodName == 'DoRelease') {
-	        	callApiResponse = v2.release(order, amtInCents);
-	        }
+            if (methodName === 'DoCapture') {
+                var isPartialCapture = (amtInCents < authAmountInCents);
+                callApiResponse = v2.capture(order, amtInCents, isPartialCapture);
+            } else if (methodName === 'DoRefund') {
+                callApiResponse = v2.refund(order, amtInCents);
+            } else if (methodName === 'DoRelease') {
+                callApiResponse = v2.release(order, amtInCents);
+            }
 
-	        if (callApiResponse == null || callApiResponse.error) {
-	        	throw new Error('SezzleAdmin.API Call failed - {0}', methodName);
-	        }
+            if (callApiResponse == null || callApiResponse.error) {
+                throw new Error('SezzleAdmin.API Call failed - {0}', methodName);
+            }
 
-        	logger.debug('SezzleAdmin.API Call successfull - {0}', methodName);
-        	Transaction.wrap(function () {
-                transactionResult = sezzleBmHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt);
+            logger.debug('SezzleAdmin.API Call successfull - {0}', methodName);
+            Transaction.wrap(function () {
+                sezzleBmHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt);
             });
-	    } else {
-	    	logger.debug('SezzleAdmin.Failed to get post data from form');
-	        responseResult = 'Error';
-	    }
+        } else {
+            logger.debug('SezzleAdmin.Failed to get post data from form');
+            responseResult = 'Error';
+        }
     } catch (e) {
-    	logger.debug('SezzleAdmin.action.- {0}', e);
-    	responseResult = 'Error';
+        logger.debug('SezzleAdmin.action.- {0}', e);
+        responseResult = 'Error';
     }
     renderJson(responseResult, callApiResponse);
 }

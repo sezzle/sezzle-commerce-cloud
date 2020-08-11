@@ -5,25 +5,15 @@
  *
  * @module controllers/Sezzle
  */
-var SEZZLE_PAYMENT_METHOD = 'Sezzle';
 var Resource = require('dw/web/Resource');
-var PaymentTransaction = require('dw/order/PaymentTransaction');
 var URLUtils = require('dw/web/URLUtils');
 var server = require('server');
 var BasketMgr = require('dw/order/BasketMgr');
-var ISML = require('dw/template/ISML');
 var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
-var sezzleSFRAHelper = require('*/cartridge/scripts/checkout/checkoutHelpers');
-
-
-var Status = require('dw/system/Status');
 var Transaction = require('dw/system/Transaction');
-var PaymentMgr = require('dw/order/PaymentMgr');
-var Order = require('dw/order/Order');
 var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
 var sezzle = require('*/cartridge/scripts/sezzle');
 var OrderModel = require('*/cartridge/models/order');
-var sezzleData = require('*/cartridge/scripts/data/sezzleData');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 var consentTracking = require('*/cartridge/scripts/middleware/consentTracking');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
@@ -70,7 +60,7 @@ server.get('Redirect', function (req, res, next) {
         var orderLinks = checkoutObject.checkout.order_links;
 
         if (orderLinks) {
-            for (var k in orderLinks) {
+            for (var k = 0; k < orderLinks.length; k++) { // eslint-disable-line no-plusplus
                 var link = orderLinks[k],
                     rel = link.rel,
                     method = link.method;
@@ -178,12 +168,16 @@ server.get(
         }
         logger.debug('Post process successfully completed');
 
- 	    var config = {
- 	        numberOfLineItems: '*'
- 	    };
+        var config = {
+            numberOfLineItems: '*'
+        };
 
         var currentLocale = Locale.getLocale(req.locale.id);
-        var orderModel = new OrderModel(order, { config: config, countryCode: currentLocale.country, containerView: 'order' });
+        var orderModel = new OrderModel(order, {
+            config: config,
+            countryCode: currentLocale.country,
+            containerView: 'order'
+        });
 
         var reportingURLs = reportingUrlsHelper.getOrderReportingURLs(order);
 
@@ -199,8 +193,8 @@ server.get(
 
 
         if (!req.currentCustomer.profile && !profile) {
-    	logger.debug('Guest order has been created');
-    	passwordForm = server.forms.getForm('newPasswords');
+            logger.debug('Guest order has been created');
+            passwordForm = server.forms.getForm('newPasswords');
             passwordForm.clear();
             res.render('checkout/confirmation/confirmation', {
                 order: orderModel,
@@ -209,8 +203,8 @@ server.get(
                 reportingURLs: reportingURLs
             });
         } else {
-    	logger.debug('Registered customer order has been created');
-    	COHelpers.sendConfirmationEmail(order, req.locale.id);
+            logger.debug('Registered customer order has been created');
+            COHelpers.sendConfirmationEmail(order, req.locale.id);
             res.render('checkout/confirmation/confirmation', {
                 order: orderModel,
                 returningCustomer: true

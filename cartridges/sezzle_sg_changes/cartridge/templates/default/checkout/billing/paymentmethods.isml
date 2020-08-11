@@ -16,7 +16,7 @@
 				<isif condition="${paymentMethodType.value.equals(dw.order.PaymentInstrument.METHOD_GIFT_CERTIFICATE)}"><iscontinue/></isif>
 
 				<isif condition="${paymentMethodType.value.equals('Sezzle')}">
-			<isinclude template="sezzle/paymentmethodinput" />
+			<isinclude template="sezzle/paymentMethodInput" />
 		<iselse/>
 			<div class="form-row label-inline">
 			<isset name="radioID" value="${paymentMethodType.value}" scope="page"/>
@@ -144,7 +144,7 @@
 			--------------------------------------------------------------
 		</iscomment>
 		
-		<isinclude template="sezzle/sezzlepaymentmethod" />
+		<isinclude template="sezzle/sezzlePaymentMethod" />
 		
 
 		<div class="payment-method <isif condition="${!empty(pdict.selectedPaymentID) && pdict.selectedPaymentID=='PayPal'}">payment-method-expanded</isif>" data-method="Custom">

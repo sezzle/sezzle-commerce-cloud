@@ -17,7 +17,8 @@ module.exports = function (array) {
                 return i < items.length;
             },
             next: function () {
-                return items[i++];
+                i += 1;
+                return items[i];
             }
         };
     };
