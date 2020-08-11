@@ -19,7 +19,7 @@ var sezzle = require('*/cartridge/scripts/sezzle'),
 var Status = require('dw/system/Status');
 var Transaction = require('dw/system/Transaction');
 var Order = require('dw/order/Order');
-var logger = require('dw/system').Logger.getLogger('Sezzle','');
+var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 
 /**
  * Redirects the user to Sezzle's checkout

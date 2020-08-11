@@ -1,12 +1,6 @@
 {
     "root": true,
-    "extends": "@jenssimon/sfcc/sfra",
-    "parserOptions": {
-        "ecmaVersion": 2015,
-        "ecmaFeatures": {
-            "impliedStrict": true
-        }
-    },
+    "extends": "airbnb-base/legacy",
     "rules": {
         "import/no-unresolved": "off",
         "indent": ["error", 4, { "SwitchCase": 1, "VariableDeclarator": 1 }],
@@ -16,7 +10,6 @@
         "vars-on-top": "off",
         "global-require": "off",
         "no-shadow": ["error", { "allow": ["err", "callback"]}],
-        "max-len": "off",
-        "linebreak-style": ["error", "windows"]
+        "max-len": "off"
     }
 }

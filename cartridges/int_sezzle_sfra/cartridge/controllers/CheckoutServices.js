@@ -36,8 +36,8 @@ server.prepend(
             contactInfoFormErrors = {},
             viewData = {};
 
-        if (paymentMethodID != 'Sezzle') {
-        	return next();
+        if (paymentMethodID !== 'Sezzle') {
+            return next();
         }
 
 
@@ -100,7 +100,6 @@ server.prepend(
 
             this.on('route:BeforeComplete',
                 function (req, res) { // eslint-disable-line no-shadow
-                    var CustomerMgr = require('dw/customer/CustomerMgr');
                     var HookMgr = require('dw/system/HookMgr');
                     var Resource = require('dw/web/Resource');
                     var PaymentMgr = require('dw/order/PaymentMgr');
@@ -108,9 +107,7 @@ server.prepend(
                     var AccountModel = require('*/cartridge/models/account');
                     var OrderModel = require('*/cartridge/models/order');
                     var URLUtils = require('dw/web/URLUtils');
-                    var array = require('*/cartridge/scripts/util/array');
                     var Locale = require('dw/util/Locale');
-                    var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
                     var hooksHelper = require('*/cartridge/scripts/helpers/hooks'),
 
                         billingData = res.getViewData();
@@ -155,9 +152,9 @@ server.prepend(
                             currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
                         }
 
-                        if (paymentMethodID == 'Sezzle') {
+                        if (paymentMethodID === 'Sezzle') {
                             if (req.currentCustomer.profile) {
-                            	currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
+                                currentBasket.setCustomerEmail(req.currentCustomer.profile.email);
                             } else {
                                 currentBasket.setCustomerEmail(billingData.email.value);
                             }
@@ -223,18 +220,19 @@ server.prepend(
 
                     var usingMultiShipping = req.session.privacyCache.get('usingMultiShipping');
 
-                    if (usingMultiShipping == true && currentBasket.shipments.length < 2) {
+                    if (usingMultiShipping === true && currentBasket.shipments.length < 2) {
                         req.session.privacyCache.set('usingMultiShipping',
                             false);
                         usingMultiShipping = false;
                     }
 
-                    if (paymentMethodID != 'Sezzle') {
+                    if (paymentMethodID !== 'Sezzle') {
                         hooksHelper('app.customer.subscription',
                             'subscribeTo',
                             [paymentForm.subscribe.checked,
                                 billingForm.email.htmlValue],
-                            function () {});
+                            function () {
+                            });
                     }
 
                     var currentLocale = Locale.getLocale(req.locale.id),
@@ -273,10 +271,9 @@ server.prepend(
 
 server.prepend('PlaceOrder',
     server.middleware.https,
-    function (req, res, next) {
+    function (req, res, next) { // eslint-disable-line consistent-return
         var BasketMgr = require('dw/order/BasketMgr');
         var URLUtils = require('dw/web/URLUtils');
-        var sezzleData = require('*/cartridge/scripts/data/sezzleData');
         var paymentMethod = '';
 
         var currentBasket = BasketMgr.getCurrentBasket();
@@ -296,7 +293,7 @@ server.prepend('PlaceOrder',
         var paymentInstruments = currentBasket.paymentInstruments;
 
         if (paymentInstruments.length <= 0) {
-        	res.json({
+            res.json({
                 error: true,
                 cartError: true,
                 fieldErrors: [],
@@ -310,7 +307,7 @@ server.prepend('PlaceOrder',
         paymentMethod = paymentInstruments[paymentInstruments.length - 1].paymentMethod;
 
 
-        if (paymentMethod == 'Sezzle') {
+        if (paymentMethod === 'Sezzle') {
             logger.debug('Selected payment method : {0}',
                 paymentMethod);
             res.json({

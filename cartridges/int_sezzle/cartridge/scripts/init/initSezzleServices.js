@@ -2,19 +2,7 @@
  * This script used for init and configure Sezzle services
  *
  */
-
-/**
- * Get Auth Header
- *
- * @param {dw.system.Site} currentSite Current Site
- * @returns {string} auth header
- */
-var getAuthHeader = function (currentSite) {
-    var authString = currentSite.getCustomPreferenceValue('SezzlePublicKey')
-            + ':' + currentSite.getCustomPreferenceValue('SezzlePrivateKey');
-    return 'Basic ' + require('dw/util/StringUtils').encodeBase64(authString);
-};
-
+/* global empty */
 /**
  * Create Common Request
  *
@@ -26,9 +14,9 @@ var commonCreateRequest = function (svc, args) {
     svc.setRequestMethod('POST');
     svc.addHeader('Content-Type', 'application/json');
     if (!empty(args)) {
-    	if (args.httpMethod) {
-    		svc.setRequestMethod(args.httpMethod);
-    	}
+        if (args.httpMethod) {
+            svc.setRequestMethod(args.httpMethod);
+        }
         if (args.authToken) {
             svc.addHeader('Authorization', 'Bearer ' + args.authToken);
         }
@@ -46,7 +34,7 @@ var commonCreateRequest = function (svc, args) {
  */
 function filterSensitiveData(key, value) {
     var identifiers = ['public_key', 'private_key', 'billing', 'shipping', 'token', 'authToken', 'merchant_uuid'];
-    if (identifiers.indexOf(key) != -1) {
+    if (identifiers.indexOf(key) !== -1) {
         return '****';
     }
     return value;
@@ -60,12 +48,13 @@ function filterSensitiveData(key, value) {
  */
 function printValues(obj) {
     var result = '\n';
-    for (var k in obj) {
-        obj[k] = filterSensitiveData(k, obj[k]);
-        if (obj[k] instanceof Object) {
-            result += printValues(obj[k]);
+    var reqObj = obj;
+    for (var k = 0; k < reqObj.length; k++) { // eslint-disable-line no-plusplus
+        reqObj[k] = filterSensitiveData(k, reqObj[k]);
+        if (reqObj[k] instanceof Object) {
+            result += printValues(reqObj[k]);
         } else {
-            result += decodeURIComponent(k + ' = ' + obj[k]) + '\n';
+            result += decodeURIComponent(k + ' = ' + reqObj[k]) + '\n';
         }
     }
     return result;
@@ -82,8 +71,7 @@ function prepareLogData(data) {
         return 'Data of response or request is null';
     }
     var obj = JSON.parse(data);
-    var result = printValues(obj);
-    return result;
+    return printValues(obj);
 }
 
 /**

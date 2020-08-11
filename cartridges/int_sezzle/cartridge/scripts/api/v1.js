@@ -1,31 +1,31 @@
 (function () {
     /**
-	 * Creates library-wrapper for Sezzle API
-	 *
-	 * @constructor
-	 * @this {Api}
-	 */
+     * Creates library-wrapper for Sezzle API
+     *
+     * @constructor
+     * @this {Api}
+     */
     var V1Api = function () {
-        var self = this,
-            sezzleData = require('*/cartridge/scripts/data/sezzleData'),
-            logger = require('dw/system').Logger.getLogger('Sezzle', ''),
-            service = require('*/cartridge/scripts/init/initSezzleServices');
+        var self = this;
+        var sezzleData = require('*/cartridge/scripts/data/sezzleData');
+        var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+        var service = require('*/cartridge/scripts/init/initSezzleServices');
 
         /**
-		 * Authenticate the merchant by public and private key
-		 *
-		 * @returns {Object} auth token object
-		 */
+         * Authenticate the merchant by public and private key
+         *
+         * @returns {Object} auth token object
+         */
         self.authenticate = function () {
             try {
                 var sezzleService = service.initService('sezzle.authenticate');
-                var public_key = sezzleData.getPublicKey();
-                var private_key = sezzleData.getPrivateKey();
+                var publicKey = sezzleData.getPublicKey();
+                var privateKey = sezzleData.getPrivateKey();
 
                 sezzleService.URL = sezzleData.getV1URLPath() + 'authentication/';
                 var resp = sezzleService.call({
-                    public_key: public_key,
-                    private_key: private_key
+                    public_key: publicKey,
+                    private_key: privateKey
                 });
                 return resp.object;
             } catch (e) {
@@ -37,13 +37,12 @@
         };
 
         /**
-		 * Capture charge by order reference ID
-		 *
-		 * @param {string} order_reference_id ref
-		 * @param {string} order_number order number
-		 * @returns {Object} status
-		 */
-        self.capture = function (order_reference_id, order_number) {
+         * Capture charge by order reference ID
+         *
+         * @param {string} orderReferenceID ref
+         * @returns {Object} status
+         */
+        self.capture = function (orderReferenceID) {
             try {
                 var authentication = self.authenticate();
                 var obj = {
@@ -51,7 +50,7 @@
                 };
 
                 var sezzleService = service.initService('sezzle.capture');
-                sezzleService.URL = sezzleData.getV1URLPath() + 'checkouts/' + order_reference_id + '/complete' + '?order_no=' + order_number;
+                sezzleService.URL = sezzleData.getV1URLPath() + 'checkouts/' + orderReferenceID + '/complete';
                 return sezzleService.call(obj).object;
             } catch (e) {
                 logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
@@ -62,12 +61,12 @@
         };
 
         /**
-		 * Refund payment by order reference ID
-		 *
-		 * @param {string} order_reference_id Ref ID
-		 * @returns {Object} status
+         * Refund payment by order reference ID
+         *
+         * @param {string} orderReferenceID Ref ID
+         * @returns {Object} status
          * */
-        self.refund = function (order_reference_id) {
+        self.refund = function (orderReferenceID) {
             try {
                 var authentication = self.authenticate();
                 var obj = {
@@ -77,7 +76,7 @@
                 };
                 var sezzleService = service.initService('sezzle.refund');
 
-                sezzleService.URL = sezzleData.getV1URLPath() + 'orders/' + order_reference_id + '/refund';
+                sezzleService.URL = sezzleData.getV1URLPath() + 'orders/' + orderReferenceID + '/refund';
 
                 return sezzleService.call(obj).object;
             } catch (e) {
@@ -89,20 +88,21 @@
         };
 
         /**
-		 * Create a checkout - fetch the checkout url
-		 *
-		 * @param {Object} checkoutObject Checkout Object
-		 * @returns {Object} object with checkout url
-		 */
+         * Create a checkout - fetch the checkout url
+         *
+         * @param {Object} checkoutObject Checkout Object
+         * @returns {Object} object with checkout url
+         */
         self.createCheckout = function (checkoutObject) {
             try {
                 var authentication = self.authenticate();
-                checkoutObject.authToken = authentication.response.token;
-                logger.debug('Token', checkoutObject.authToken);
+                var payloadObj = checkoutObject;
+                payloadObj.authToken = authentication.response.token;
+                logger.debug('Token', payloadObj.authToken);
                 var sezzleService = service.initService('sezzle.initiatecheckout');
 
                 sezzleService.URL = sezzleData.getV1URLPath() + 'checkouts/';
-                return sezzleService.call(checkoutObject).object;
+                return sezzleService.call(payloadObj).object;
             } catch (e) {
                 logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
                 return {

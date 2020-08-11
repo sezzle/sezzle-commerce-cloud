@@ -2,9 +2,10 @@ var LocalServiceRegistry = function () {};
 
 LocalServiceRegistry.createService = function (name, obj) {
     return function () {
-        obj.name = name;
-        Object.assign(obj, this);
-        this.object = obj;
+        var reqObj = obj;
+        reqObj.name = name;
+        Object.assign(reqObj, this);
+        this.object = reqObj;
         return this;
     };
 };

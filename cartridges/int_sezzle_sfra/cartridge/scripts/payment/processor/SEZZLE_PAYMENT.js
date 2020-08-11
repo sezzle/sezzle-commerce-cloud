@@ -10,7 +10,6 @@ var BasketMgr = require('dw/order/BasketMgr');
 var Transaction = require('dw/system/Transaction');
 var sezzleUtils = require('*/cartridge/scripts/sezzle');
 var OrderMgr = require('dw/order/OrderMgr');
-var Order = require('dw/order/Order');
 var Money = require('dw/value/Money');
 var logger = require('dw/system').Logger.getLogger('Sezzle', '');
 
@@ -51,7 +50,7 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor) {
             order_uuid: session.privacy.orderUUID,
             events: [{ id: session.privacy.sezzleFirstEventID }],
             amount: session.privacy.sezzleOrderAmount,
-            type: "sfra",
+            type: 'sfra',
             order_links: {
                 get_order: session.privacy.getOrderLink,
                 update_order: session.privacy.updateOrderLink,
@@ -60,7 +59,7 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor) {
                 release_payment: session.privacy.releasePaymentLink
             }
         };
-        sezzleUtils.order.updateAttributes(order, sezzleResponseObject, paymentProcessor, paymentInstrument);
+        sezzleUtils.order.updateAttributes(order, sezzleResponseObject);
     });
     return { authorized: true };
 }

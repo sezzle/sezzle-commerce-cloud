@@ -1,9 +1,8 @@
 'use strict';
 
-var SezzlePaymentMethod = 'Sezzle';
+/* global empty */
 var BasketMgr = require('dw/order/BasketMgr');
 var sezzle = require('*/cartridge/scripts/sezzle');
-var v2 = require('*/cartridge/scripts/api/v2');
 var sezzleData = require('~/cartridge/scripts/data/sezzleData');
 var Transaction = require('dw/system/Transaction');
 var Order = require('dw/order/Order');
@@ -25,7 +24,7 @@ function checkCart(cart) {
     var paymentInstruments = basket.paymentInstruments;
     var paymentMethod = '';
 
-    for (var i = 0; i < paymentInstruments.length; i++) {
+    for (var i = 0; i < paymentInstruments.length; i++) { // eslint-disable-line no-plusplus
         var paymentInstrument = paymentInstruments[i];
         paymentMethod = paymentInstrument.paymentMethod;
     }
@@ -38,7 +37,7 @@ function checkCart(cart) {
         };
     }
 
-    if (!sezzle.data.getSezzleOnlineStatus() || paymentMethod != 'Sezzle') {
+    if (!sezzle.data.getSezzleOnlineStatus() || paymentMethod !== 'Sezzle') {
         return {
             status: {
                 error: false
@@ -60,11 +59,12 @@ function checkCart(cart) {
  */
 function storeTokenizeRecord(order, tokenizeObject) {
     try {
+        var orderObj = order;
         if (empty(tokenizeObject)) {
             throw new Error('{tokenizeObject} is empty');
         }
 
-        if (tokenizeObject.token != '') {
+        if (tokenizeObject.token !== '') {
             if (!tokenizeObject.is_customer_tokenized) {
                 throw new Error('Customer not tokenized by Sezzle. Bypassing storing');
             }
@@ -82,16 +82,16 @@ function storeTokenizeRecord(order, tokenizeObject) {
                     profile.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
                     var customerLinks = tokenDetails.response.customer.links;
                     if (customerLinks) {
-                        for (var k in customerLinks) {
+                        for (var k = 0; k < customerLinks.length; k++) { // eslint-disable-line no-plusplus
                             var link = customerLinks[k];
                             switch (link.rel) {
                                 case 'order':
-                                    if (link.method == 'POST') {
+                                    if (link.method === 'POST') {
                                         profile.custom.SezzleCustomerCreateOrderLink = link.href;
                                     }
                                     break;
                                 case 'self':
-                                    if (link.method == 'GET') {
+                                    if (link.method === 'GET') {
                                         profile.custom.SezzleGetCustomerLink = link.href;
                                     }
                                     break;
@@ -102,14 +102,14 @@ function storeTokenizeRecord(order, tokenizeObject) {
                     }
                 }
 
-                order.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
-                order.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
+                orderObj.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
+                orderObj.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
             });
             logger.debug('Tokenize record successfully stored in Order and Profile');
-        } else if (tokenizeObject.customer_uuid != '' && tokenizeObject.customer_uuid_expiration != '') {
+        } else if (tokenizeObject.customer_uuid !== '' && tokenizeObject.customer_uuid_expiration !== '') {
             Transaction.wrap(function () {
-                order.custom.SezzleCustomerUUID = tokenizeObject.customer_uuid;
-                order.custom.SezzleCustomerUUIDExpiration = tokenizeObject.customer_uuid_expiration;
+                orderObj.custom.SezzleCustomerUUID = tokenizeObject.customer_uuid;
+                orderObj.custom.SezzleCustomerUUIDExpiration = tokenizeObject.customer_uuid_expiration;
             });
             logger.debug('Tokenize record successfully stored in Order and Profile');
         }
@@ -126,22 +126,23 @@ function storeTokenizeRecord(order, tokenizeObject) {
  * @returns {boolean} status
  */
 function postProcess(order) {
-    var canCapture = sezzleData.getSezzlePaymentAction() == 'CAPTURE';
+    var orderObj = order;
+    var canCapture = String(sezzleData.getSezzlePaymentAction()) === 'CAPTURE';
     try {
         Transaction.wrap(function () {
             if (canCapture) {
-                sezzle.order.captureOrder(order);
-                order.custom.SezzleCapturedAmount = order.totalGrossPrice.toString();
-                order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-                order.setStatus(Order.ORDER_STATUS_COMPLETED);
+                sezzle.order.captureOrder(orderObj);
+                orderObj.custom.SezzleCapturedAmount = orderObj.totalGrossPrice.toString();
+                orderObj.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
+                orderObj.setStatus(Order.ORDER_STATUS_COMPLETED);
                 logger.debug('Payment has been captured successfully by Sezzle');
             }
-            if (order.custom.SezzleOrderUUID) {
-                var sezzleOrder = sezzle.order.getOrderByOrderUUID(order);
+            if (orderObj.custom.SezzleOrderUUID) {
+                var sezzleOrder = sezzle.order.getOrderByOrderUUID(orderObj);
                 if (!sezzleOrder.error && !canCapture) {
-                    order.custom.SezzleAuthExpiration = sezzleOrder.response.authorization.expiration;
+                    orderObj.custom.SezzleAuthExpiration = sezzleOrder.response.authorization.expiration;
                 }
-                sezzle.order.updateOrder(order);
+                sezzle.order.updateOrder(orderObj);
                 logger.debug('SFCC Order No has been successfully updated in the corresponding Sezzle order');
             }
         });
@@ -170,11 +171,7 @@ function init(basket, applicablePaymentMethods) {
  */
 function isSezzleApplicable() {
     var basket = BasketMgr.getCurrentBasket();
-    if (!basket.getGiftCertificateLineItems().empty || !sezzle.data.getSezzleOnlineStatus() || sezzle.data.getSezzlePaymentOnlineStatus() || !sezzle.utils.checkBasketTotalRange('object' in basket ? basket.object : basket)) {
-        return false;
-    }
-
-    return true;
+    return !(!basket.getGiftCertificateLineItems().empty || !sezzle.data.getSezzleOnlineStatus() || sezzle.data.getSezzlePaymentOnlineStatus() || !sezzle.utils.checkBasketTotalRange('object' in basket ? basket.object : basket));
 }
 
 module.exports = {
