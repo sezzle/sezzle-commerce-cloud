@@ -11,7 +11,7 @@ var Transaction = require('dw/system/Transaction');
 var sezzleUtils = require('*/cartridge/scripts/sezzle');
 var OrderMgr = require('dw/order/OrderMgr');
 var Money = require('dw/value/Money');
-var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
 
 /*
  * Export the publicly available controller methods
@@ -34,10 +34,10 @@ function authorize(orderNumber, paymentInstrument, paymentProcessor) {
 
     // Check the reference token passed during redirection
     var reference_id = request.httpParameterMap.order_reference_id;
-    logger.debug('Sezzle Payment Reference Id - {0}', reference_id);
+    logger.info('Sezzle Payment Reference Id - {0}', reference_id);
 
     if (session.privacy.referenceId != reference_id) {
-        logger.debug('Sezzle Error - Reference ID has changed');
+        logger.error('Sezzle Error - Reference ID has changed');
         return { error: true };
     }
 

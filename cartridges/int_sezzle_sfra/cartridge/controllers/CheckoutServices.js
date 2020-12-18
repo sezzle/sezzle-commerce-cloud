@@ -6,7 +6,7 @@ var server = require('server');
 
 var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
-var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
 
 server.extend(page);
 
@@ -19,7 +19,7 @@ server.prepend(
     server.middleware.https,
     csrfProtection.validateAjaxRequest,
     function (req, res, next) {
-        logger.debug('****Checkout Started****');
+        logger.info('****Checkout Started****');
         var data = res.getViewData();
         var BasketMgr = require('dw/order/BasketMgr'),
             currentBasket = BasketMgr.getCurrentBasket();
@@ -274,8 +274,13 @@ server.prepend('PlaceOrder',
     function (req, res, next) { // eslint-disable-line consistent-return
         var BasketMgr = require('dw/order/BasketMgr');
         var URLUtils = require('dw/web/URLUtils');
-        var paymentMethod = '';
-
+	    var Resource = require('dw/web/Resource');
+	    var Transaction = require('dw/system/Transaction');
+	    var URLUtils = require('dw/web/URLUtils');
+	    var basketCalculationHelpers = require('*/cartridge/scripts/helpers/basketCalculationHelpers');
+	    var hooksHelper = require('*/cartridge/scripts/helpers/hooks');
+	    var COHelpers = require('*/cartridge/scripts/checkout/checkoutHelpers');
+	    var validationHelpers = require('*/cartridge/scripts/helpers/basketValidationHelpers');
         var currentBasket = BasketMgr.getCurrentBasket();
 
         if (!currentBasket) {
@@ -304,20 +309,107 @@ server.prepend('PlaceOrder',
             return next();
         }
 
-        paymentMethod = paymentInstruments[paymentInstruments.length - 1].paymentMethod;
+        var paymentMethod = paymentInstruments[paymentInstruments.length - 1].paymentMethod;
+        if (paymentMethod !== 'Sezzle') {
+			return next();
+		}
 
+	    var validatedProducts = validationHelpers.validateProducts(currentBasket);
+	    if (validatedProducts.error) {
+	        res.json({
+	            error: true,
+	            cartError: true,
+	            fieldErrors: [],
+	            serverErrors: [],
+	            redirectUrl: URLUtils.url('Cart-Show').toString()
+	        });
+	        return next();
+	    }
 
-        if (paymentMethod === 'Sezzle') {
-            logger.debug('Selected payment method : {0}',
-                paymentMethod);
-            res.json({
-                error: false,
-                continueUrl: URLUtils.url('Sezzle-Redirect').toString()
-            });
-            this.emit('route:Complete',
-                req,
-                res);
-        }
+	    if (req.session.privacyCache.get('fraudDetectionStatus')) {
+	        res.json({
+	            error: true,
+	            cartError: true,
+	            redirectUrl: URLUtils.url('Error-ErrorCode', 'err', '01').toString(),
+	            errorMessage: Resource.msg('error.technical', 'checkout', null)
+	        });
+
+	        return next();
+	    }
+
+	    var validationOrderStatus = hooksHelper('app.validate.order', 'validateOrder', currentBasket, require('*/cartridge/scripts/hooks/validateOrder').validateOrder);
+	    if (validationOrderStatus.error) {
+	        res.json({
+	            error: true,
+	            errorMessage: validationOrderStatus.message
+	        });
+	        return next();
+	    }
+
+	    // Check to make sure there is a shipping address
+	    if (currentBasket.defaultShipment.shippingAddress === null) {
+	        res.json({
+	            error: true,
+	            errorStage: {
+	                stage: 'shipping',
+	                step: 'address'
+	            },
+	            errorMessage: Resource.msg('error.no.shipping.address', 'checkout', null)
+	        });
+	        return next();
+	    }
+
+	    // Check to make sure billing address exists
+	    if (!currentBasket.billingAddress) {
+	        res.json({
+	            error: true,
+	            errorStage: {
+	                stage: 'payment',
+	                step: 'billingAddress'
+	            },
+	            errorMessage: Resource.msg('error.no.billing.address', 'checkout', null)
+	        });
+	        return next();
+	    }
+
+	    // Calculate the basket
+	    Transaction.wrap(function () {
+	        basketCalculationHelpers.calculateTotals(currentBasket);
+	    });
+
+	    // Re-validates existing payment instruments
+	    var validPayment = COHelpers.validatePayment(req, currentBasket);
+	    if (validPayment.error) {
+	        res.json({
+	            error: true,
+	            errorStage: {
+	                stage: 'payment',
+	                step: 'paymentInstrument'
+	            },
+	            errorMessage: Resource.msg('error.payment.not.valid', 'checkout', null)
+	        });
+	        return next();
+	    }
+
+	    // Re-calculate the payments.
+	    var calculatedPaymentTransactionTotal = COHelpers.calculatePaymentTransaction(currentBasket);
+	    if (calculatedPaymentTransactionTotal.error) {
+	        res.json({
+	            error: true,
+	            errorMessage: Resource.msg('error.technical', 'checkout', null)
+	        });
+	        return next();
+	    }
+
+        logger.info('Selected payment method : {0}',paymentMethod);
+        res.json({
+            error: false,
+            continueUrl: URLUtils.url('Sezzle-Redirect').toString()
+        });
+        this.emit('route:Complete',
+            req,
+            res);
+
     });
 
 module.exports = server.exports();

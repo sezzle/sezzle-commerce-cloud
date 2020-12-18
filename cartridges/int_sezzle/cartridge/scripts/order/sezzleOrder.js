@@ -8,7 +8,7 @@
      * @this {Order}
      */
     var Order = function () {
-        var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+        var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
         var OrderMgr = require('dw/order/OrderMgr');
         var OrderModel = require('dw/order/Order');
         var Money = require('dw/value/Money');
@@ -38,9 +38,9 @@
                     orderObj.custom.SezzleRefundPaymentLink = response.order_links.refund_payment;
                     orderObj.custom.SezzleReleasePaymentLink = response.order_links.release_payment;
                 }
-                logger.debug('Sezzle attributes has been updated in the Order object');
+                logger.info('Sezzle attributes has been updated in the Order object');
             } catch (e) {
-                logger.debug('sezzleOrder.updateAttributes.- {0}', e);
+                logger.error('sezzleOrder.updateAttributes.- {0}', e);
             }
         };
 
@@ -49,14 +49,19 @@
          *
          * @param {dw.order.Order} order Order
          * @param {string} apiVersion Api Version v1/v2
+		 * @returns {bool} status
          */
         this.captureOrder = function (order, apiVersion) {
             if (apiVersion === 'v1') {
-                v1.capture(order.custom.SezzleExternalId);
-                return;
-            }
-            var captureAmount = order.totalGrossPrice.multiply(100).getValue();
-            v2.capture(order, captureAmount, false);
+                var captureResponse = v1.capture(order.custom.SezzleExternalId);
+            } else {
+				var captureAmount = order.totalGrossPrice.multiply(100).getValue();
+            	var captureResponse = v2.capture(order, captureAmount, false);
+			}
+			if (captureResponse == null || captureResponse.error) {
+				return false;
+			}
+			return true;
         };
 
         /**
@@ -127,9 +132,9 @@
                     }
                 }, 'status = {0} AND custom.SezzleRefundedAmount = null',
                 OrderModel.ORDER_STATUS_CANCELLED);
-                logger.debug('Payment has been successfully refunded by Sezzle');
+                logger.info('Payment has been successfully refunded by Sezzle');
             } catch (e) {
-                logger.debug('sezzleOrder.refundOrders.- {0}', e);
+                logger.error('sezzleOrder.refundOrders.- {0}', e);
             }
         };
     };

@@ -8,7 +8,7 @@
     var V2Api = function () {
         var self = this;
         var sezzleData = require('*/cartridge/scripts/data/sezzleData');
-        var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+        var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
         var service = require('*/cartridge/scripts/init/initSezzleServices');
         var sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils');
 
@@ -18,28 +18,21 @@
          * @returns {Object} response object
          */
         self.authenticate = function () {
-            try {
-                if (sezzleUtils.getAuthToken() !== '') {
-                    return sezzleUtils.getAuthToken();
-                }
-                var sezzleService = service.initService('sezzle.authenticate');
-                var publicKey = sezzleData.getPublicKey();
-                var privateKey = sezzleData.getPrivateKey();
-
-                sezzleService.URL = sezzleData.getV2URLPath() + 'authentication';
-                var resp = sezzleService.call({
-                    public_key: publicKey,
-                    private_key: privateKey
-                });
-                var response = resp.object.response;
-                sezzleUtils.setAuthToken(response);
-                return response.token;
-            } catch (e) {
-                logger.debug('Api:authenticate. - {0}', e);
-                return {
-                    error: true
-                };
+            if (sezzleUtils.getAuthToken() !== '') {
+                return sezzleUtils.getAuthToken();
             }
+            var sezzleService = service.initService('sezzle.authenticate');
+            var publicKey = sezzleData.getPublicKey();
+            var privateKey = sezzleData.getPrivateKey();
+
+            sezzleService.URL = sezzleData.getV2URLPath() + 'authentication';
+            var resp = sezzleService.setThrowOnError().call({
+                public_key: publicKey,
+                private_key: privateKey
+            });
+            var response = resp.object.response;
+            sezzleUtils.setAuthToken(response);
+            return response.token;
         };
 
         /**
@@ -63,9 +56,9 @@
 
                 var sezzleService = service.initService('sezzle.capture');
                 sezzleService.URL = order.custom.SezzleCapturePaymentLink;
-                return sezzleService.call(obj).object;
+                return sezzleService.setThrowOnError().call(obj).object.response.uuid;
             } catch (e) {
-                logger.debug('Api:capture. - {0}', e);
+                logger.error('Api:capture - {0}', e);
                 return {
                     error: true
                 };
@@ -87,9 +80,9 @@
 
                 var sezzleService = service.initService('sezzle.getcustomeruuid');
                 sezzleService.URL = sezzleData.getV2URLPath() + 'token/' + token + '/session';
-                return sezzleService.call(obj).object;
+                return sezzleService.setThrowOnError().call(obj).object;
             } catch (e) {
-                logger.debug('Api:getCustomerUUID. - {0}', e);
+                logger.error('Api:getCustomerUUID - {0}', e);
                 return {
                     error: true
                 };
@@ -111,9 +104,9 @@
 
                 var sezzleService = service.initService('sezzle.getorderbyorderuuid');
                 sezzleService.URL = order.custom.SezzleGetOrderLink;
-                return sezzleService.call(obj).object;
+                return sezzleService.setThrowOnError().call(obj).object;
             } catch (e) {
-                logger.debug('Api:getOrderByOrderUUID. - {0}', e);
+                logger.error('Api:getOrderByOrderUUID - {0}', e);
                 return {
                     error: true
                 };
@@ -132,9 +125,9 @@
                 payloadObj.authToken = self.authenticate();
                 var sezzleService = service.initService('sezzle.createorderbycustomeruuid');
                 sezzleService.URL = payloadObj.link;
-                return sezzleService.call(payloadObj).object;
+                return sezzleService.setThrowOnError().call(payloadObj).object;
             } catch (e) {
-                logger.debug('Api:createOrderByCustomerUUID. - {0}', e);
+                logger.error('Api:createOrderByCustomerUUID - {0}', e);
                 return {
                     error: true
                 };
@@ -158,9 +151,9 @@
 
                 var sezzleService = service.initService('sezzle.refund');
                 sezzleService.URL = order.custom.SezzleRefundPaymentLink;
-                return sezzleService.call(obj).object;
+                return sezzleService.setThrowOnError().call(obj).object.response.uuid;
             } catch (e) {
-                logger.debug('Api:refund. - {0}', e);
+                logger.error('Api:refund - {0}', e);
                 return {
                     error: true
                 };
@@ -183,9 +176,9 @@
                 };
                 var sezzleService = service.initService('sezzle.release');
                 sezzleService.URL = order.custom.SezzleReleasePaymentLink;
-                return sezzleService.call(obj).object;
+                return sezzleService.setThrowOnError().call(obj).object.response.uuid;
             } catch (e) {
-                logger.debug('Api:release. - {0}', e);
+                logger.error('Api:release - {0}', e);
                 return {
                     error: true
                 };
@@ -208,9 +201,9 @@
 
                 var sezzleService = service.initService('sezzle.updateorder');
                 sezzleService.URL = order.custom.SezzleUpdateOrderLink;
-                return sezzleService.call(obj).object;
+                return sezzleService.setThrowOnError().call(obj).object;
             } catch (e) {
-                logger.debug('Api:updateOrder. - {0}', e);
+                logger.error('Api:updateOrder - {0}', e);
                 return {
                     error: true
                 };
@@ -232,9 +225,9 @@
 
                 var sezzleService = service.initService('sezzle.getcustomer');
                 sezzleService.URL = profile.custom.SezzleGetCustomerLink;
-                return sezzleService.call(obj).object;
+                return sezzleService.setThrowOnError().call(obj).object;
             } catch (e) {
-                logger.debug('Api:getCustomer. - {0}', e);
+                logger.error('Api:getCustomer - {0}', e);
                 return {
                     error: true
                 };
@@ -253,9 +246,9 @@
                 payloadObj.authToken = self.authenticate();
                 var sezzleService = service.initService('sezzle.createsession');
                 sezzleService.URL = sezzleData.getV2URLPath() + 'session';
-                return sezzleService.call(payloadObj).object;
+                return sezzleService.setThrowOnError().call(payloadObj).object;
             } catch (e) {
-                logger.debug('Api:createSession. - {0}', e);
+                logger.error('Api:createSession - {0}', e);
                 return {
                     error: true
                 };

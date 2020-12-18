@@ -8,7 +8,7 @@
     var V1Api = function () {
         var self = this;
         var sezzleData = require('*/cartridge/scripts/data/sezzleData');
-        var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+        var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
         var service = require('*/cartridge/scripts/init/initSezzleServices');
 
         /**
@@ -17,45 +17,37 @@
          * @returns {Object} auth token object
          */
         self.authenticate = function () {
-            try {
-                var sezzleService = service.initService('sezzle.authenticate');
-                var publicKey = sezzleData.getPublicKey();
-                var privateKey = sezzleData.getPrivateKey();
+            var sezzleService = service.initService('sezzle.authenticate');
+            var publicKey = sezzleData.getPublicKey();
+            var privateKey = sezzleData.getPrivateKey();
 
-                sezzleService.URL = sezzleData.getV1URLPath() + 'authentication/';
-                var resp = sezzleService.call({
-                    public_key: publicKey,
-                    private_key: privateKey
-                });
-                return resp.object;
-            } catch (e) {
-                logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
-                return {
-                    error: false
-                };
-            }
+            sezzleService.URL = sezzleData.getV1URLPath() + 'authentication/';
+            var resp = sezzleService.setThrowOnError().call({
+                public_key: publicKey,
+                private_key: privateKey
+            });
+            return resp.object.response.token;
         };
 
         /**
          * Capture charge by order reference ID
          *
          * @param {string} orderReferenceID ref
-         * @returns {Object} status
+         * @returns {string} Captured At Time
          */
         self.capture = function (orderReferenceID) {
             try {
-                var authentication = self.authenticate();
                 var obj = {
-                    authToken: authentication.response.token
+                    authToken: self.authenticate()
                 };
 
                 var sezzleService = service.initService('sezzle.capture');
                 sezzleService.URL = sezzleData.getV1URLPath() + 'checkouts/' + orderReferenceID + '/complete';
-                return sezzleService.call(obj).object;
+                return sezzleService.setThrowOnError().call(obj).object.response;
             } catch (e) {
-                logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
+                logger.error('Api.capture - {0}', e);
                 return {
-                    error: false
+                    error: true
                 };
             }
         };
@@ -64,13 +56,12 @@
          * Refund payment by order reference ID
          *
          * @param {string} orderReferenceID Ref ID
-         * @returns {Object} status
+         * @returns {string} Refund ID
          * */
         self.refund = function (orderReferenceID) {
             try {
-                var authentication = self.authenticate();
                 var obj = {
-                    authToken: authentication.response.token,
+                    authToken: self.authenticate(),
                     is_full_refund: true
 
                 };
@@ -78,11 +69,11 @@
 
                 sezzleService.URL = sezzleData.getV1URLPath() + 'orders/' + orderReferenceID + '/refund';
 
-                return sezzleService.call(obj).object;
+                return sezzleService.setThrowOnError().call(obj).object.response;
             } catch (e) {
-                logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
+                logger.error('Api.refund - {0}', e);
                 return {
-                    error: false
+                    error: true
                 };
             }
         };
@@ -95,18 +86,17 @@
          */
         self.createCheckout = function (checkoutObject) {
             try {
-                var authentication = self.authenticate();
                 var payloadObj = checkoutObject;
-                payloadObj.authToken = authentication.response.token;
-                logger.debug('Token', payloadObj.authToken);
+                payloadObj.authToken = self.authenticate();
+                logger.info('Token', payloadObj.authToken);
                 var sezzleService = service.initService('sezzle.initiatecheckout');
 
                 sezzleService.URL = sezzleData.getV1URLPath() + 'checkouts/';
-                return sezzleService.call(payloadObj).object;
+                return sezzleService.setThrowOnError().call(payloadObj).object.response;
             } catch (e) {
-                logger.debug('Sezzle. File - sezzleAPI. Error - {0}', e);
+                logger.error('Api.createCheckout - {0}', e);
                 return {
-                    error: false
+                    error: true
                 };
             }
         };

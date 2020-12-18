@@ -14,7 +14,7 @@ var Transaction = require('dw/system/Transaction');
 var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
 var sezzle = require('*/cartridge/scripts/sezzle');
 var OrderModel = require('*/cartridge/models/order');
-var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
 var consentTracking = require('*/cartridge/scripts/middleware/consentTracking');
 var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
 
@@ -22,7 +22,7 @@ var csrfProtection = require('*/cartridge/scripts/middleware/csrf');
  * Handle redirection to Sezzle
  */
 server.get('Redirect', function (req, res, next) {
-    logger.debug('Sezzle Redirecting');
+    logger.info('Sezzle Redirecting');
     var basket = BasketMgr.getCurrentBasket();
     var checkoutObject = sezzle.basket.initiateCheckout(basket);
     var redirectURL = checkoutObject.checkout.checkout_url;
@@ -44,7 +44,7 @@ server.get('Redirect', function (req, res, next) {
     }
 
     if (erMsg != '') {
-        logger.debug('Redirection - {0}', erMsg);
+        logger.error('Redirection - {0}', erMsg);
     }
 
     res.render('sezzle/sezzleRedirect', {
@@ -85,7 +85,7 @@ server.get('Redirect', function (req, res, next) {
                         break;
                 }
             }
-            logger.debug('Order Links has been successfully gathered into session');
+            logger.info('Order Links has been successfully gathered into session');
         }
 
         if (checkoutObject.tokenize) {
@@ -93,7 +93,7 @@ server.get('Redirect', function (req, res, next) {
             session.privacy.tokenExpiration = checkoutObject.tokenize.token_expiration || '';
             session.privacy.customerUUID = checkoutObject.tokenize.customer_uuid || '';
             session.privacy.customerUUIDExpiration = checkoutObject.tokenize.customer_uuid_expiration || '';
-            logger.debug('Tokenize records has been successfully gathered into session');
+            logger.info('Tokenize records has been successfully gathered into session');
         }
     }
     return next();
@@ -108,18 +108,40 @@ server.get(
     server.middleware.https,
     csrfProtection.generateToken,
     function (req, res, next) {
+		var sezzleData = require('*/cartridge/scripts/data/sezzleData');
         var reportingUrlsHelper = require('*/cartridge/scripts/reportingUrls');
         var Locale = require('dw/util/Locale');
-        var basket = BasketMgr.getCurrentBasket();
-        if (!basket) {
-            res.redirect(URLUtils.url('Home-Show'));
-            return next();
-        }
-        // Creates a new order.
-        var currentBasket = BasketMgr.getCurrentBasket();
-        var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
-        logger.debug('Cart successfully checked and moving forward {0}', sezzleCheck.status.error);
+		var OrderMgr = require('dw/order/OrderMgr');
+		var Order = require('dw/order/Order');
+		var addressHelpers = require('*/cartridge/scripts/helpers/addressHelpers');
+	    var hooksHelper = require('*/cartridge/scripts/helpers/hooks');
 
+        var currentBasket = BasketMgr.getCurrentBasket();
+		if (!currentBasket) {
+	        res.json({
+	            error: true,
+	            cartError: true,
+	            fieldErrors: [],
+	            serverErrors: [],
+	            redirectUrl: URLUtils.url('Cart-Show').toString()
+	        });
+	        return next();
+	    }
+
+        var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
+		if (sezzleCheck.status.error) {
+			res.json({
+	            error: true,
+	            cartError: true,
+	            fieldErrors: [],
+	            serverErrors: [],
+	            redirectUrl: URLUtils.url('Cart-Show').toString()
+	        });
+	        return next();
+		}
+        logger.info('Cart successfully checked and moving forward {0}', sezzleCheck.status.error);
+
+		// Creates a new order.
         var order = COHelpers.createOrder(currentBasket);
         if (!order) {
             res.json({
@@ -128,7 +150,7 @@ server.get(
             });
             return next();
         }
-        logger.debug('Order Created');
+        logger.info('Order Created');
 
         var handlePaymentResult = COHelpers.handlePayments(order, order.orderNo);
         if (handlePaymentResult.error) {
@@ -138,15 +160,25 @@ server.get(
             });
             return next();
         }
-        logger.debug('Payment handled successfully');
+        logger.info('Payment handled successfully');
 
-        var orderPlacementStatus = COHelpers.placeOrder(order, { status: 'success' });
 
-        if (orderPlacementStatus.error) {
-            return next(new Error('Could not place order'));
-        }
+		var fraudDetectionStatus = hooksHelper('app.fraud.detection', 'fraudDetection', currentBasket, require('*/cartridge/scripts/hooks/fraudDetection').fraudDetection);
+	    if (fraudDetectionStatus.status === 'fail') {
+	        Transaction.wrap(function () { OrderMgr.failOrder(order, true); });
 
-        logger.debug('Order placed successfully in Salesforce');
+	        // fraud detection failed
+	        req.session.privacyCache.set('fraudDetectionStatus', true);
+
+	        res.json({
+	            error: true,
+	            cartError: true,
+	            redirectUrl: URLUtils.url('Error-ErrorCode', 'err', fraudDetectionStatus.errorCode).toString(),
+	            errorMessage: Resource.msg('error.technical', 'checkout', null)
+	        });
+
+	        return next();
+	    }
 
         var customerUUID = request.httpParameterMap['customer-uuid'].stringValue;
         var tokenizeObject = {
@@ -160,13 +192,41 @@ server.get(
 
         var result = sezzleHelper.PostProcess(order);
         if (!result) {
-            res.json({
-                error: true,
-                errorMessage: Resource.msg('error.technical', 'checkout', null)
+			Transaction.wrap(function () { OrderMgr.failOrder(order, true); });
+            res.render('/error', {
+                message: Resource.msg('payment.capture.error', 'sezzle', null)
             });
             return next();
         }
-        logger.debug('Post process successfully completed');
+        logger.info('Post process successfully completed');
+
+		var orderPlacementStatus = COHelpers.placeOrder(order, { status: 'success' });
+
+        if (orderPlacementStatus.error) {
+            return next(new Error('Could not place order'));
+        }
+		logger.info('Order placed successfully in Salesforce');
+
+		if (String(sezzleData.getSezzlePaymentAction()) === 'CAPTURE') {
+			Transaction.wrap(function () { order.setStatus(Order.ORDER_STATUS_COMPLETED) });
+		}
+
+		if (req.currentCustomer.addressBook) {
+        	// save all used shipping addresses to address book of the logged in customer
+	        var allAddresses = addressHelpers.gatherShippingAddresses(order);
+	        allAddresses.forEach(function (address) {
+	            if (!addressHelpers.checkIfAddressStored(address, req.currentCustomer.addressBook.addresses)) {
+	                addressHelpers.saveAddress(address, req.currentCustomer, addressHelpers.generateAddressName(address));
+	            }
+	        });
+	    }
+
+	    if (order.getCustomerEmail()) {
+	        COHelpers.sendConfirmationEmail(order, req.locale.id);
+	    }
+
+	    // Reset usingMultiShip after successful Order placement
+	    req.session.privacyCache.set('usingMultiShipping', false);
 
         var config = {
             numberOfLineItems: '*'
@@ -193,7 +253,7 @@ server.get(
 
 
         if (!req.currentCustomer.profile && !profile) {
-            logger.debug('Guest order has been created');
+            logger.info('Guest order has been created');
             passwordForm = server.forms.getForm('newPasswords');
             passwordForm.clear();
             res.render('checkout/confirmation/confirmation', {
@@ -203,7 +263,7 @@ server.get(
                 reportingURLs: reportingURLs
             });
         } else {
-            logger.debug('Registered customer order has been created');
+            logger.info('Registered customer order has been created');
             COHelpers.sendConfirmationEmail(order, req.locale.id);
             res.render('checkout/confirmation/confirmation', {
                 order: orderModel,
@@ -211,7 +271,7 @@ server.get(
             });
         }
         req.session.raw.custom.orderID = req.querystring.ID; // eslint-disable-line no-param-reassign
-        logger.debug('****Checkout completed****');
+        logger.info('****Checkout completed****');
         return next();
     }
 );

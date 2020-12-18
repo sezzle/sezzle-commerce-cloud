@@ -6,7 +6,7 @@ var sezzle = require('*/cartridge/scripts/sezzle');
 var sezzleData = require('~/cartridge/scripts/data/sezzleData');
 var Transaction = require('dw/system/Transaction');
 var Order = require('dw/order/Order');
-var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
 
 /*
  * Export the publicly available controller methods
@@ -105,17 +105,17 @@ function storeTokenizeRecord(order, tokenizeObject) {
                 orderObj.custom.SezzleCustomerUUID = tokenDetails.response.customer.uuid;
                 orderObj.custom.SezzleCustomerUUIDExpiration = tokenDetails.response.customer.expiration;
             });
-            logger.debug('Tokenize record successfully stored in Order and Profile');
+            logger.info('Tokenize record successfully stored in Order and Profile');
         } else if (tokenizeObject.customer_uuid !== '' && tokenizeObject.customer_uuid_expiration !== '') {
             Transaction.wrap(function () {
                 orderObj.custom.SezzleCustomerUUID = tokenizeObject.customer_uuid;
                 orderObj.custom.SezzleCustomerUUIDExpiration = tokenizeObject.customer_uuid_expiration;
             });
-            logger.debug('Tokenize record successfully stored in Order and Profile');
+            logger.info('Tokenize record successfully stored in Order and Profile');
         }
     } catch (e) {
-        logger.debug('sezzleHelper.storeTokenizeRecord.- {0}', e);
-        logger.debug('Tokenize record not stored in Order and Profile');
+        logger.error('sezzleHelper.storeTokenizeRecord.- {0}', e);
+        logger.error('Tokenize record not stored in Order and Profile');
     }
 }
 
@@ -131,11 +131,14 @@ function postProcess(order) {
     try {
         Transaction.wrap(function () {
             if (canCapture) {
-                sezzle.order.captureOrder(orderObj);
+                var isCaptured = sezzle.order.captureOrder(orderObj);
+				if (!isCaptured) {
+					throw new Error('Capture Payment Error');
+				}
                 orderObj.custom.SezzleCapturedAmount = orderObj.totalGrossPrice.toString();
                 orderObj.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
-                orderObj.setStatus(Order.ORDER_STATUS_COMPLETED);
-                logger.debug('Payment has been captured successfully by Sezzle');
+                logger.info('Payment has been captured successfully by Sezzle');
+
             }
             if (orderObj.custom.SezzleOrderUUID) {
                 var sezzleOrder = sezzle.order.getOrderByOrderUUID(orderObj);
@@ -143,12 +146,12 @@ function postProcess(order) {
                     orderObj.custom.SezzleAuthExpiration = sezzleOrder.response.authorization.expiration;
                 }
                 sezzle.order.updateOrder(orderObj);
-                logger.debug('SFCC Order No has been successfully updated in the corresponding Sezzle order');
+                logger.info('SFCC Order No has been successfully updated in the corresponding Sezzle order');
             }
         });
         return true;
     } catch (e) {
-        logger.debug('sezzleHelper.postProcess.- {0}', e);
+        logger.error('sezzleHelper.postProcess.- {0}', e);
         return false;
     }
 }

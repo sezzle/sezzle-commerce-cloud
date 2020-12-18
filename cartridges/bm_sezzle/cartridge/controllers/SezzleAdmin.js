@@ -1,7 +1,7 @@
 /* global dw request response empty */
 
 var sezzleBmHelper = require('*/cartridge/scripts/helper/sezzleBmHelper');
-var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
 var v2 = require('*/cartridge/scripts/api/v2');
 var Money = require('dw/value/Money');
 var sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils');
@@ -191,7 +191,7 @@ function orderTransaction() {
         return;
     }
 
-    logger.debug('SezzleAdmin.orderTransaction - Order validated');
+    logger.info('SezzleAdmin.orderTransaction - Order validated');
 
 
     var sezzlePaymentAction = order.custom.SezzlePaymentAction;
@@ -284,16 +284,16 @@ function action() {
                 throw new Error('SezzleAdmin.API Call failed - {0}', methodName);
             }
 
-            logger.debug('SezzleAdmin.API Call successfull - {0}', methodName);
+            logger.info('SezzleAdmin.API Call successfull - {0}', methodName);
             Transaction.wrap(function () {
                 sezzleBmHelper.updateOrderTransaction(order, isCustomOrder, transactionid, methodName, params.amt);
             });
         } else {
-            logger.debug('SezzleAdmin.Failed to get post data from form');
+            logger.error('SezzleAdmin.Failed to get post data from form');
             responseResult = 'Error';
         }
     } catch (e) {
-        logger.debug('SezzleAdmin.action.- {0}', e);
+        logger.error('SezzleAdmin.action.- {0}', e);
         responseResult = 'Error';
     }
     renderJson(responseResult, callApiResponse);

@@ -14,31 +14,30 @@ var app = require(fullStoreFrontPath + '/cartridge/scripts/app');
 var guard = require(fullStoreFrontPath + '/cartridge/scripts/guard');
 var BasketMgr = require('dw/order/BasketMgr');
 var ISML = require('dw/template/ISML');
-var sezzle = require('*/cartridge/scripts/sezzle'),
-    CurrentForms = session.getForms();
-var Status = require('dw/system/Status');
+var sezzle = require('*/cartridge/scripts/sezzle');
+var CurrentForms = session.getForms();
 var Transaction = require('dw/system/Transaction');
 var Order = require('dw/order/Order');
-var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+var Status = require('dw/system/Status');
+var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
 
 /**
  * Redirects the user to Sezzle's checkout
  */
 
 function redirect() {
-    logger.debug('Selected Payment Method Id - {0}',
-        CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value);
+    logger.info('Selected Payment Method Id - {0}', CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value);
     if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
         var basket = BasketMgr.getCurrentBasket();
         var checkoutObject = sezzle.basket.initiateV1Checkout(basket);
-        if (empty(checkoutObject)) {
+        if (!checkoutObject.redirect_url) {
             return false;
         }
 
         ISML.renderTemplate('sezzle/sezzleRedirect',
-            {
-                SezzleRedirectUrl: checkoutObject.redirect_url
-            });
+        {
+            SezzleRedirectUrl: checkoutObject.redirect_url
+        });
         session.privacy.sezzled = true;
         session.privacy.sezzleAmount = checkoutObject.amount_in_cents;
         session.privacy.referenceId = checkoutObject.order_reference_id;
@@ -57,16 +56,17 @@ function init(basket, applicablePaymentMethods) {
 function postProcess(order) {
     try {
         Transaction.wrap(function () {
-            sezzle.order.captureOrder(order, 'v1');
+            var isCaptured = sezzle.order.captureOrder(order, 'v1');
+			if (!isCaptured) {
+				throw new Error('Capture Payment Error');
+			}
             order.custom.SezzleCapturedAmount = order.totalGrossPrice.toString();
             order.custom.SezzleStatus = 'CAPTURE';
             order.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
             order.setStatus(Order.ORDER_STATUS_COMPLETED);
         });
     } catch (e) {
-        logger.error('Sezzle Capturing error. Details - {0}',
-            e);
-
+        logger.error('Sezzle Capturing error. Details - {0}', e);
         return new Status(Status.ERROR);
     }
     return new Status(Status.OK);
@@ -76,8 +76,7 @@ function postProcess(order) {
  * Handle successful response from Sezzle
  */
 function success() {
-    var placeOrderResult = app.getController('COPlaceOrder').Start();
-
+	var placeOrderResult = app.getController('COPlaceOrder').Start();
     if (placeOrderResult.error) {
         app.getController('COSummary').Start({
             PlaceOrderError: placeOrderResult.PlaceOrderError
@@ -85,7 +84,7 @@ function success() {
     } else if (placeOrderResult.order_created) {
         app.getController('COSummary').ShowConfirmation(placeOrderResult.Order);
         postProcess(placeOrderResult.Order);
-    }
+    } 
 }
 
 /**
@@ -93,7 +92,6 @@ function success() {
  * gift certificates in basket
  */
 exports.Redirect = redirect;
-exports.Success = guard.ensure(['get'],
-    success);
+exports.Success = guard.ensure(['get'],success);
 exports.PostProcess = postProcess;
 exports.Init = init;

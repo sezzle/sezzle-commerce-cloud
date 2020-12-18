@@ -2,7 +2,7 @@
 
 /* global empty dw */
 
-var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
 var Money = require('dw/value/Money');
 
 var sezzleBmHelper = {};
@@ -132,7 +132,7 @@ sezzleBmHelper.updateOrderTransaction = function (order, isCustomOrder, transact
     try {
         updateOrderData(order, transactionID, methodName, amount);
     } catch (error) {
-        logger.debug('sezzleBmHelper.updateOrderTransaction.- {0}', error);
+        logger.error('sezzleBmHelper.updateOrderTransaction.- {0}', error);
         return false;
     }
 
