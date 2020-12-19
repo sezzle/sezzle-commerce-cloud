@@ -118,35 +118,29 @@ server.get(
 
         var currentBasket = BasketMgr.getCurrentBasket();
 		if (!currentBasket) {
-	        res.json({
-	            error: true,
-	            cartError: true,
-	            fieldErrors: [],
-	            serverErrors: [],
-	            redirectUrl: URLUtils.url('Cart-Show').toString()
-	        });
-	        return next();
+			res.render('/error', {
+                message: Resource.msg('basket.changed.error', 'sezzle', null)
+            });
+            return next();
 	    }
 
         var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
 		if (sezzleCheck.status.error) {
-			res.json({
-	            error: true,
-	            cartError: true,
-	            fieldErrors: [],
-	            serverErrors: [],
-	            redirectUrl: URLUtils.url('Cart-Show').toString()
-	        });
-	        return next();
+			var errorMsg = sezzleCheck.status.basket_changed 
+					? Resource.msg('basket.changed.error', 'sezzle', null)
+					: Resource.msg('error.technical', 'checkout', null);
+			res.render('/error', {
+                message: errorMsg
+            });
+            return next();
 		}
         logger.info('Cart successfully checked and moving forward {0}', sezzleCheck.status.error);
 
 		// Creates a new order.
         var order = COHelpers.createOrder(currentBasket);
         if (!order) {
-            res.json({
-                error: true,
-                errorMessage: Resource.msg('error.technical', 'checkout', null)
+            res.render('/error', {
+                message: Resource.msg('error.technical', 'checkout', null)
             });
             return next();
         }
@@ -154,9 +148,8 @@ server.get(
 
         var handlePaymentResult = COHelpers.handlePayments(order, order.orderNo);
         if (handlePaymentResult.error) {
-            res.json({
-                error: true,
-                errorMessage: Resource.msg('error.technical', 'checkout', null)
+            res.render('/error', {
+                message: Resource.msg('error.technical', 'checkout', null)
             });
             return next();
         }
@@ -170,14 +163,10 @@ server.get(
 	        // fraud detection failed
 	        req.session.privacyCache.set('fraudDetectionStatus', true);
 
-	        res.json({
-	            error: true,
-	            cartError: true,
-	            redirectUrl: URLUtils.url('Error-ErrorCode', 'err', fraudDetectionStatus.errorCode).toString(),
-	            errorMessage: Resource.msg('error.technical', 'checkout', null)
-	        });
-
-	        return next();
+	        res.render('/error', {
+                message: Resource.msg('error.technical', 'checkout', null)
+            });
+            return next();
 	    }
 
         var customerUUID = request.httpParameterMap['customer-uuid'].stringValue;

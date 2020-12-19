@@ -82,9 +82,6 @@
                         <isset name="price" value="${product.price}" scope="page" />
                         <isinclude template="product/components/pricing/main" />
                     </div>
-                    
-                    <!-- Sezzle Widget -->
-                    <div id="sezzle-widget"></div>
 
                     <!-- Cart and [Optionally] Apple Pay -->
                     <isinclude template="product/components/addToCartGlobal" />

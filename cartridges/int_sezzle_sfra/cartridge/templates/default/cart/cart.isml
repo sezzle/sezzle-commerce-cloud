@@ -82,9 +82,6 @@
                     </div>
                     <isinclude template="cart/cartTotals" />
                     
-                    <!-- Sezzle Widget -->
-                    <div id="sezzle-widget"></div>
-                    
                     <div class="row">
                         <div class="col-12 checkout-continue">
                             <isinclude template="cart/checkoutButtons" />

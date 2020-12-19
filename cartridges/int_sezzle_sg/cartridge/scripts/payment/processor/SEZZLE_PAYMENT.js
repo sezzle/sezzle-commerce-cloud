@@ -43,7 +43,7 @@ function authorize(args) {
         var sezzleResponseObject = {
             reference_id: session.privacy.referenceId,
             events: [{ id: session.privacy.sezzleFirstEventID }],
-            amount: session.privacy.sezzleAmount,
+            amount: session.privacy.sezzleOrderAmount,
             type: 'sg'
         };
         sezzleUtils.order.updateAttributes(order, sezzleResponseObject);
@@ -59,7 +59,7 @@ function handle() {
         sezzleUtils.basket.createPaymentInstrument(basket);
         session.privacy.sezzleResponseID = '';
         session.privacy.sezzleFirstEventID = '';
-        session.privacy.sezzleAmount = '';
+        session.privacy.sezzleOrderAmount = '';
     });
 
     return { success: true };

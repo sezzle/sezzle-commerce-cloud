@@ -48,7 +48,7 @@ function checkCart(cart) {
 	var basketTotal = basket.getTotalGrossPrice();
 	var basketTotalInCents = basketTotal.multiply(100).getValue();
 
-	if (basketTotalInCents != session.privacy.sezzleAmount || basket.giftCertificateTotalPrice.value > 0) {
+	if (basketTotalInCents != session.privacy.sezzleOrderAmount || basket.giftCertificateTotalPrice.value > 0) {
         return {
             status: {
                 error: true,

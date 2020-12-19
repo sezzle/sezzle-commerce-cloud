@@ -50,7 +50,7 @@ function redirect() {
             SezzleRedirectUrl: checkoutObject.redirect_url
         });
         session.privacy.sezzled = true;
-        session.privacy.sezzleAmount = checkoutObject.amount_in_cents;
+        session.privacy.sezzleOrderAmount = checkoutObject.amount_in_cents;
         session.privacy.referenceId = checkoutObject.order_reference_id;
 
         return true;
