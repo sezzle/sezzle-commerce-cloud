@@ -28,9 +28,8 @@ function authorize(args) {
     // Check the reference token passed during redirection
     var reference_id = request.httpParameterMap.order_reference_id;
 
-    logger.info('Sezzle Payment Reference Id - {0} {1}',
-        reference_id,
-        session.privacy.referenceId);
+    logger.info('Sezzle Payment Reference Id from redirection - {0}', reference_id);
+    logger.info('Sezzle Payment Reference Id stored - {0}', session.privacy.referenceId);
 
     if (session.privacy.referenceId != reference_id) {
         logger.error('Sezzle Error - Reference ID has changed');
@@ -41,7 +40,6 @@ function authorize(args) {
     Transaction.wrap(function () {
         paymentInstrument.paymentTransaction.transactionID = reference_id;
         paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
-        logger.info('Sezzle Payment Reference Id - {0}', session.privacy.referenceId);
         var sezzleResponseObject = {
             reference_id: session.privacy.referenceId,
             events: [{ id: session.privacy.sezzleFirstEventID }],

@@ -88,9 +88,7 @@
             try {
                 var payloadObj = checkoutObject;
                 payloadObj.authToken = self.authenticate();
-                logger.info('Token', payloadObj.authToken);
                 var sezzleService = service.initService('sezzle.initiatecheckout');
-
                 sezzleService.URL = sezzleData.getV1URLPath() + 'checkouts/';
                 return sezzleService.setThrowOnError().call(payloadObj).object.response;
             } catch (e) {
