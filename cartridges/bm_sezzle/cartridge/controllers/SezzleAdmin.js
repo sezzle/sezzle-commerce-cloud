@@ -280,8 +280,8 @@ function action() {
                 callApiResponse = v2.release(order, amtInCents);
             }
 
-            if (callApiResponse == null || callApiResponse.error) {
-                throw new Error('SezzleAdmin.API Call failed - {0}', methodName);
+            if (!callApiResponse) {
+                throw new Error('SezzleAdmin.API Call failed - ' + methodName);
             }
 
             logger.info('SezzleAdmin.API Call successfull - {0}', methodName);

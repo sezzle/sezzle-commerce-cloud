@@ -128,7 +128,7 @@ function handlePayments(order) {
 function success() {
 	var placeOrderResult = placeOrder();
     if (placeOrderResult.error) {
-        logger.info("Order placement error. Redirecting to order confirmation page.")
+        logger.info("Order placement error. Redirecting to order review page.")
         app.getController('COSummary').Start({
             PlaceOrderError: placeOrderResult.PlaceOrderError
         });

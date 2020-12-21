@@ -41,7 +41,7 @@
          * @param {dw.order.Order} order Order
          * @param {string} amount Amount
          * @param {boolean} isPartialCapture Is Partial Capture
-         * @returns {Object} response object
+         * @returns {boolean} response status
          */
         self.capture = function (order, amount, isPartialCapture) {
             try {
@@ -59,9 +59,7 @@
                 return sezzleService.setThrowOnError().call(obj).object.response.uuid;
             } catch (e) {
                 logger.error('Api:capture - {0}', e);
-                return {
-                    error: true
-                };
+                return false;
             }
         };
 
@@ -139,7 +137,7 @@
          *
          * @param {dw.order.Order} order Order
          * @param {string} amount Amount
-         * @returns {Object} response object
+         * @returns {boolean} response status
          */
         self.refund = function (order, amount) {
             try {
@@ -154,9 +152,7 @@
                 return sezzleService.setThrowOnError().call(obj).object.response.uuid;
             } catch (e) {
                 logger.error('Api:refund - {0}', e);
-                return {
-                    error: true
-                };
+                return false;
             }
         };
 
@@ -165,7 +161,7 @@
          *
          * @param {dw.order.Order} order Order
          * @param {string} amount Amount
-         * @returns {Object} response object
+         * @returns {boolean} response status
          */
         self.release = function (order, amount) {
             try {
@@ -179,9 +175,7 @@
                 return sezzleService.setThrowOnError().call(obj).object.response.uuid;
             } catch (e) {
                 logger.error('Api:release - {0}', e);
-                return {
-                    error: true
-                };
+                return false;
             }
         };
 

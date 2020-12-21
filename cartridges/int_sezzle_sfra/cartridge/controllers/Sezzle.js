@@ -126,7 +126,7 @@ server.get(
 
         var sezzleCheck = sezzleHelper.CheckCart(currentBasket);
 		if (sezzleCheck.status.error) {
-			var errorMsg = sezzleCheck.status.basket_changed 
+			var errorMsg = sezzleCheck.status.basket_changed
 					? Resource.msg('basket.changed.error', 'sezzle', null)
 					: Resource.msg('error.technical', 'checkout', null);
 			res.render('/error', {
@@ -253,7 +253,6 @@ server.get(
             });
         } else {
             logger.info('Registered customer order has been created');
-            COHelpers.sendConfirmationEmail(order, req.locale.id);
             res.render('checkout/confirmation/confirmation', {
                 order: orderModel,
                 returningCustomer: true

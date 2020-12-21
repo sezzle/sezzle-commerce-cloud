@@ -49,19 +49,14 @@
          *
          * @param {dw.order.Order} order Order
          * @param {string} apiVersion Api Version v1/v2
-		 * @returns {bool} status
+		 * @returns {boolean} status
          */
         this.captureOrder = function (order, apiVersion) {
             if (apiVersion === 'v1') {
-                var captureResponse = v1.capture(order.custom.SezzleExternalId);
-            } else {
-				var captureAmount = order.totalGrossPrice.multiply(100).getValue();
-            	var captureResponse = v2.capture(order, captureAmount, false);
-			}
-			if (captureResponse == null || captureResponse.error) {
-				return false;
-			}
-			return true;
+                return captureResponse = v1.capture(order.custom.SezzleExternalId);
+            } 
+			var captureAmount = order.totalGrossPrice.multiply(100).getValue();
+        	return v2.capture(order, captureAmount, false);
         };
 
         /**
@@ -123,7 +118,7 @@
                         } else {
                             response = v2.refund(orderObj, authAmountInCents);
                         }
-                        if (response != null && !response.error) {
+						if (response) {
                             if (!orderObj.custom.SezzleOrderUUID) {
                                 orderObj.custom.SezzleStatus = 'REFUNDED';
                             }

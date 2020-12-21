@@ -33,7 +33,7 @@
          * Capture charge by order reference ID
          *
          * @param {string} orderReferenceID ref
-         * @returns {string} Captured At Time
+         * @returns {booelan} response status
          */
         self.capture = function (orderReferenceID) {
             try {
@@ -46,9 +46,7 @@
                 return sezzleService.setThrowOnError().call(obj).object.response;
             } catch (e) {
                 logger.error('Api.capture - {0}', e);
-                return {
-                    error: true
-                };
+                return false;
             }
         };
 
@@ -56,7 +54,7 @@
          * Refund payment by order reference ID
          *
          * @param {string} orderReferenceID Ref ID
-         * @returns {string} Refund ID
+         * @returns {boolean} response status
          * */
         self.refund = function (orderReferenceID) {
             try {
@@ -72,9 +70,7 @@
                 return sezzleService.setThrowOnError().call(obj).object.response;
             } catch (e) {
                 logger.error('Api.refund - {0}', e);
-                return {
-                    error: true
-                };
+                return false;
             }
         };
 
