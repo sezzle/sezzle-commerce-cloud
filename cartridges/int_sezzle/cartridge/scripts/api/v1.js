@@ -33,7 +33,7 @@
          * Capture charge by order reference ID
          *
          * @param {string} orderReferenceID ref
-         * @returns {booelan} response status
+         * @returns {boolean} response status
          */
         self.capture = function (orderReferenceID) {
             try {
