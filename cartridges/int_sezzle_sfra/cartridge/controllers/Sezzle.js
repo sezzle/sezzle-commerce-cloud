@@ -232,16 +232,8 @@ server.get(
 
         var passwordForm;
 
-        var CustomerMgr = require('dw/customer/CustomerMgr');
-        var profile = CustomerMgr.searchProfile('email={0}', orderModel.orderEmail);
-        if (profile) {
-            Transaction.wrap(function () {
-                order.setCustomer(profile.getCustomer());
-            });
-        }
 
-
-        if (!req.currentCustomer.profile && !profile) {
+        if (!req.currentCustomer.profile) {
             logger.info('Guest order has been created');
             passwordForm = server.forms.getForm('newPasswords');
             passwordForm.clear();
