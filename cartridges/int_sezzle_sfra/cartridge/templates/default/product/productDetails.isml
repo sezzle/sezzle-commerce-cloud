@@ -7,12 +7,9 @@
         var sezzleData = require('*/cartridge/scripts/data/sezzleData');
     </isscript>
     
-    <isif condition="${sezzleData.getMerchantUUID() && sezzleData.isWidgetScriptAllowedInPDP()}">
-    	<isscript>
-	        assets.addJs('/js/sezzleWidgetCore.js');
-	        assets.addJs('/js/widgetRenderer.js');
-	    </isscript>
-    </isif>
+    <isif condition="${sezzleData.isSezzleEnabled() && sezzleData.getMerchantUUID() && sezzleData.isWidgetScriptAllowedInPDP()}">
+	   	<script src="${Resource.msg('sezzle.widget.url', 'sezzle', null)}?uuid=${sezzleData.getMerchantUUID()}" type="text/javascript"></script>
+	</isif>
 
     <isset name="product" value="${pdict.product}" scope="page" />
     <isset name="isQuickView" value="${false}" scope="page" />
@@ -127,9 +124,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Sezzle Widget -->
-                            <div id="sezzle-widget"></div>
 
                             <!-- Cart and [Optionally] Apple Pay -->
                             <isinclude template="product/components/addToCartProduct" />

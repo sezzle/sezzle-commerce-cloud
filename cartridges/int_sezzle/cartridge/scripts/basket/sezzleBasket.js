@@ -13,7 +13,7 @@
         var PaymentMgr = require('dw/order/PaymentMgr');
         var sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils');
         var sezzleData = require('*/cartridge/scripts/data/sezzleData');
-        var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+        var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
         var v2 = require('*/cartridge/scripts/api/v2');
         var v1 = require('*/cartridge/scripts/api/v1');
         var sezzleOrder = require('*/cartridge/scripts/order/sezzleOrder');
@@ -234,7 +234,7 @@
             var customerTokenRecord = self.getCustomerTokenRecord(basket.customer.profile);
             var returnObj = {};
             if (customerTokenRecord.customer_uuid !== undefined && customerTokenRecord.customer_uuid_expiration !== undefined) {
-                logger.debug('Tokenized Checkout');
+                logger.info('Tokenized Checkout');
                 var createOrderLinkByCustomerUUID = basket.customer.profile.custom.SezzleCustomerCreateOrderLink;
                 var requestObject = {
                     customer_uuid: customerTokenRecord.customer_uuid,
@@ -265,7 +265,7 @@
                     }
                 }
             } else {
-                logger.debug('Typical Checkout');
+                logger.info('Typical Checkout');
                 var checkoutObject = {
                     cancel_url: {
                         href: self.getMerchant().user_cancel_url
@@ -336,7 +336,10 @@
                 merchant_completes: true
             };
             var checkoutResponse = v1.createCheckout(checkoutObject);
-            checkoutObject.redirect_url = checkoutResponse.response.checkout_url;
+			if (checkoutResponse.error) {
+				return checkoutObject;
+			}
+            checkoutObject.redirect_url = checkoutResponse.checkout_url;
             return checkoutObject;
         };
 
@@ -357,7 +360,7 @@
                     if (currentTimestamp <= customerUUIDExpirationTimestamp) {
                         var customer = v2.getCustomer(profile);
                         if (customer !== null && !customer.error && customer.response.email) {
-                            logger.debug('Found customer token and moving forward');
+                            logger.info('Found customer token and moving forward');
                             return {
                                 customer_uuid: customerUUID,
                                 is_tokenized: isCustomerTokenized,
@@ -366,7 +369,7 @@
                         }
                     }
                     self.deleteCustomerToken(profile);
-                    logger.debug('Customer token has been expired and hence deleted the record from Profile');
+                    logger.info('Customer token has been expired and hence deleted the record from Profile');
                 }
             }
             return {};

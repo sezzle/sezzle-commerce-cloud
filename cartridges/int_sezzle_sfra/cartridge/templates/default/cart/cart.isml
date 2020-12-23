@@ -5,12 +5,9 @@
         var sezzleData = require('*/cartridge/scripts/data/sezzleData');
     </isscript>
     
-    <isif condition="${sezzleData.getMerchantUUID() && sezzleData.isWidgetScriptAllowedInCart()}">
-    	<isscript>
-	        assets.addJs('/js/sezzleWidgetCore.js');
-	        assets.addJs('/js/widgetRenderer.js');
-	    </isscript>
-    </isif>
+    <isif condition="${sezzleData.isSezzleEnabled() && sezzleData.getMerchantUUID() && sezzleData.isWidgetScriptAllowedInCart()}">
+	   	<script src="${Resource.msg('sezzle.widget.url', 'sezzle', null)}?uuid=${sezzleData.getMerchantUUID()}" type="text/javascript"></script>
+	</isif>
 
     <isif condition="${pdict.reportingURLs && pdict.reportingURLs.length}">
         <isinclude template="reporting/reportingUrls" />
@@ -84,9 +81,6 @@
                         <isinclude template="cart/cartShippingMethodSelection" />
                     </div>
                     <isinclude template="cart/cartTotals" />
-                    
-                    <!-- Sezzle Widget -->
-                    <div id="sezzle-widget"></div>
                     
                     <div class="row">
                         <div class="col-12 checkout-continue">

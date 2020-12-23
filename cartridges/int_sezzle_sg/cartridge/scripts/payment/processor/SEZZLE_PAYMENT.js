@@ -10,19 +10,16 @@ var BasketMgr = require('dw/order/BasketMgr');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var Transaction = require('dw/system/Transaction');
 var sezzleUtils = require('*/cartridge/scripts/sezzle');
-var OrderMgr = require('dw/order/OrderMgr');
-var Order = require('dw/order/Order');
-var logger = require('dw/system').Logger.getLogger('Sezzle', '');
+var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
 
 /*
  * Export the publicly available controller methods
  */
 
 function authorize(args) {
-    var orderNo = args.OrderNo,
-        paymentInstrument = args.PaymentInstrument,
+    var paymentInstrument = args.PaymentInstrument,
         paymentProcessor = PaymentMgr.getPaymentMethod(paymentInstrument.getPaymentMethod()).getPaymentProcessor(),
-        order = OrderMgr.getOrder(orderNo);
+        order = args.Order;
 
     if (!session.privacy.sezzled && empty(session.privacy.sezzleResponseID)) {
         return { error: true };
@@ -31,12 +28,11 @@ function authorize(args) {
     // Check the reference token passed during redirection
     var reference_id = request.httpParameterMap.order_reference_id;
 
-    logger.debug('Sezzle Payment Reference Id - {0} {1}',
-        reference_id,
-        session.privacy.referenceId);
+    logger.info('Sezzle Payment Reference Id from redirection - {0}', reference_id);
+    logger.info('Sezzle Payment Reference Id stored - {0}', session.privacy.referenceId);
 
     if (session.privacy.referenceId != reference_id) {
-        logger.debug('Sezzle Error - Reference ID has changed');
+        logger.error('Sezzle Error - Reference ID has changed');
 
         return { error: true };
     }
@@ -44,11 +40,10 @@ function authorize(args) {
     Transaction.wrap(function () {
         paymentInstrument.paymentTransaction.transactionID = reference_id;
         paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
-        logger.debug('Sezzle Payment Reference Id - {0}', session.privacy.referenceId);
         var sezzleResponseObject = {
             reference_id: session.privacy.referenceId,
             events: [{ id: session.privacy.sezzleFirstEventID }],
-            amount: session.privacy.sezzleAmount,
+            amount: session.privacy.sezzleOrderAmount,
             type: 'sg'
         };
         sezzleUtils.order.updateAttributes(order, sezzleResponseObject);
@@ -64,7 +59,7 @@ function handle() {
         sezzleUtils.basket.createPaymentInstrument(basket);
         session.privacy.sezzleResponseID = '';
         session.privacy.sezzleFirstEventID = '';
-        session.privacy.sezzleAmount = '';
+        session.privacy.sezzleOrderAmount = '';
     });
 
     return { success: true };

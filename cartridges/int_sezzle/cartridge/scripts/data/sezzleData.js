@@ -13,6 +13,16 @@
         var mode = !empty(currentSite.getCustomPreferenceValue('SezzleMode'))
             ? currentSite.getCustomPreferenceValue('SezzleMode').getValue()
             : 'sandbox';
+
+		/**
+         * Return Sezzle Online
+         *
+         * @returns {boolean} status
+         */
+		this.isSezzleEnabled = function () {
+			return currentSite.getCustomPreferenceValue('SezzleOnline');
+		};
+		
         /**
          * Return Sezzle public key
          *

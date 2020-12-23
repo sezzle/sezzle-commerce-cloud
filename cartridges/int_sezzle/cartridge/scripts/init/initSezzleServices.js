@@ -33,7 +33,30 @@ var commonCreateRequest = function (svc, args) {
  * @returns {string} value
  */
 function filterSensitiveData(key, value) {
-    var identifiers = ['public_key', 'private_key', 'billing', 'shipping', 'token', 'authToken', 'merchant_uuid'];
+    var identifiers = [
+		'public_key',
+		'private_key',
+		'expiration_date',
+		'billing_address',
+		'shipping_address',
+		'customer_details',
+		'capture_expiration',
+		'token',
+		'authToken',
+		'merchant_uuid',
+		'customer',
+		'uuid',
+		'checkout_url',
+		'links',
+		'tokenize',
+		'authorization',
+		'expiration',
+		'email',
+		'first_name',
+		'last_name',
+		'phone',
+		'dob'
+	];
     if (identifiers.indexOf(key) !== -1) {
         return '****';
     }
@@ -49,7 +72,7 @@ function filterSensitiveData(key, value) {
 function printValues(obj) {
     var result = '\n';
     var reqObj = obj;
-    for (var k = 0; k < reqObj.length; k++) { // eslint-disable-line no-plusplus
+    for (var k in reqObj) { // eslint-disable-line no-plusplus
         reqObj[k] = filterSensitiveData(k, reqObj[k]);
         if (reqObj[k] instanceof Object) {
             result += printValues(reqObj[k]);
