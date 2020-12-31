@@ -9,6 +9,9 @@ var loggerMock = {
     },
     getLogger: function () {
         return this;
+    },
+    info: function (text) {
+        return text;
     }
 };
 
