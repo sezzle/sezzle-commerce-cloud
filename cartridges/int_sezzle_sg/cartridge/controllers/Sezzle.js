@@ -42,41 +42,26 @@ function redirect() {
 		return false;
 	}
     var basket = BasketMgr.getCurrentBasket();
-    /*var checkoutObject = sezzle.basket.initiateV1Checkout(basket);
-    if (!checkoutObject.redirect_url) {
-        return false;
-    }
-
-    ISML.renderTemplate('sezzle/sezzleRedirect',
-    {
-        SezzleRedirectUrl: checkoutObject.redirect_url
-    });
-    session.privacy.sezzled = true;
-    session.privacy.sezzleOrderAmount = checkoutObject.amount_in_cents;
-    session.privacy.referenceId = checkoutObject.order_reference_id;*/
-
 	var checkoutObject = sezzle.basket.initiateCheckout(basket, 'SG');
     var redirectURL = checkoutObject.checkout.checkout_url;
     var sezzleOrderUUID = checkoutObject.checkout.order_uuid;
     var isCheckoutApproved = checkoutObject.checkout.approved;
-    var error = false;
     var erMsg = '';
     session.privacy.sezzleErrorMessage = '';
     if (!isCheckoutApproved) {
-        error = true;
-        erMsg = 'Sezzle has not approved your checkout. Please contact Sezzle Customer Support.';
+        erMsg = 'Sezzle has not approved your checkout. Please try again.';
         session.privacy.sezzleErrorMessage = erMsg;
-        //redirectURL = URLUtils.url('Checkout-Begin').toString() + '?stage=payment';
     } else if (redirectURL == undefined && sezzleOrderUUID == undefined) {
-        error = true;
         erMsg = 'Something went wrong while redirecting. Please try again.';
         session.privacy.sezzleErrorMessage = erMsg;
-        //redirectURL = URLUtils.url('Checkout-Begin').toString() + '?stage=payment';
     }
 
-    if (erMsg != '' && error) {
+    if (erMsg !== '') {
         logger.error('Redirection - {0}', erMsg);
-		return false;
+		return {
+            error: true,
+            RedirectError: new Status(Status.ERROR, erMsg)
+        };
     }
 
 	ISML.renderTemplate('sezzle/sezzleRedirect',
@@ -127,7 +112,9 @@ function redirect() {
         logger.info('Tokenize records has been successfully gathered into session');
     }
 
-    return true;
+    return {
+		error: false
+	};
 }
 
 function init(basket, applicablePaymentMethods) {
