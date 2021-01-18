@@ -38,25 +38,96 @@ var sezzleHelper = require('*/cartridge/scripts/utils/sezzleHelper');
 function redirect() {
     logger.info("****Checkout Started****");
     logger.info('Selected Payment Method Id - {0}', CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value);
-    if (CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
-        var basket = BasketMgr.getCurrentBasket();
-        var checkoutObject = sezzle.basket.initiateV1Checkout(basket);
-        if (!checkoutObject.redirect_url) {
-            return false;
-        }
-
-        ISML.renderTemplate('sezzle/sezzleRedirect',
-        {
-            SezzleRedirectUrl: checkoutObject.redirect_url
-        });
-        session.privacy.sezzled = true;
-        session.privacy.sezzleOrderAmount = checkoutObject.amount_in_cents;
-        session.privacy.referenceId = checkoutObject.order_reference_id;
-
-        return true;
+    if (!CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
+		return false;
+	}
+    var basket = BasketMgr.getCurrentBasket();
+    /*var checkoutObject = sezzle.basket.initiateV1Checkout(basket);
+    if (!checkoutObject.redirect_url) {
+        return false;
     }
 
-    return false;
+    ISML.renderTemplate('sezzle/sezzleRedirect',
+    {
+        SezzleRedirectUrl: checkoutObject.redirect_url
+    });
+    session.privacy.sezzled = true;
+    session.privacy.sezzleOrderAmount = checkoutObject.amount_in_cents;
+    session.privacy.referenceId = checkoutObject.order_reference_id;*/
+
+	var checkoutObject = sezzle.basket.initiateCheckout(basket, 'SG');
+    var redirectURL = checkoutObject.checkout.checkout_url;
+    var sezzleOrderUUID = checkoutObject.checkout.order_uuid;
+    var isCheckoutApproved = checkoutObject.checkout.approved;
+    var error = false;
+    var erMsg = '';
+    session.privacy.sezzleErrorMessage = '';
+    if (!isCheckoutApproved) {
+        error = true;
+        erMsg = 'Sezzle has not approved your checkout. Please contact Sezzle Customer Support.';
+        session.privacy.sezzleErrorMessage = erMsg;
+        //redirectURL = URLUtils.url('Checkout-Begin').toString() + '?stage=payment';
+    } else if (redirectURL == undefined && sezzleOrderUUID == undefined) {
+        error = true;
+        erMsg = 'Something went wrong while redirecting. Please try again.';
+        session.privacy.sezzleErrorMessage = erMsg;
+        //redirectURL = URLUtils.url('Checkout-Begin').toString() + '?stage=payment';
+    }
+
+    if (erMsg != '' && error) {
+        logger.error('Redirection - {0}', erMsg);
+		return false;
+    }
+
+	ISML.renderTemplate('sezzle/sezzleRedirect',
+    {
+        SezzleRedirectUrl: redirectURL
+    });
+
+    session.privacy.sezzled = true;
+    session.privacy.sezzleOrderAmount = checkoutObject.checkout.amount_in_cents;
+    session.privacy.referenceId = checkoutObject.checkout.reference_id;
+    session.privacy.orderUUID = sezzleOrderUUID;
+    var orderLinks = checkoutObject.checkout.order_links;
+
+    if (orderLinks) {
+        for (var k = 0; k < orderLinks.length; k++) { // eslint-disable-line no-plusplus
+            var link = orderLinks[k],
+                rel = link.rel,
+                method = link.method;
+            switch (rel) {
+                case 'self':
+                    if (method == 'GET') {
+                        session.privacy.getOrderLink = link.href;
+                    } else if (method == 'PATCH') {
+                        session.privacy.updateOrderLink = link.href;
+                    }
+                    break;
+                case 'capture':
+                    session.privacy.capturePaymentLink = link.href;
+                    break;
+                case 'refund':
+                    session.privacy.refundPaymentLink = link.href;
+                    break;
+                case 'release':
+                    session.privacy.releasePaymentLink = link.href;
+                    break;
+                default:
+                    break;
+            }
+        }
+        logger.info('Order Links has been successfully gathered into session');
+    }
+
+    if (checkoutObject.tokenize) {
+        session.privacy.token = checkoutObject.tokenize.token || '';
+        session.privacy.tokenExpiration = checkoutObject.tokenize.token_expiration || '';
+        session.privacy.customerUUID = checkoutObject.tokenize.customer_uuid || '';
+        session.privacy.customerUUIDExpiration = checkoutObject.tokenize.customer_uuid_expiration || '';
+        logger.info('Tokenize records has been successfully gathered into session');
+    }
+
+    return true;
 }
 
 function init(basket, applicablePaymentMethods) {
@@ -237,7 +308,17 @@ function placeOrder() {
     }
     logger.info("Payment handled successfully in SFCC");
 
-	if (postProcess(order).error) {
+	var customerUUID = request.httpParameterMap['customer-uuid'].stringValue;
+    var tokenizeObject = {
+        token: session.privacy.token,
+        token_expiration: session.privacy.tokenExpiration,
+        customer_uuid: session.privacy.customerUUID,
+        customer_uuid_expiration: session.privacy.customerUUIDExpiration,
+        is_customer_tokenized: customerUUID != null
+    };
+    sezzleHelper.StoreTokenizeRecord(order, tokenizeObject);
+
+	if (!sezzleHelper.PostProcess(order)) {
 		return Transaction.wrap(function () {
 			OrderMgr.failOrder(order);
             return {

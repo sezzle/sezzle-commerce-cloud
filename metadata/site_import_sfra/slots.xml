@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<slot-configurations xmlns="http://www.demandware.com/xml/impex/slot/2008-09-08">
+
+    <slot-configuration slot-id="sezzle-payment-method" context="global" configuration-id="Sezzle Slot Configuration" assigned-to-site="true">
+        <template>slots/content/contentassetbody.isml</template>
+        <enabled-flag>true</enabled-flag>
+        <content>
+            <content-assets>
+                <content-asset content-id="sezzle-payment-method"/>
+            </content-assets>
+        </content>
+    </slot-configuration>
+
+</slot-configurations>

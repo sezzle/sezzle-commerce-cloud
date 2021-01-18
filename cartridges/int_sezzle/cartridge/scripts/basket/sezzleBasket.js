@@ -229,7 +229,7 @@
          * @param {dw.order.Basket}  basket Basket
          * @returns {Object} checkout data object in JSON format
          */
-        self.initiateCheckout = function (basket) {
+        self.initiateCheckout = function (basket, type) {
             var referenceID = sezzleUtils.generateUUID();
             var customerTokenRecord = self.getCustomerTokenRecord(basket.customer.profile);
             var returnObj = {};
@@ -268,10 +268,10 @@
                 logger.info('Typical Checkout');
                 var checkoutObject = {
                     cancel_url: {
-                        href: self.getMerchant().user_cancel_url
+                        href: self.getMerchant(type).user_cancel_url
                     },
                     complete_url: {
-                        href: self.getMerchant().user_confirmation_url + '?order_reference_id=' + referenceID
+                        href: self.getMerchant(type).user_confirmation_url + '?order_reference_id=' + referenceID
                     },
                     customer: self.getCustomer(basket)
                 };
