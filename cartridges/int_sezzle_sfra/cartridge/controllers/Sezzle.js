@@ -47,13 +47,14 @@ server.get('Redirect', function (req, res, next) {
         logger.error('Redirection - {0}', erMsg);
     }
 
-    res.render('sezzle/sezzleRedirect', {
+    res.render('sezzle/sezzleRedirect', { 
         SezzleRedirectUrl: redirectURL
     });
 
 
     if (!error) {
-        session.privacy.sezzled = true;
+		sezzleHelper.GatherInfoFromSezzleCheckout(checkoutObject);
+        /*session.privacy.sezzled = true;
         session.privacy.sezzleOrderAmount = checkoutObject.checkout.amount_in_cents;
         session.privacy.referenceId = checkoutObject.checkout.reference_id;
         session.privacy.orderUUID = sezzleOrderUUID;
@@ -94,7 +95,7 @@ server.get('Redirect', function (req, res, next) {
             session.privacy.customerUUID = checkoutObject.tokenize.customer_uuid || '';
             session.privacy.customerUUIDExpiration = checkoutObject.tokenize.customer_uuid_expiration || '';
             logger.info('Tokenize records has been successfully gathered into session');
-        }
+        }*/
     }
     return next();
 });

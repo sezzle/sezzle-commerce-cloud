@@ -69,48 +69,7 @@ function redirect() {
         SezzleRedirectUrl: redirectURL
     });
 
-    session.privacy.sezzled = true;
-    session.privacy.sezzleOrderAmount = checkoutObject.checkout.amount_in_cents;
-    session.privacy.referenceId = checkoutObject.checkout.reference_id;
-    session.privacy.orderUUID = sezzleOrderUUID;
-    var orderLinks = checkoutObject.checkout.order_links;
-
-    if (orderLinks) {
-        for (var k = 0; k < orderLinks.length; k++) { // eslint-disable-line no-plusplus
-            var link = orderLinks[k],
-                rel = link.rel,
-                method = link.method;
-            switch (rel) {
-                case 'self':
-                    if (method == 'GET') {
-                        session.privacy.getOrderLink = link.href;
-                    } else if (method == 'PATCH') {
-                        session.privacy.updateOrderLink = link.href;
-                    }
-                    break;
-                case 'capture':
-                    session.privacy.capturePaymentLink = link.href;
-                    break;
-                case 'refund':
-                    session.privacy.refundPaymentLink = link.href;
-                    break;
-                case 'release':
-                    session.privacy.releasePaymentLink = link.href;
-                    break;
-                default:
-                    break;
-            }
-        }
-        logger.info('Order Links has been successfully gathered into session');
-    }
-
-    if (checkoutObject.tokenize) {
-        session.privacy.token = checkoutObject.tokenize.token || '';
-        session.privacy.tokenExpiration = checkoutObject.tokenize.token_expiration || '';
-        session.privacy.customerUUID = checkoutObject.tokenize.customer_uuid || '';
-        session.privacy.customerUUIDExpiration = checkoutObject.tokenize.customer_uuid_expiration || '';
-        logger.info('Tokenize records has been successfully gathered into session');
-    }
+	sezzleHelper.GatherInfoFromSezzleCheckout(checkoutObject);
 
     return {
 		error: false
@@ -193,12 +152,15 @@ function success() {
         return {};
     } else if (placeOrderResult.order_created) {
         app.getController('COSummary').ShowConfirmation(placeOrderResult.Order);
-        Transaction.wrap(function () {
-			placeOrderResult.Order.setStatus(OrderModel.ORDER_STATUS_COMPLETED);
-			placeOrderResult.Order.setPaymentStatus(OrderModel.PAYMENT_STATUS_PAID);
-            logger.info("Order and payment status changed to Completed and Paid");
-            logger.info("****Checkout Completed****");
-		});
+		if (String(sezzleData.getSezzlePaymentAction()) === 'CAPTURE') {
+	        Transaction.wrap(function () {
+				placeOrderResult.Order.setStatus(OrderModel.ORDER_STATUS_COMPLETED);
+				placeOrderResult.Order.setPaymentStatus(OrderModel.PAYMENT_STATUS_PAID);
+	            logger.info("Order and payment status changed to Completed and Paid");
+	            
+			});
+		}
+		logger.info("****Checkout Completed****");
     }
 }
 

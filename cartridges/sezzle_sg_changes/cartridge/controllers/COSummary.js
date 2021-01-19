@@ -71,16 +71,6 @@ function submit() {
 	start({
         PlaceOrderError: redirectStatus.RedirectError
     });
-
-
-    /*var placeOrderResult = app.getController('COPlaceOrder').Start();
-    if (placeOrderResult.error) {
-        start({
-            PlaceOrderError: placeOrderResult.PlaceOrderError
-        });
-    } else if (placeOrderResult.order_created) {
-        showConfirmation(placeOrderResult.Order);
-    }*/
 }
 
 /**
