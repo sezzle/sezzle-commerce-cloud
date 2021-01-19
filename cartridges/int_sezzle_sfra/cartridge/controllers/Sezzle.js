@@ -54,48 +54,6 @@ server.get('Redirect', function (req, res, next) {
 
     if (!error) {
 		sezzleHelper.GatherInfoFromSezzleCheckout(checkoutObject);
-        /*session.privacy.sezzled = true;
-        session.privacy.sezzleOrderAmount = checkoutObject.checkout.amount_in_cents;
-        session.privacy.referenceId = checkoutObject.checkout.reference_id;
-        session.privacy.orderUUID = sezzleOrderUUID;
-        var orderLinks = checkoutObject.checkout.order_links;
-
-        if (orderLinks) {
-            for (var k = 0; k < orderLinks.length; k++) { // eslint-disable-line no-plusplus
-                var link = orderLinks[k],
-                    rel = link.rel,
-                    method = link.method;
-                switch (rel) {
-                    case 'self':
-                        if (method == 'GET') {
-                            session.privacy.getOrderLink = link.href;
-                        } else if (method == 'PATCH') {
-                            session.privacy.updateOrderLink = link.href;
-                        }
-                        break;
-                    case 'capture':
-                        session.privacy.capturePaymentLink = link.href;
-                        break;
-                    case 'refund':
-                        session.privacy.refundPaymentLink = link.href;
-                        break;
-                    case 'release':
-                        session.privacy.releasePaymentLink = link.href;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            logger.info('Order Links has been successfully gathered into session');
-        }
-
-        if (checkoutObject.tokenize) {
-            session.privacy.token = checkoutObject.tokenize.token || '';
-            session.privacy.tokenExpiration = checkoutObject.tokenize.token_expiration || '';
-            session.privacy.customerUUID = checkoutObject.tokenize.customer_uuid || '';
-            session.privacy.customerUUIDExpiration = checkoutObject.tokenize.customer_uuid_expiration || '';
-            logger.info('Tokenize records has been successfully gathered into session');
-        }*/
     }
     return next();
 });
