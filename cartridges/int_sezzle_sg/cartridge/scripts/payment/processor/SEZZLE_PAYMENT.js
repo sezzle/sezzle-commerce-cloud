@@ -43,10 +43,6 @@ function authorize(args) {
         paymentInstrument.paymentTransaction.amount = new Money(session.privacy.sezzleOrderAmount, order.currencyCode).divide(100);
         paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
         var sezzleResponseObject = {
-            // reference_id: session.privacy.referenceId,
-            // events: [{ id: session.privacy.sezzleFirstEventID }],
-            // amount: session.privacy.sezzleOrderAmount,
-            // type: 'sg'
             reference_id: session.privacy.referenceId,
             order_uuid: session.privacy.orderUUID,
             events: [{ id: session.privacy.sezzleFirstEventID }],

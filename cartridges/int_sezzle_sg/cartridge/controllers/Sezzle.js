@@ -39,7 +39,9 @@ function redirect() {
     logger.info("****Checkout Started****");
     logger.info('Selected Payment Method Id - {0}', CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value);
     if (!CurrentForms.billing.paymentMethods.selectedPaymentMethodID.value.equals(SEZZLE_PAYMENT_METHOD)) {
-		return false;
+        return {
+            isSezzle: false
+        };
 	}
     var basket = BasketMgr.getCurrentBasket();
 	var checkoutObject = sezzle.basket.initiateCheckout(basket, 'SG');
@@ -79,23 +81,6 @@ function redirect() {
 function init(basket, applicablePaymentMethods) {
     return sezzle.basket.validatePayments(basket,
         applicablePaymentMethods);
-}
-
-function postProcess(order) {
-    try {
-        Transaction.wrap(function () {
-            var isCaptured = sezzle.order.captureOrder(order, 'v1');
-			if (!isCaptured) {
-				throw new Error('Capture Payment Error');
-			}
-            order.custom.SezzleCapturedAmount = order.totalGrossPrice.toString();
-            order.custom.SezzleStatus = 'CAPTURE';
-        });
-    } catch (e) {
-        logger.error('Sezzle Capturing error. Details - {0}', e);
-        return { error: true };
-    }
-    return { error: false };
 }
 
 function handlePayments(order) {
@@ -157,7 +142,7 @@ function success() {
 				placeOrderResult.Order.setStatus(OrderModel.ORDER_STATUS_COMPLETED);
 				placeOrderResult.Order.setPaymentStatus(OrderModel.PAYMENT_STATUS_PAID);
 	            logger.info("Order and payment status changed to Completed and Paid");
-	            
+
 			});
 		}
 		logger.info("****Checkout Completed****");
@@ -298,7 +283,5 @@ function clearForms() {
  * gift certificates in basket
  */
 exports.Redirect = redirect;
-exports.Success = guard.ensure(['get'],
-    success);
-exports.PostProcess = postProcess;
+exports.Success = guard.ensure(['get'], success);
 exports.Init = init;

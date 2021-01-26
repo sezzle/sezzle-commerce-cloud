@@ -27,9 +27,7 @@
                 var orderObj = order;
                 orderObj.custom.SezzleExternalId = response.reference_id;
                 orderObj.custom.SezzlePaymentAction = (response.order_uuid && response.order_uuid !== 'undefined') ? String(data.getSezzlePaymentAction()) : 'CAPTURE';
-                // if (response.type === 'sfra') {
                 orderObj.custom.SezzleOrderUUID = (response.order_uuid && response.order_uuid !== 'undefined') ? response.order_uuid : '';
-                // }
                 orderObj.custom.SezzleOrderAmount = new Money(response.amount, orderObj.currencyCode).divide(100);
                 if (!empty(response.order_links)) {
                     orderObj.custom.SezzleGetOrderLink = response.order_links.get_order;

@@ -263,7 +263,7 @@
 
 	<div class="product-actions">
 		<isscript>
-			var Url = require('~/cartridge/scripts/util/Url');
+			var Url = require('*/cartridge/scripts/util/Url');
 			pdict.url = Url.getCurrent(pdict);
 			pdict.title = pdict.Product.name;
 		</isscript>

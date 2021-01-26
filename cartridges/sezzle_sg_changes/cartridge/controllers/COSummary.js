@@ -64,6 +64,18 @@ function submit() {
     // If the order creation failed, it returns a JSON object with an error key and a boolean value.
 
 	var redirectStatus = require('*/cartridge/controllers/Sezzle').Redirect();
+	if (!redirectStatus.isSezzle) {
+		var placeOrderResult = app.getController('COPlaceOrder').Start();
+	    if (placeOrderResult.error) {
+	        start({
+	            PlaceOrderError: placeOrderResult.PlaceOrderError
+	        });
+	    } else if (placeOrderResult.order_created) {
+	        showConfirmation(placeOrderResult.Order);
+	    }
+        return;
+	} 
+	
 	if (!redirectStatus.error) {
         return;
 	}
