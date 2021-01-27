@@ -62,7 +62,8 @@ function redirect() {
         logger.error('Redirection - {0}', erMsg);
 		return {
             error: true,
-            RedirectError: new Status(Status.ERROR, erMsg)
+            RedirectError: new Status(Status.ERROR, erMsg),
+			isSezzle: true
         };
     }
 
@@ -74,7 +75,8 @@ function redirect() {
 	sezzleHelper.GatherInfoFromSezzleCheckout(checkoutObject);
 
     return {
-		error: false
+		error: false,
+		isSezzle: true
 	};
 }
 
