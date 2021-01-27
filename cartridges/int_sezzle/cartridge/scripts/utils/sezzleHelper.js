@@ -191,10 +191,46 @@ function isSezzleApplicable() {
     return !(!basket.getGiftCertificateLineItems().empty || !sezzle.data.getSezzleOnlineStatus() || sezzle.data.getSezzlePaymentOnlineStatus() || !sezzle.utils.checkBasketTotalRange('object' in basket ? basket.object : basket));
 }
 
+/**
+ * Gather Info from Sezzle Checkout
+ */
+function gatherInfoFromSezzleCheckout(checkoutObject) {
+	session.privacy.sezzled = true;
+    session.privacy.sezzleOrderAmount = checkoutObject.checkout.amount_in_cents;
+    session.privacy.referenceId = checkoutObject.checkout.reference_id;
+    session.privacy.orderUUID = checkoutObject.checkout.order_uuid;
+    var orderLinks = checkoutObject.checkout.order_links;
+
+    if (!orderLinks.length) {
+		return;
+	}
+	var findLink = function(m, r) {
+		var obj = orderLinks.filter(l => l.method === m && l.rel === r);
+		return obj.length ? obj[0].href : '';
+	}
+	
+	session.privacy.getOrderLink = findLink('GET', 'self');
+	session.privacy.updateOrderLink = findLink('PATCH', 'self');
+	session.privacy.capturePaymentLink = findLink('POST', 'capture');
+	session.privacy.refundPaymentLink = findLink('POST', 'refund');
+	session.privacy.releasePaymentLink = findLink('POST', 'release');
+    logger.info('Order Links has been successfully gathered into session');
+
+    if (!checkoutObject.tokenize) {
+		return;
+	}
+    session.privacy.token = checkoutObject.tokenize.token || '';
+    session.privacy.tokenExpiration = checkoutObject.tokenize.token_expiration || '';
+    session.privacy.customerUUID = checkoutObject.tokenize.customer_uuid || '';
+    session.privacy.customerUUIDExpiration = checkoutObject.tokenize.customer_uuid_expiration || '';
+    logger.info('Tokenize records has been successfully gathered into session');
+}
+
 module.exports = {
     Init: init,
     CheckCart: checkCart,
     StoreTokenizeRecord: storeTokenizeRecord,
     PostProcess: postProcess,
-    IsSezzleApplicable: isSezzleApplicable
+    IsSezzleApplicable: isSezzleApplicable,
+	GatherInfoFromSezzleCheckout: gatherInfoFromSezzleCheckout
 };

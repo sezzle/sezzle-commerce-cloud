@@ -10,6 +10,7 @@ var BasketMgr = require('dw/order/BasketMgr');
 var PaymentMgr = require('dw/order/PaymentMgr');
 var Transaction = require('dw/system/Transaction');
 var sezzleUtils = require('*/cartridge/scripts/sezzle');
+var Money = require('dw/value/Money');
 var logger = require('dw/system').Logger.getLogger('Sezzle', 'sezzle');
 
 /*
@@ -39,12 +40,21 @@ function authorize(args) {
 
     Transaction.wrap(function () {
         paymentInstrument.paymentTransaction.transactionID = reference_id;
+        paymentInstrument.paymentTransaction.amount = new Money(session.privacy.sezzleOrderAmount, order.currencyCode).divide(100);
         paymentInstrument.paymentTransaction.paymentProcessor = paymentProcessor;
         var sezzleResponseObject = {
             reference_id: session.privacy.referenceId,
+            order_uuid: session.privacy.orderUUID,
             events: [{ id: session.privacy.sezzleFirstEventID }],
             amount: session.privacy.sezzleOrderAmount,
-            type: 'sg'
+            type: 'sg',
+            order_links: {
+                get_order: session.privacy.getOrderLink,
+                update_order: session.privacy.updateOrderLink,
+                capture_payment: session.privacy.capturePaymentLink,
+                refund_payment: session.privacy.refundPaymentLink,
+                release_payment: session.privacy.releasePaymentLink
+            }
         };
         sezzleUtils.order.updateAttributes(order, sezzleResponseObject);
     });

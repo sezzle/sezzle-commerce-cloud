@@ -229,7 +229,7 @@
          * @param {dw.order.Basket}  basket Basket
          * @returns {Object} checkout data object in JSON format
          */
-        self.initiateCheckout = function (basket) {
+        self.initiateCheckout = function (basket, type) {
             var referenceID = sezzleUtils.generateUUID();
             var customerTokenRecord = self.getCustomerTokenRecord(basket.customer.profile);
             var returnObj = {};
@@ -255,7 +255,7 @@
                     var orderResponse = sezzleOrder.createOrder(requestObject);
                     if (orderResponse !== null && !orderResponse.error) {
                         returnObj.checkout.approved = orderResponse.response.authorization.approved;
-                        returnObj.checkout.checkout_url = self.getMerchant().user_confirmation_url + '?order_reference_id=' + referenceID;
+                        returnObj.checkout.checkout_url = self.getMerchant(type).user_confirmation_url + '?order_reference_id=' + referenceID;
                         returnObj.checkout.order_uuid = orderResponse.response.uuid;
                         returnObj.checkout.order_links = orderResponse.response.links;
                         returnObj.tokenize = {
@@ -268,10 +268,10 @@
                 logger.info('Typical Checkout');
                 var checkoutObject = {
                     cancel_url: {
-                        href: self.getMerchant().user_cancel_url
+                        href: self.getMerchant(type).user_cancel_url
                     },
                     complete_url: {
-                        href: self.getMerchant().user_confirmation_url + '?order_reference_id=' + referenceID
+                        href: self.getMerchant(type).user_confirmation_url + '?order_reference_id=' + referenceID
                     },
                     customer: self.getCustomer(basket)
                 };
@@ -306,6 +306,7 @@
          *
          * @param {dw.order.Basket}  basket Basket
          * @returns {Object} checkout data object in JSON format
+		 * @deprecated
          */
         self.initiateV1Checkout = function (basket) {
             var orderRefID = sezzleUtils.generateUUID();

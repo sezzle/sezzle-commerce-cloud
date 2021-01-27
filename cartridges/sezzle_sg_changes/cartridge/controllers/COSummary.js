@@ -63,20 +63,26 @@ function submit() {
     // COPlaceOrder returns a JSON object with an order_created key and a boolean value if the order was created successfully.
     // If the order creation failed, it returns a JSON object with an error key and a boolean value.
 
-	var redirected = require('*/cartridge/controllers/Sezzle').Redirect();
-	if (redirected) {
-    		return;
+	var redirectStatus = require('*/cartridge/controllers/Sezzle').Redirect();
+	if (!redirectStatus.isSezzle) {
+		var placeOrderResult = app.getController('COPlaceOrder').Start();
+	    if (placeOrderResult.error) {
+	        start({
+	            PlaceOrderError: placeOrderResult.PlaceOrderError
+	        });
+	    } else if (placeOrderResult.order_created) {
+	        showConfirmation(placeOrderResult.Order);
+	    }
+        return;
+	} 
+	
+	if (!redirectStatus.error) {
+        return;
 	}
-
-
-    var placeOrderResult = app.getController('COPlaceOrder').Start();
-    if (placeOrderResult.error) {
-        start({
-            PlaceOrderError: placeOrderResult.PlaceOrderError
-        });
-    } else if (placeOrderResult.order_created) {
-        showConfirmation(placeOrderResult.Order);
-    }
+	
+	start({
+        PlaceOrderError: redirectStatus.RedirectError
+    });
 }
 
 /**
