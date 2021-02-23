@@ -15,6 +15,7 @@
         var data = require('~/cartridge/scripts/data/sezzleData');
         var v2 = require('~/cartridge/scripts/api/v2');
         var v1 = require('~/cartridge/scripts/api/v1');
+		var sezzleUtils = require('*/cartridge/scripts/utils/sezzleUtils');
 
         /**
          * Updates PaymentInstrument and Order system objects
@@ -46,14 +47,11 @@
          * Capture payment
          *
          * @param {dw.order.Order} order Order
-         * @param {string} apiVersion Api Version v1/v2
+         * @param {dw.value.Money} amount Capture Amount
 		 * @returns {boolean} status
          */
-        this.captureOrder = function (order, apiVersion) {
-            if (apiVersion === 'v1') {
-                return captureResponse = v1.capture(order.custom.SezzleExternalId);
-            }
-			var captureAmount = order.totalGrossPrice.multiply(100).getValue();
+        this.captureOrder = function (order, amount) {
+			var captureAmount = amount.multiply(100).getValue();
         	return v2.capture(order, captureAmount, false);
         };
 
