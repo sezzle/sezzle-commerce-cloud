@@ -15,7 +15,7 @@
          * Calculate non-gift certificate amount
          *
          * @param {dw.order.Basket}  basket Basket
-         * @returns {dw.value.Money} simple object with name and shipping address
+         * @returns {dw.value.Money} money object
          */
         self.calculateNonGiftCertificateAmount = function (basket) {
             var basketTotal = basket.getTotalGrossPrice();
@@ -28,6 +28,25 @@
             }
 
             return basketTotal.subtract(giftCertTotal);
+        };
+
+		/**
+         * Calculate non-gift certificate order amount
+         *
+         * @param {dw.order.Order}  order Order
+         * @returns {dw.value.Money} money object
+         */
+        self.calculateNonGiftCertificateOrderAmount = function (order) {
+            var orderTotal = order.getTotalGrossPrice();
+            var giftCertTotal = new values.Money(0.0, order.getCurrencyCode());
+            var giftCertificatePaymentInstrs = order.getGiftCertificatePaymentInstruments().iterator();
+
+            while (!empty(giftCertificatePaymentInstrs) && giftCertificatePaymentInstrs.hasNext()) {
+                var orderPI = giftCertificatePaymentInstrs.next();
+                giftCertTotal = giftCertTotal.add(orderPI.getPaymentTransaction().getAmount());
+            }
+
+            return orderTotal.subtract(giftCertTotal);
         };
 
         /**

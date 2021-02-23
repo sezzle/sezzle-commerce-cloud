@@ -1,6 +1,6 @@
 {
   "name": "int_sezzle_sfra",
-  "version": "21.2.1",
+  "version": "21.2.2",
   "description": "Sezzle LINK Cartridge(Controller and SFRA)",
   "main": "index.js",
   "scripts": {

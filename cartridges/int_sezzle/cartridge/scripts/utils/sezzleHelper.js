@@ -145,14 +145,14 @@ function postProcess(order) {
     try {
         Transaction.wrap(function () {
             if (canCapture) {
-                var isCaptured = sezzle.order.captureOrder(orderObj);
+				var captureAmount = sezzle.utils.calculateNonGiftCertificateOrderAmount(order);
+                var isCaptured = sezzle.order.captureOrder(orderObj, captureAmount);
 				if (!isCaptured) {
 					throw new Error('Capture Payment Error');
 				}
-                orderObj.custom.SezzleCapturedAmount = orderObj.totalGrossPrice.toString();
+                orderObj.custom.SezzleCapturedAmount = captureAmount.toString();
                 orderObj.setPaymentStatus(Order.PAYMENT_STATUS_PAID);
                 logger.info('Payment has been captured successfully by Sezzle');
-
             }
             if (orderObj.custom.SezzleOrderUUID) {
                 var sezzleOrder = sezzle.order.getOrderByOrderUUID(orderObj);
