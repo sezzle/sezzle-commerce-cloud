@@ -23,7 +23,7 @@
         "eslint-plugin-import": "2.26.0",
         "istanbul": "^0.4.4",
         "mocha": "^2.5.3",
-        "node-sass": "^4.9.0",
+        "node-sass": "7.0.1",
         "postcss-loader": "^2.1.5",
         "properties-parser": "^0.3.1",
         "proxyquire": "1.8.0",
