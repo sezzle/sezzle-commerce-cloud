@@ -1,8 +1,6 @@
 include:
   - project: 'DevOps/templates'
     ref: 'v2.0.4'
-    file:
-      - '.compile/js.yml'
 
 variables:
   JIRA_PROJECT_NAME: "MERCHANT"
