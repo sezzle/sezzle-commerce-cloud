@@ -6,5 +6,11 @@
     "preview:dockerVersions"
   ],
   "minimumReleaseAge": "3 days",
-  "enabled": false
+  "packageRules": [
+    {
+      "description": "Only devDependencies are managed; runtime dependencies are excluded",
+      "matchDepTypes": ["dependencies"],
+      "enabled": false
+    }
+  ]
 }
