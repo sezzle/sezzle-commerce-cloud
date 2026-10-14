@@ -8,9 +8,19 @@
   "minimumReleaseAge": "3 days",
   "packageRules": [
     {
-      "description": "Only devDependencies are managed; runtime dependencies are excluded",
-      "matchDepTypes": ["dependencies"],
+      "description": "Disable everything by default",
+      "matchPackageNames": [
+        "*"
+      ],
       "enabled": false
+    },
+    {
+      "description": "Only devDependencies (and the security overrides) are managed",
+      "matchDepTypes": [
+        "devDependencies",
+        "overrides"
+      ],
+      "enabled": true
     }
   ]
 }

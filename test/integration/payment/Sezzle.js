@@ -1,3 +1,5 @@
+'use strict';
+
 var assert = require('chai').assert;
 var https = require('https');
 var config = require('../it.config');
@@ -20,10 +22,10 @@ function get(url) {
             });
             res.on('end', function () {
                 if (res.statusCode < 200 || res.statusCode >= 300) {
-                    reject(new Error('Request failed with status ' + res.statusCode));
-                } else {
-                    resolve(body);
+                    return reject(new Error('Request failed with status ' + res.statusCode));
                 }
+
+                return resolve(body);
             });
         }).on('error', reject);
     });
