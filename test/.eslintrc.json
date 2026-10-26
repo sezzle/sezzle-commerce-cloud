@@ -1,6 +1,7 @@
 {
   "env": {
-    "mocha": true
+    "mocha": true,
+    "es6": true
   },
   "rules": {
     "require-jsdoc": "off",
@@ -10,5 +11,3 @@
     "valid-jsdoc": "off"
   }
 }
-
-

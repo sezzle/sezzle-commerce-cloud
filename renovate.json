@@ -6,5 +6,21 @@
     "preview:dockerVersions"
   ],
   "minimumReleaseAge": "3 days",
-  "enabled": false
+  "packageRules": [
+    {
+      "description": "Disable everything by default",
+      "matchPackageNames": [
+        "*"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Only devDependencies (and the security overrides) are managed",
+      "matchDepTypes": [
+        "devDependencies",
+        "overrides"
+      ],
+      "enabled": true
+    }
+  ]
 }
