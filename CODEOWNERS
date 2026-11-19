@@ -1,1 +1,4 @@
 * @team/integrations @team/merchant
+
+[gatekeeper]
+**/CODEOWNERS @gatekeeper
