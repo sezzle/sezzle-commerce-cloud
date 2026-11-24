@@ -247,20 +247,6 @@
         };
 
         /**
-         * Get Query String from URL
-         *
-         * @param {string}  field Field
-         * @param {string}  url URL
-         * @returns {string} query string
-         */
-        self.getQueryString = function (field, url) {
-            var href = url;
-            var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
-            var string = reg.exec(href);
-            return string ? string[1] : null;
-        };
-
-        /**
          * Check total basket range
          *
          * @param {dw.order.Basket}  basket Basket
